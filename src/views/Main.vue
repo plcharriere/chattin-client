@@ -25,6 +25,7 @@
 				<MessageList
 					:messages="getChannelMessages(currentChannelUuid)"
 					:users="users"
+					@scrolledTop="onMessageListScrolledTop"
 				/>
         <textarea
           class="message"
@@ -43,12 +44,13 @@ import { Options, Vue } from "vue-class-component";
 import router from "../router/index";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
-import { Message, MessageInput } from "@/dto/Message";
+import { Message, MessageHistoryRequest, MessageInput } from "@/dto/Message";
 import { Packet, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/UserList.vue";
+import { watch } from "@vue/runtime-core";
 
 @Options({
   props: {},
@@ -58,6 +60,11 @@ import UserList from "@/components/UserList.vue";
     MessageList,
     UserList,
   },
+	watch: {
+		currentChannelUuid(uuid) {
+			this.onChangedCurrentChannelUuid(uuid);
+		}
+	}
 })
 export default class Main extends Vue {
   loading = true;
@@ -76,6 +83,28 @@ export default class Main extends Vue {
   currentChannelUuid = "";
   currentUserUuid = "";
 
+	getChannelMessageHistory(channelUuid: string, fromMessageUuid: string, count: number) {
+		this.sendPacket(PacketType.GET_MESSAGES, {
+				channelUuid,
+				fromMessageUuid,
+				count,
+			} as MessageHistoryRequest)
+	}
+
+	onMessageListScrolledTop() {
+		const channelMessages = this.messages.filter((message) => message.channelUuid === this.currentChannelUuid);
+		if (channelMessages && channelMessages.length > 0)
+			this.getChannelMessageHistory(this.currentChannelUuid, channelMessages[0].uuid, 50);
+	}
+
+	onChangedCurrentChannelUuid(uuid: string) {
+		if (this.messages.filter((message) => message.channelUuid === uuid).length === 0) {
+			const channel = this.getChannelByUuid(uuid);
+			if (channel && channel.saveMessages)
+				this.getChannelMessageHistory(uuid, "", 50);
+		}
+	}
+
   setCurrentChannelUuid(uuid: string) {
     this.currentChannelUuid = uuid;
   }
@@ -85,9 +114,7 @@ export default class Main extends Vue {
   }
 
   getUserByUuid(uuid: string): User | undefined {
-    const user = this.users.find((user) => user.uuid === uuid);
-    //console.log(user);
-    return user;
+    return this.users.find((user) => user.uuid === uuid);
   }
 
   sendPacket(type: PacketType, data: any = "") {
@@ -221,6 +248,24 @@ export default class Main extends Vue {
         );
         if (userIndex >= 0) this.users.splice(userIndex, 1);
       }
+    } else if (packet.type === PacketType.GET_MESSAGES) {
+      console.log("RECEIVED GET_MESSAGES:", packet.data);
+			if (packet.data) {
+				for (let i = 0; i < packet.data.length; i++) {
+						let message: Message = {
+						uuid: packet.data[i].uuid,
+						channelUuid: packet.data[i].channelUuid,
+						userUuid: packet.data[i].userUuid,
+						date: new Date(packet.data[i].date),
+						edited: packet.data[i].edited,
+						content: packet.data[i].content,
+					};
+					this.messages.push(message);
+					this.messages = this.messages.sort(function(message1, message2){
+						return new Date(message1.date).getTime() - new Date(message2.date).getTime();
+					});
+				}
+			}
     }
 
     if (this.channels.length > 0 && this.users.length > 0) {

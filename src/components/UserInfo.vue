@@ -22,7 +22,6 @@ import UserListItem from "@/components/UserListItem.vue";
 })
 export default class UserInfo extends Vue {
   getUserName(user: User): string {
-    console.log(user);
     if (user) return user.nickname.length > 0 ? user.nickname : user.login;
     return "";
   }

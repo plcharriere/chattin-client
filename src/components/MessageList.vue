@@ -46,8 +46,15 @@ import UserAvatar from "@/components/UserAvatar.vue";
   }
 })
 export default class MessageList extends Vue {
+	mounted() {
+		this.$el.addEventListener("scroll", () => {
+			if (this.$el.scrollTop === 0) {
+				this.$emit("scrolledTop")
+			}
+		});
+	}
 	scrollElemIfBottom() {
-    if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
+		if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
 			this.$nextTick().then(() => {
 				this.$el.scrollTop = this.$el.scrollHeight
 			});
@@ -55,7 +62,6 @@ export default class MessageList extends Vue {
 	}
 
   getUserByUuid(users: User[], uuid: string): User | undefined {
-    //console.log(this.aaa);
     return users.find((user) => user.uuid === uuid);
   }
 
