@@ -152,8 +152,12 @@ export default class Main extends Vue {
         this.$store.state.token = "";
         this.$router.push("/login");
       }
-    } else if (packet.type == PacketType.USER_LIST) {
-      this.users = [];
+    } else if (packet.type === PacketType.USER_LIST || packet.type === PacketType.ADD_USERS) {
+			if (packet.type === PacketType.USER_LIST) {
+      	console.log("RECEIVED USER_LIST:", packet.data);
+      	this.users = [];
+			} else
+      	console.log("RECEIVED ADD_USERS:", packet.data);
       for (let i = 0; i < packet.data.length; i++) {
         let user: User = {
           uuid: packet.data[i].uuid,
@@ -163,7 +167,6 @@ export default class Main extends Vue {
         };
         this.users.push(user);
       }
-      console.log("RECEIVED USER_LIST:", this.users);
       this.ws.send(
         JSON.stringify({
           type: PacketType.ONLINE_USERS,
@@ -211,6 +214,14 @@ export default class Main extends Vue {
           (user) => user.uuid == packet.data[i]
         );
         if (userIndex >= 0) this.users[userIndex].online = false;
+      }
+    } else if (packet.type === PacketType.REMOVE_USERS) {
+      console.log("RECEIVED REMOVE_USERS:", packet.data);
+      for (let i = 0; i < packet.data.length; i++) {
+        const userIndex = this.users.findIndex(
+          (user) => user.uuid == packet.data[i]
+        );
+        if (userIndex >= 0) this.users.splice(userIndex, 1);
       }
     }
 
