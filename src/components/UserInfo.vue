@@ -1,8 +1,5 @@
 <template>
-  <div class="user">
-    <img class="avatar" />
-    <div class="name">{{ getUserName(user) }}</div>
-  </div>
+	<UserListItem :user="user" />
 </template>
 
 <script lang="ts">
@@ -10,8 +7,12 @@ import { Options, Vue } from "vue-class-component";
 import router from "../router/index";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
+import UserListItem from "@/components/UserListItem.vue";
 
 @Options({
+	components: {
+		UserListItem
+	},
   props: {
     user: {
       type: Object as PropType<User>,
@@ -36,16 +37,5 @@ export default class UserInfo extends Vue {
   width: 200px;
   padding: 20px 20px;
   align-items: center;
-
-  .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 100%;
-    background: #ddd;
-  }
-
-  .name {
-    padding-left: 10px;
-  }
 }
 </style>

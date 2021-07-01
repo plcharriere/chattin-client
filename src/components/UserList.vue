@@ -6,14 +6,11 @@
         <div class="separator"></div>
         <div>{{ getOnlineUsers(users).length }}</div>
       </div>
-      <div
+			<UserListItem
         v-for="user in getOnlineUsers(users)"
         v-bind:key="user.uuid"
-        class="user online"
-      >
-        <img class="avatar" />
-        <div class="name">{{ getUserName(user) }}</div>
-      </div>
+				:user="user"
+      />
     </div>
     <div class="list" v-if="getOfflineUsers(users).length > 0">
       <div class="status">
@@ -21,14 +18,11 @@
         <div class="separator"></div>
         <div>{{ getOfflineUsers(users).length }}</div>
       </div>
-      <div
+      <UserListItem
         v-for="user in getOfflineUsers(users)"
         v-bind:key="user.uuid"
-        class="user offline"
-      >
-        <img class="avatar" />
-        <div class="name">{{ getUserName(user) }}</div>
-      </div>
+				:user="user"
+      />
     </div>
   </div>
 </template>
@@ -38,8 +32,12 @@ import { Options, Vue } from "vue-class-component";
 import router from "../router/index";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
+import UserListItem from "@/components/UserListItem.vue";
 
 @Options({
+	components: {
+		UserListItem
+	},
   props: {
     users: {
       type: Array as PropType<User[]>,
@@ -91,31 +89,6 @@ export default class UserList extends Vue {
         flex-grow: 1;
         border-top: 1px solid #ddd;
         margin: 0px 16px;
-      }
-    }
-
-    .user {
-      display: flex;
-      flex-direction: row;
-      padding: 5px 10px;
-      margin: 4px 0;
-      align-items: center;
-      cursor: pointer;
-
-      .avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 100%;
-        background: #ddd;
-      }
-
-      .name {
-        padding-left: 10px;
-      }
-
-      &:hover {
-        background: #eee;
-        border-radius: 5px;
       }
     }
   }

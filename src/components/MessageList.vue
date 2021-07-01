@@ -1,8 +1,6 @@
 <template>
   <div class="message" v-for="message in messages" v-bind:key="message.uuid">
-    <img
-      class="avatar"
-    />
+    <UserAvatar :user="user" size="medium" />
     <div class="container">
       <div class="infos">
         <div class="name">{{ getMessageUserName(message, users) }}</div>
@@ -20,8 +18,12 @@ import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
+import UserAvatar from "@/components/UserAvatar.vue";
 
 @Options({
+	components: {
+		UserAvatar,
+	},
   props: {
     users: {
       type: Array as PropType<User[]>,
@@ -59,13 +61,6 @@ export default class MessageList extends Vue {
 
   &:hover {
     background: #eee;
-  }
-
-  .avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 100%;
-    background: #ddd;
   }
 
   .container {
