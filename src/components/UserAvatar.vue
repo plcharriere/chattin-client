@@ -3,10 +3,16 @@
 </template>
 
 <script lang="ts">
+import { User } from "@/dto/User";
+import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {
+    user: {
+      type: Object as PropType<User>,
+      required: true,
+    },
     size: {
       type: String,
       default: "medium",

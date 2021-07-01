@@ -4,7 +4,6 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import router from "../router/index";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserListItem from "@/components/UserListItem.vue";
@@ -20,12 +19,7 @@ import UserListItem from "@/components/UserListItem.vue";
     },
   },
 })
-export default class UserInfo extends Vue {
-  getUserName(user: User): string {
-    if (user) return user.nickname.length > 0 ? user.nickname : user.login;
-    return "";
-  }
-}
+export default class UserInfo extends Vue {}
 </script>
 
 <style scoped lang="scss">

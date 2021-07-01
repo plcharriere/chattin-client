@@ -29,7 +29,6 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import router from "../router/index";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserListItem from "@/components/UserListItem.vue";
@@ -52,10 +51,6 @@ export default class UserList extends Vue {
 
   getOfflineUsers(users: User[]): User[] {
     return users.filter((user) => user.online === false);
-  }
-
-  getUserName(user: User) {
-    return user.nickname.length > 0 ? user.nickname : user.login;
   }
 }
 </script>

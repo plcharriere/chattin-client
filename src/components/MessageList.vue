@@ -7,7 +7,7 @@
       />
       <div class="container">
         <div class="infos">
-          <div class="name">{{ getMessageUserName(message, users) }}</div>
+          <UserName :user="getUserByUuid(users, message.userUuid)" />
           <div class="date">{{ getMessageDateString(message) }}</div>
         </div>
         <div class="content">{{ message.content }}</div>
@@ -24,10 +24,12 @@ import { User } from "@/dto/User";
 import { PropType, watch } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
 import UserAvatar from "@/components/UserAvatar.vue";
+import UserName from "@/components/UserName.vue";
 
 @Options({
   components: {
     UserAvatar,
+    UserName,
   },
   props: {
     users: {
@@ -108,9 +110,6 @@ export default class MessageList extends Vue {
         margin-bottom: 6px;
         align-items: center;
 
-        .name {
-          font-weight: 500;
-        }
         .date {
           margin-left: 16px;
           font-size: 12px;

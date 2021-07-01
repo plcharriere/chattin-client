@@ -1,7 +1,7 @@
 <template>
   <div class="user">
     <UserAvatar :user="user" size="small" />
-    <div class="name">{{ getUserName(user) }}</div>
+    <UserName :user="user" class="name" />
   </div>
 </template>
 
@@ -10,10 +10,12 @@ import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 import UserAvatar from "@/components/UserAvatar.vue";
+import UserName from "@/components/UserName.vue";
 
 @Options({
   components: {
     UserAvatar,
+    UserName,
   },
   props: {
     user: {
@@ -22,11 +24,7 @@ import UserAvatar from "@/components/UserAvatar.vue";
     },
   },
 })
-export default class UserListItem extends Vue {
-  getUserName(user: User) {
-    return user.nickname.length > 0 ? user.nickname : user.login;
-  }
-}
+export default class UserListItem extends Vue {}
 </script>
 
 <style scoped lang="scss">
