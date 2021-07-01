@@ -22,12 +22,10 @@
         </div>
       </div>
       <div class="channel">
-        <div class="messages">
-          <MessageList
-            :messages="getChannelMessages(currentChannelUuid)"
-            :users="users"
-          />
-        </div>
+				<MessageList
+					:messages="getChannelMessages(currentChannelUuid)"
+					:users="users"
+				/>
         <textarea
           class="message"
           v-model="message"
@@ -316,14 +314,6 @@ export default class Main extends Vue {
 
       display: flex;
       flex-direction: column;
-
-      .messages {
-        flex-grow: 1;
-        min-width: 400px;
-        border-bottom: 1px solid #ddd;
-        height: 0;
-        overflow: auto;
-      }
 
       .message {
         min-height: 60px;

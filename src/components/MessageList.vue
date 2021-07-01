@@ -1,12 +1,17 @@
 <template>
-  <div class="message" v-for="message in messages" v-bind:key="message.uuid">
-    <UserAvatar :user="user" size="medium" />
-    <div class="container">
-      <div class="infos">
-        <div class="name">{{ getMessageUserName(message, users) }}</div>
-        <div class="date">{{ getMessageDateString(message) }}</div>
+  <div class="messages">
+    <div class="message" v-for="message in messages" v-bind:key="message.uuid">
+      <UserAvatar
+        :user="getUserByUuid(users, message.userUuid)"
+        size="medium"
+      />
+      <div class="container">
+        <div class="infos">
+          <div class="name">{{ getMessageUserName(message, users) }}</div>
+          <div class="date">{{ getMessageDateString(message) }}</div>
+        </div>
+        <div class="content">{{ message.content }}</div>
       </div>
-      <div class="content">{{ message.content }}</div>
     </div>
   </div>
 </template>
@@ -16,14 +21,14 @@ import { Options, Vue } from "vue-class-component";
 import router from "../router/index";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { PropType, watch } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
 import UserAvatar from "@/components/UserAvatar.vue";
 
 @Options({
-	components: {
-		UserAvatar,
-	},
+  components: {
+    UserAvatar,
+  },
   props: {
     users: {
       type: Array as PropType<User[]>,
@@ -34,8 +39,26 @@ import UserAvatar from "@/components/UserAvatar.vue";
       default: [],
     },
   },
+	watch: {
+    messages() {
+			this.scrollElemIfBottom();
+    }
+  }
 })
 export default class MessageList extends Vue {
+	scrollElemIfBottom() {
+    if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
+			this.$nextTick().then(() => {
+				this.$el.scrollTop = this.$el.scrollHeight
+			});
+		}
+	}
+
+  getUserByUuid(users: User[], uuid: string): User | undefined {
+    //console.log(this.aaa);
+    return users.find((user) => user.uuid === uuid);
+  }
+
   getMessageUserName(message: Message, users: User[]): string {
     const user = users.find((user) => user.uuid == message.userUuid);
     if (user) return user.nickname.length > 0 ? user.nickname : user.login;
@@ -53,32 +76,40 @@ export default class MessageList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.message {
-  display: flex;
-  flex-direction: row;
-  padding: 6px 20px;
-  margin: 12px 0;
+.messages {
+  flex-grow: 1;
+  min-width: 400px;
+  border-bottom: 1px solid #ddd;
+  height: 0;
+  overflow: auto;
 
-  &:hover {
-    background: #eee;
-  }
+  .message {
+    display: flex;
+    flex-direction: row;
+    padding: 6px 20px;
+    margin: 12px 0;
 
-  .container {
-    margin-left: 10px;
+    &:hover {
+      background: #eee;
+    }
 
-    .infos {
-      display: flex;
-      flex-direction: row;
-      margin-bottom: 6px;
-      align-items: center;
+    .container {
+      margin-left: 10px;
 
-      .name {
-        font-weight: 500;
-      }
-      .date {
-        margin-left: 16px;
-        font-size: 12px;
-        color: #777;
+      .infos {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 6px;
+        align-items: center;
+
+        .name {
+          font-weight: 500;
+        }
+        .date {
+          margin-left: 16px;
+          font-size: 12px;
+          color: #777;
+        }
       }
     }
   }
