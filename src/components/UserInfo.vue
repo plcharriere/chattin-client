@@ -1,5 +1,5 @@
 <template>
-	<UserListItem :user="user" />
+  <UserListItem :user="user" />
 </template>
 
 <script lang="ts">
@@ -10,9 +10,9 @@ import { PropType } from "@vue/runtime-core";
 import UserListItem from "@/components/UserListItem.vue";
 
 @Options({
-	components: {
-		UserListItem
-	},
+  components: {
+    UserListItem,
+  },
   props: {
     user: {
       type: Object as PropType<User>,

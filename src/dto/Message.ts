@@ -13,7 +13,7 @@ export interface MessageInput {
 }
 
 export interface MessageHistoryRequest {
-	channelUuid: string,
-	fromMessageUuid: string,
-	count: number,
+  channelUuid: string;
+  fromMessageUuid: string;
+  count: number;
 }

@@ -39,27 +39,27 @@ import UserAvatar from "@/components/UserAvatar.vue";
       default: [],
     },
   },
-	watch: {
+  watch: {
     messages() {
-			this.scrollElemIfBottom();
-    }
-  }
+      this.scrollElemIfBottom();
+    },
+  },
 })
 export default class MessageList extends Vue {
-	mounted() {
-		this.$el.addEventListener("scroll", () => {
-			if (this.$el.scrollTop === 0) {
-				this.$emit("scrolledTop")
-			}
-		});
-	}
-	scrollElemIfBottom() {
-		if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
-			this.$nextTick().then(() => {
-				this.$el.scrollTop = this.$el.scrollHeight
-			});
-		}
-	}
+  mounted() {
+    this.$el.addEventListener("scroll", () => {
+      if (this.$el.scrollTop === 0) {
+        this.$emit("scrolledTop");
+      }
+    });
+  }
+  scrollElemIfBottom() {
+    if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
+      this.$nextTick().then(() => {
+        this.$el.scrollTop = this.$el.scrollHeight;
+      });
+    }
+  }
 
   getUserByUuid(users: User[], uuid: string): User | undefined {
     return users.find((user) => user.uuid === uuid);

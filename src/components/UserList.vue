@@ -6,10 +6,10 @@
         <div class="separator"></div>
         <div>{{ getOnlineUsers(users).length }}</div>
       </div>
-			<UserListItem
+      <UserListItem
         v-for="user in getOnlineUsers(users)"
         v-bind:key="user.uuid"
-				:user="user"
+        :user="user"
       />
     </div>
     <div class="list" v-if="getOfflineUsers(users).length > 0">
@@ -21,7 +21,7 @@
       <UserListItem
         v-for="user in getOfflineUsers(users)"
         v-bind:key="user.uuid"
-				:user="user"
+        :user="user"
       />
     </div>
   </div>
@@ -35,9 +35,9 @@ import { PropType } from "@vue/runtime-core";
 import UserListItem from "@/components/UserListItem.vue";
 
 @Options({
-	components: {
-		UserListItem
-	},
+  components: {
+    UserListItem,
+  },
   props: {
     users: {
       type: Array as PropType<User[]>,
