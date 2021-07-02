@@ -43,7 +43,7 @@ import UserName from "@/components/UserName.vue";
   },
   watch: {
     messages() {
-      this.scrollElemIfBottom();
+      this.fixScroll();
     },
   },
 })
@@ -55,12 +55,16 @@ export default class MessageList extends Vue {
       }
     });
   }
-  scrollElemIfBottom() {
-    if (this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight) {
-      this.$nextTick().then(() => {
-        this.$el.scrollTop = this.$el.scrollHeight;
-      });
-    }
+
+  fixScroll() {
+    const isScrollBarAtTheBottom =
+      this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight;
+    const currentScrollHeight = this.$el.scrollHeight;
+    this.$nextTick().then(() => {
+      if (isScrollBarAtTheBottom) this.$el.scrollTop = this.$el.scrollHeight;
+      else if (this.$el.scrollTop === 0)
+        this.$el.scrollTop = this.$el.scrollHeight - currentScrollHeight;
+    });
   }
 
   getUserByUuid(users: User[], uuid: string): User | undefined {
@@ -107,6 +111,7 @@ export default class MessageList extends Vue {
       .infos {
         display: flex;
         flex-direction: row;
+        margin-top: 1px;
         margin-bottom: 6px;
         align-items: center;
 
