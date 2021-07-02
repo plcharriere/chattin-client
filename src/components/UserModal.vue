@@ -81,7 +81,7 @@ export default class UserModal extends Vue {}
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    padding: 50px;
+    padding: 50px 40px;
     align-items: flex-end;
     z-index: 2;
 
