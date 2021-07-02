@@ -1,8 +1,8 @@
 <template>
-	<div class="user">
-		<UserAvatar :user="user" size="small" />
-		<UserName :user="user" class="name" />
-	</div>
+  <div class="user">
+    <UserAvatar :user="user" size="small" />
+    <UserName :user="user" class="name" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -42,7 +42,7 @@ export default class UserInfo extends Vue {}
 
   &:hover {
     background: #eee;
-		cursor: pointer;
+    cursor: pointer;
   }
 }
 </style>

@@ -17,6 +17,10 @@ import { Options, Vue } from "vue-class-component";
       type: String,
       default: "medium",
     },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class UserAvatar extends Vue {}
@@ -36,8 +40,8 @@ export default class UserAvatar extends Vue {}
     height: 42px;
   }
   &.large {
-    width: 52px;
-    height: 52px;
+    width: 100px;
+    height: 100px;
   }
 }
 </style>

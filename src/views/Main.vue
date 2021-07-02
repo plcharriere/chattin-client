@@ -5,10 +5,18 @@
     <span v-else>totally <b title="not*">now</b> loading...</span>
   </div>
   <div v-else class="main">
+    <UserModal
+      v-if="showUserModal"
+      :user="getUserByUuid(currentUserUuid)"
+      :closeCallback="toggleUserModal"
+    />
     <div class="infos">
       <div class="server">Instant Messenger</div>
       <ChannelInfo :channel="getChannelByUuid(currentChannelUuid)" />
-      <UserInfo :user="getUserByUuid(currentUserUuid)" />
+      <UserInfo
+        :user="getUserByUuid(currentUserUuid)"
+        @click="toggleUserModal"
+      />
     </div>
     <div class="content">
       <div class="channels">
@@ -50,11 +58,13 @@ import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/UserList.vue";
+import UserModal from "@/components/UserModal.vue";
 import { watch } from "@vue/runtime-core";
 
 @Options({
   props: {},
   components: {
+    UserModal,
     ChannelInfo,
     UserInfo,
     MessageList,
@@ -82,6 +92,13 @@ export default class Main extends Vue {
 
   currentChannelUuid = "";
   currentUserUuid = "";
+
+  showUserModal = false;
+
+  toggleUserModal() {
+    console.log("aaa");
+    this.showUserModal = !this.showUserModal;
+  }
 
   getChannelMessageHistory(
     channelUuid: string,
