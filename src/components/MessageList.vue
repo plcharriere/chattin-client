@@ -18,10 +18,9 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import router from "../router/index";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
-import { PropType, watch } from "@vue/runtime-core";
+import { PropType } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
 import UserAvatar from "@/components/UserAvatar.vue";
 import UserName from "@/components/UserName.vue";
@@ -48,7 +47,7 @@ import UserName from "@/components/UserName.vue";
   },
 })
 export default class MessageList extends Vue {
-  mounted() {
+  mounted(): void {
     this.$el.addEventListener("scroll", () => {
       if (this.$el.scrollTop === 0) {
         this.$emit("scrolledTop");
@@ -56,7 +55,7 @@ export default class MessageList extends Vue {
     });
   }
 
-  fixScroll() {
+  fixScroll(): void {
     const isScrollBarAtTheBottom =
       this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight;
     const currentScrollHeight = this.$el.scrollHeight;
@@ -77,7 +76,7 @@ export default class MessageList extends Vue {
     return "Deleted User";
   }
 
-  getMessageDateString(message: Message) {
+  getMessageDateString(message: Message): string {
     if (isToday(message.date))
       return format(message.date, "'Today at' h:mm aa");
     if (isYesterday(message.date))

@@ -49,17 +49,15 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import router from "../router/index";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message, MessageHistoryRequest, MessageInput } from "@/dto/Message";
-import { Packet, PacketType } from "@/dto/Packet";
+import { Packet, PacketData, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/UserList.vue";
 import UserModal from "@/components/UserModal.vue";
-import { watch } from "@vue/runtime-core";
 
 @Options({
   props: {},
@@ -80,7 +78,7 @@ export default class Main extends Vue {
   loading = true;
   reconnecting = false;
 
-  ws: any = null;
+  ws: WebSocket | null = null;
 
   channels: Channel[] = [];
 
@@ -95,8 +93,7 @@ export default class Main extends Vue {
 
   showUserModal = false;
 
-  toggleUserModal() {
-    console.log("aaa");
+  toggleUserModal(): void {
     this.showUserModal = !this.showUserModal;
   }
 
@@ -104,7 +101,7 @@ export default class Main extends Vue {
     channelUuid: string,
     fromMessageUuid: string,
     count: number
-  ) {
+  ): void {
     this.sendPacket(PacketType.GET_MESSAGES, {
       channelUuid,
       fromMessageUuid,
@@ -112,7 +109,7 @@ export default class Main extends Vue {
     } as MessageHistoryRequest);
   }
 
-  onMessageListScrolledTop() {
+  onMessageListScrolledTop(): void {
     const channelMessages = this.messages.filter(
       (message) => message.channelUuid === this.currentChannelUuid
     );
@@ -124,7 +121,7 @@ export default class Main extends Vue {
       );
   }
 
-  onChangedCurrentChannelUuid(uuid: string) {
+  onChangedCurrentChannelUuid(uuid: string): void {
     if (
       this.messages.filter((message) => message.channelUuid === uuid).length ===
       0
@@ -135,7 +132,7 @@ export default class Main extends Vue {
     }
   }
 
-  setCurrentChannelUuid(uuid: string) {
+  setCurrentChannelUuid(uuid: string): void {
     this.currentChannelUuid = uuid;
   }
 
@@ -147,16 +144,20 @@ export default class Main extends Vue {
     return this.users.find((user) => user.uuid === uuid);
   }
 
-  sendPacket(type: PacketType, data: any = "") {
-    console.log("SEND", type, data);
-    const packet: Packet = {
-      type: type,
-      data: data,
-    };
-    this.ws.send(JSON.stringify(packet));
+  sendPacket(type: PacketType, data: PacketData = ""): void {
+    if (this.ws) {
+      console.log("SEND PACKET:", type, data);
+      const packet: Packet = {
+        type: type,
+        data: data,
+      };
+      this.ws.send(JSON.stringify(packet));
+    } else {
+      console.log("SEND PACKET: ws is null");
+    }
   }
 
-  sendMessage() {
+  sendMessage(): void {
     this.sendPacket(PacketType.MESSAGE, {
       channelUuid: this.currentChannelUuid,
       content: this.message,
@@ -164,19 +165,14 @@ export default class Main extends Vue {
     this.message = "";
   }
 
-  getChannelMessages(uuid: string) {
+  getChannelMessages(uuid: string): Message[] {
     return this.messages.filter((message) => message.channelUuid == uuid);
   }
 
-  initWebSocket() {
+  initWebSocket(): void {
     this.ws = new WebSocket("ws://localhost:2727/ws");
     this.ws.onopen = () => {
-      this.ws.send(
-        JSON.stringify({
-          query: "AUTH",
-          data: this.$store.state.token,
-        })
-      );
+      this.sendPacket(PacketType.AUTH, this.$store.state.token);
     };
     this.ws.onclose = () => {
       console.log("CLOSE");
@@ -184,20 +180,20 @@ export default class Main extends Vue {
       this.reconnecting = true;
       setTimeout(this.initWebSocket, 3000);
     };
-    this.ws.onmessage = (e: any) => {
+    this.ws.onmessage = (e: MessageEvent) => {
       this.parseWebSocketMessage(e.data);
     };
-    this.ws.onerror = function (e: any) {
+    this.ws.onerror = function (e: Event) {
       console.log("ERROR: " + e);
     };
   }
 
-  parseWebSocketMessage(data: any) {
+  parseWebSocketMessage(data: string): void {
     const packet = JSON.parse(data) as Packet;
 
     if (packet.type === PacketType.AUTH) {
       this.reconnecting = false;
-      if (packet.data.length == 36) {
+      if (typeof packet.data == "string" && packet.data.length == 36) {
         console.log("RECEIVED AUTH:", packet.data);
         this.currentUserUuid = packet.data;
         this.sendPacket(PacketType.CHANNEL_LIST);
@@ -215,82 +211,94 @@ export default class Main extends Vue {
         console.log("RECEIVED USER_LIST:", packet.data);
         this.users = [];
       } else console.log("RECEIVED ADD_USERS:", packet.data);
-      for (let i = 0; i < packet.data.length; i++) {
-        let user: User = {
-          uuid: packet.data[i].uuid,
-          login: packet.data[i].login,
-          nickname: packet.data[i].nickname,
-          online: false,
-        };
-        this.users.push(user);
+      if (packet.data instanceof Array) {
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetUser = packet.data[i] as User;
+          let user: User = {
+            uuid: packetUser.uuid,
+            login: packetUser.login,
+            nickname: packetUser.nickname,
+            online: false,
+          };
+          this.users.push(user);
+        }
+        this.sendPacket(PacketType.ONLINE_USERS);
       }
-      this.ws.send(
-        JSON.stringify({
-          type: PacketType.ONLINE_USERS,
-          data: "",
-        } as Packet)
-      );
     } else if (packet.type === PacketType.CHANNEL_LIST) {
       console.log("RECEIVED CHANNEL_LIST:", packet.data);
-      this.channels = [];
-      for (let i = 0; i < packet.data.length; i++) {
-        let channel: Channel = {
-          uuid: packet.data[i].uuid,
-          name: packet.data[i].name,
-          description: packet.data[i].description,
-          nsfw: packet.data[i].nsfw,
-          saveMessages: packet.data[i].save_messages,
-        };
-        this.channels.push(channel);
-        if (this.currentChannelUuid == "")
-          this.currentChannelUuid = channel.uuid;
+      if (packet.data instanceof Array) {
+        this.channels = [];
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetChannel = packet.data[i] as Channel;
+          let channel: Channel = {
+            uuid: packetChannel.uuid,
+            name: packetChannel.name,
+            description: packetChannel.description,
+            nsfw: packetChannel.nsfw,
+            saveMessages: packetChannel.saveMessages,
+          };
+          this.channels.push(channel);
+          if (this.currentChannelUuid == "")
+            this.currentChannelUuid = channel.uuid;
+        }
       }
     } else if (packet.type === PacketType.MESSAGE) {
       console.log("RECEIVED MESSAGE:", packet.data);
+      let packetMessage = packet.data as Message;
       let message: Message = {
-        uuid: packet.data.uuid,
-        channelUuid: packet.data.channelUuid,
-        userUuid: packet.data.userUuid,
-        date: new Date(packet.data.date),
-        edited: packet.data.edited,
-        content: packet.data.content,
+        uuid: packetMessage.uuid,
+        channelUuid: packetMessage.channelUuid,
+        userUuid: packetMessage.userUuid,
+        date: new Date(packetMessage.date),
+        edited: packetMessage.edited,
+        content: packetMessage.content,
       };
       this.messages.push(message);
     } else if (packet.type === PacketType.ONLINE_USERS) {
       console.log("RECEIVED ONLINE_USERS:", packet.data);
-      for (let i = 0; i < packet.data.length; i++) {
-        const userIndex = this.users.findIndex(
-          (user) => user.uuid == packet.data[i]
-        );
-        if (userIndex >= 0) this.users[userIndex].online = true;
+      if (packet.data instanceof Array) {
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetUuid = packet.data[i] as string;
+          const userIndex = this.users.findIndex(
+            (user) => user.uuid == packetUuid
+          );
+          if (userIndex >= 0) this.users[userIndex].online = true;
+        }
       }
     } else if (packet.type === PacketType.OFFLINE_USERS) {
       console.log("RECEIVED OFFLINE_USERS:", packet.data);
-      for (let i = 0; i < packet.data.length; i++) {
-        const userIndex = this.users.findIndex(
-          (user) => user.uuid == packet.data[i]
-        );
-        if (userIndex >= 0) this.users[userIndex].online = false;
+      if (packet.data instanceof Array) {
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetUuid = packet.data[i] as string;
+          const userIndex = this.users.findIndex(
+            (user) => user.uuid == packetUuid
+          );
+          if (userIndex >= 0) this.users[userIndex].online = false;
+        }
       }
     } else if (packet.type === PacketType.REMOVE_USERS) {
       console.log("RECEIVED REMOVE_USERS:", packet.data);
-      for (let i = 0; i < packet.data.length; i++) {
-        const userIndex = this.users.findIndex(
-          (user) => user.uuid == packet.data[i]
-        );
-        if (userIndex >= 0) this.users.splice(userIndex, 1);
+      if (packet.data instanceof Array) {
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetUuid = packet.data[i] as string;
+          const userIndex = this.users.findIndex(
+            (user) => user.uuid == packetUuid
+          );
+          if (userIndex >= 0) this.users.splice(userIndex, 1);
+        }
       }
     } else if (packet.type === PacketType.GET_MESSAGES) {
       console.log("RECEIVED GET_MESSAGES:", packet.data);
-      if (packet.data) {
+      if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
+          let packetMessage = packet.data[i] as Message;
           let message: Message = {
-            uuid: packet.data[i].uuid,
-            channelUuid: packet.data[i].channelUuid,
-            userUuid: packet.data[i].userUuid,
-            date: new Date(packet.data[i].date),
-            edited: packet.data[i].edited,
-            content: packet.data[i].content,
+            uuid: packetMessage.uuid,
+            channelUuid: packetMessage.channelUuid,
+            userUuid: packetMessage.userUuid,
+            date: new Date(packetMessage.date),
+            edited: packetMessage.edited,
+            content: packetMessage.content,
           };
           this.messages.push(message);
           this.messages = this.messages.sort(function (message1, message2) {
@@ -309,7 +317,7 @@ export default class Main extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     if (this.$store.state.token == "") {
       this.$router.push("/login");
     } else {

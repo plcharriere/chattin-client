@@ -1,6 +1,19 @@
+import { Channel } from "./Channel";
+import { Message, MessageHistoryRequest, MessageInput } from "./Message";
+import { User } from "./User";
+
+export type PacketData =
+  | string
+  | string[]
+  | Channel[]
+  | User[]
+  | Message[]
+  | MessageInput
+  | MessageHistoryRequest;
+
 export interface Packet {
   type: PacketType;
-  data: any;
+  data: PacketData;
 }
 
 export enum PacketType {

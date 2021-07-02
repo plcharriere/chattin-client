@@ -20,17 +20,17 @@
     <template v-else>
       <input
         type="text"
-        v-model="login"
+        id="login"
         placeholder="ok my name is"
         :disabled="loading"
       />
       <input
         type="password"
-        v-model="password"
+        id="password"
         placeholder="and my secret is"
         :disabled="loading"
       />
-      <button @click="loginm" :disabled="loading">sure catto</button>
+      <button @click="login" :disabled="loading">sure catto</button>
       <span class="register" @click="register">i wanna register pls</span>
     </template>
   </div>
@@ -39,7 +39,6 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import axios from "axios";
-import router from "../router/index";
 
 @Options({
   props: {},
@@ -49,22 +48,19 @@ export default class Main extends Vue {
   authenticated = false;
   wrong = false;
 
-  login = "";
-  password = "";
-
-  mounted() {
+  mounted(): void {
     if (this.$store.state.token != "") {
       this.$router.push("/");
     }
   }
 
-  loginm() {
+  login(): void {
     this.loading = true;
-
     axios
       .post("http://localhost:2727/login", {
-        login: this.login,
-        password: this.password,
+        login: (document.getElementById("login") as HTMLInputElement).value,
+        password: (document.getElementById("password") as HTMLInputElement)
+          .value,
       })
       .then((resp) => {
         setTimeout(() => {
@@ -81,11 +77,11 @@ export default class Main extends Vue {
       });
   }
 
-  register() {
+  register(): void {
     this.$router.push("/register");
   }
 
-  proceed() {
+  proceed(): void {
     if (this.$store.state.token != "") {
       this.$router.push("/");
     } else {

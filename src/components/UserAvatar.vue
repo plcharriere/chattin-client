@@ -56,13 +56,18 @@ import { Options, Vue } from "vue-class-component";
 export default class UserAvatar extends Vue {
   avatarPreviewUrl = "";
 
-  editClick() {
+  editClick(): void {
     const avatarFileInput = document.getElementById("avatarFileInput");
     if (avatarFileInput) avatarFileInput.click();
   }
 
-  avatarChange(event: any) {
-    this.avatarPreviewUrl = URL.createObjectURL(event.target.files[0]);
+  avatarChange(event: Event): void {
+    if (
+      event.target &&
+      event.target instanceof HTMLInputElement &&
+      event.target.files
+    )
+      this.avatarPreviewUrl = URL.createObjectURL(event.target.files[0]);
   }
 }
 </script>

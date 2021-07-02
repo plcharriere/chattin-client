@@ -9,7 +9,7 @@ import { Options, Vue } from "vue-class-component";
   components: {},
 })
 export default class App extends Vue {
-  created() {
+  created(): void {
     const token = localStorage.getItem("token");
     if (token) {
       this.$store.state.token = token;

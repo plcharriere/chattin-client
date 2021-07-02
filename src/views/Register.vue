@@ -18,20 +18,20 @@
     <template v-else>
       <input
         type="text"
-        v-model="login"
+        id="login"
         placeholder="ok my name is"
         :disabled="loading"
       />
       <input
         type="password"
-        v-model="password"
+        id="password"
         placeholder="and my secret is"
         :disabled="loading"
       />
       <button @click="register" :disabled="loading">
         here doggo, have some bepis
       </button>
-      <span class="login" @click="loginm">pranked i wanna login pls</span>
+      <span class="login" @click="login">pranked i wanna login pls</span>
     </template>
   </div>
 </template>
@@ -39,7 +39,6 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import axios from "axios";
-import router from "../router/index";
 
 @Options({
   props: {},
@@ -49,22 +48,19 @@ export default class Main extends Vue {
   registered = false;
   wrong = false;
 
-  login = "";
-  password = "";
-
-  mounted() {
+  mounted(): void {
     if (this.$store.state.token != "") {
       this.$router.push("/");
     }
   }
 
-  register() {
+  register(): void {
     this.loading = true;
-
     axios
       .post("http://localhost:2727/register", {
-        login: this.login,
-        password: this.password,
+        login: (document.getElementById("login") as HTMLInputElement).value,
+        password: (document.getElementById("password") as HTMLInputElement)
+          .value,
       })
       .then((resp) => {
         setTimeout(() => {
@@ -81,11 +77,11 @@ export default class Main extends Vue {
       });
   }
 
-  loginm() {
+  login(): void {
     this.$router.push("/login");
   }
 
-  proceed() {
+  proceed(): void {
     if (this.$store.state.token != "") {
       this.$router.push("/");
     } else {
@@ -114,7 +110,7 @@ export default class Main extends Vue {
     border-radius: 2px;
     margin-bottom: 15px;
     transition: all 300ms;
-    background: url(https://cdn.discordapp.com/emojis/849722750049189909.png?v=1);
+    background: url(~@/assets/img/polite-doggo.png);
     background-size: contain;
 
     &:hover {

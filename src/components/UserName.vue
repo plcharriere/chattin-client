@@ -18,7 +18,7 @@ import { Options, Vue } from "vue-class-component";
   },
 })
 export default class UserName extends Vue {
-  getUserName(user: User) {
+  getUserName(user: User): string {
     return user.nickname.length > 0 ? user.nickname : user.login;
   }
 }

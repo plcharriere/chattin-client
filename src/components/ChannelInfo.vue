@@ -11,13 +11,16 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import router from "../router/index";
 import { Channel } from "@/dto/Channel";
+import { PropType } from "@vue/runtime-core";
+import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {
-    channel: null,
+    channel: {
+      type: Object as PropType<Channel>,
+      required: true,
+    },
   },
 })
 export default class ChannelInfo extends Vue {}
