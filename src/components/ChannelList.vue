@@ -7,20 +7,7 @@
       :class="{ active: currentChannelUuid == channel.uuid }"
       @click="setCurrentChannelUuid(channel.uuid)"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="tag"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-        />
-      </svg>
+      <div class="hashtag"></div>
       {{ channel.name }}
     </div>
   </div>
@@ -65,11 +52,11 @@ export default class ChannelList extends Vue {
     flex-direction: row;
     align-items: center;
 
-    .tag {
-      color: #333;
+    .hashtag {
+      background: url(~@/assets/svg/hashtag-outline.svg);
       width: 18px;
       height: 18px;
-      margin-right: 8px;
+      margin-right: 10px;
     }
 
     &.active,
