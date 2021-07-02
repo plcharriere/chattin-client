@@ -102,9 +102,7 @@ export default class UserModal extends Vue {}
 
       .form {
         flex-grow: 1;
-        margin-top: 5px;
-        margin-left: 25px;
-        margin-right: 30px;
+        margin: 5px 30px 0 30px;
         display: flex;
         flex-direction: column;
 

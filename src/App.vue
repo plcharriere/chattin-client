@@ -35,4 +35,20 @@ textarea {
   font-size: 14px;
   background: transparent;
 }
+::-webkit-scrollbar {
+  width: 8px;
+  padding: 2px;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: #eee;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
 </style>

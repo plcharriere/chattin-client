@@ -54,7 +54,7 @@ export default class ChannelInfo extends Vue {}
     color: #333;
     width: 24px;
     height: 24px;
-    margin-right: 8px;
+    margin-right: 10px;
   }
 
   .name {

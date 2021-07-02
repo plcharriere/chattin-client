@@ -69,7 +69,7 @@ export default class ChannelList extends Vue {
       color: #333;
       width: 18px;
       height: 18px;
-      margin-right: 6px;
+      margin-right: 8px;
     }
 
     &.active,
