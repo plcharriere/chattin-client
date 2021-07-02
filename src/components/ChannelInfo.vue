@@ -1,6 +1,22 @@
 <template>
   <div class="channel">
-    <div class="name"># {{ channel.name }}</div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="tag"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+      />
+    </svg>
+    <div class="name">
+      {{ channel.name }}
+    </div>
     <template v-if="channel.description.length > 0">
       <div class="separator"></div>
       <div class="description">
@@ -34,17 +50,23 @@ export default class ChannelInfo extends Vue {}
   align-items: center;
   padding: 20px;
 
+  .tag {
+    color: #333;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
   .name {
     font-size: 18px;
     font-weight: 600;
   }
+
   .separator {
     border-left: 1px solid #ddd;
     width: 1px;
     height: 100%;
     margin: 0 20px;
-  }
-  .description {
   }
 }
 </style>

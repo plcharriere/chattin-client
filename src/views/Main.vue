@@ -19,16 +19,11 @@
       />
     </div>
     <div class="content">
-      <div class="channels">
-        <div
-          v-for="channel in channels"
-          v-bind:key="channel.uuid"
-          :class="{ active: currentChannelUuid == channel.uuid }"
-          @click="setCurrentChannelUuid(channel.uuid)"
-        >
-          # {{ channel.name }}
-        </div>
-      </div>
+      <ChannelList
+        :channels="channels"
+        :currentChannelUuid="currentChannelUuid"
+        @setCurrentChannelUuid="setCurrentChannelUuid"
+      />
       <div class="channel">
         <MessageList
           :messages="getChannelMessages(currentChannelUuid)"
@@ -55,6 +50,7 @@ import { Message, MessageHistoryRequest, MessageInput } from "@/dto/Message";
 import { Packet, PacketData, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
+import ChannelList from "@/components/ChannelList.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/UserList.vue";
 import UserModal from "@/components/UserModal.vue";
@@ -62,6 +58,7 @@ import UserModal from "@/components/UserModal.vue";
 @Options({
   props: {},
   components: {
+    ChannelList,
     UserModal,
     ChannelInfo,
     UserInfo,
@@ -409,25 +406,6 @@ export default class Main extends Vue {
         outline: 0;
         border: none;
         resize: none;
-      }
-    }
-
-    .channels {
-      min-width: 200px;
-      padding: 20px;
-      border-right: 1px solid #ddd;
-
-      div {
-        font-size: 14px;
-        padding: 8px 12px;
-        margin-bottom: 6px;
-        cursor: pointer;
-
-        &.active,
-        &:hover {
-          background: #eee;
-          border-radius: 5px;
-        }
       }
     }
   }
