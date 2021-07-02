@@ -1,16 +1,21 @@
 <template>
-  <UserListItem :user="user" />
+	<div class="user">
+		<UserAvatar :user="user" size="small" />
+		<UserName :user="user" class="name" />
+	</div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
-import UserListItem from "@/components/UserListItem.vue";
+import UserAvatar from "@/components/UserAvatar.vue";
+import UserName from "@/components/UserName.vue";
 
 @Options({
   components: {
-    UserListItem,
+    UserAvatar,
+    UserName,
   },
   props: {
     user: {
@@ -30,5 +35,14 @@ export default class UserInfo extends Vue {}
   width: 200px;
   padding: 20px 20px;
   align-items: center;
+
+  .name {
+    padding-left: 10px;
+  }
+
+  &:hover {
+    background: #eee;
+		cursor: pointer;
+  }
 }
 </style>
