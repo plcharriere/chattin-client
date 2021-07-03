@@ -210,13 +210,8 @@ export default class Main extends Vue {
       } else console.log("RECEIVED ADD_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
-          let packetUser = packet.data[i] as User;
-          let user: User = {
-            uuid: packetUser.uuid,
-            login: packetUser.login,
-            nickname: packetUser.nickname,
-            online: false,
-          };
+          let user = packet.data[i] as User;
+          user.online = false;
           this.users.push(user);
         }
         this.sendPacket(PacketType.ONLINE_USERS);
@@ -226,38 +221,23 @@ export default class Main extends Vue {
       if (packet.data instanceof Array) {
         this.channels = [];
         for (let i = 0; i < packet.data.length; i++) {
-          let packetChannel = packet.data[i] as Channel;
-          let channel: Channel = {
-            uuid: packetChannel.uuid,
-            name: packetChannel.name,
-            description: packetChannel.description,
-            nsfw: packetChannel.nsfw,
-            saveMessages: packetChannel.saveMessages,
-          };
-          this.channels.push(channel);
+          this.channels.push(packet.data[i] as Channel);
           if (this.currentChannelUuid == "")
-            this.currentChannelUuid = channel.uuid;
+            this.currentChannelUuid = (packet.data[i] as Channel).uuid;
         }
       }
     } else if (packet.type === PacketType.MESSAGE) {
       console.log("RECEIVED MESSAGE:", packet.data);
-      let packetMessage = packet.data as Message;
-      let message: Message = {
-        uuid: packetMessage.uuid,
-        channelUuid: packetMessage.channelUuid,
-        userUuid: packetMessage.userUuid,
-        date: new Date(packetMessage.date),
-        edited: packetMessage.edited,
-        content: packetMessage.content,
-      };
+      let message = packet.data as Message;
+      message.date = new Date(message.date);
       this.messages.push(message);
     } else if (packet.type === PacketType.ONLINE_USERS) {
       console.log("RECEIVED ONLINE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
-          let packetUuid = packet.data[i] as string;
+          let userUuid = packet.data[i] as string;
           const userIndex = this.users.findIndex(
-            (user) => user.uuid == packetUuid
+            (user) => user.uuid === userUuid
           );
           if (userIndex >= 0) this.users[userIndex].online = true;
         }
@@ -266,9 +246,9 @@ export default class Main extends Vue {
       console.log("RECEIVED OFFLINE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
-          let packetUuid = packet.data[i] as string;
+          let userUuid = packet.data[i] as string;
           const userIndex = this.users.findIndex(
-            (user) => user.uuid == packetUuid
+            (user) => user.uuid == userUuid
           );
           if (userIndex >= 0) this.users[userIndex].online = false;
         }
@@ -277,9 +257,9 @@ export default class Main extends Vue {
       console.log("RECEIVED REMOVE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
-          let packetUuid = packet.data[i] as string;
+          let userUuid = packet.data[i] as string;
           const userIndex = this.users.findIndex(
-            (user) => user.uuid == packetUuid
+            (user) => user.uuid == userUuid
           );
           if (userIndex >= 0) this.users.splice(userIndex, 1);
         }
@@ -288,15 +268,8 @@ export default class Main extends Vue {
       console.log("RECEIVED GET_MESSAGES:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
-          let packetMessage = packet.data[i] as Message;
-          let message: Message = {
-            uuid: packetMessage.uuid,
-            channelUuid: packetMessage.channelUuid,
-            userUuid: packetMessage.userUuid,
-            date: new Date(packetMessage.date),
-            edited: packetMessage.edited,
-            content: packetMessage.content,
-          };
+          let message = packet.data[i] as Message;
+          message.date = new Date(message.date);
           this.messages.push(message);
           this.messages = this.messages.sort(function (message1, message2) {
             return (
