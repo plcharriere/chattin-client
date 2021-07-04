@@ -30,12 +30,14 @@
           :users="users"
           @scrolledTop="onMessageListScrolledTop"
         />
-        <textarea
-          class="message"
-          v-model="message"
-          placeholder="Message"
-          @keyup.enter.exact="sendMessage()"
-        ></textarea>
+        <div class="message">
+          <textarea
+            class="message"
+            v-model="message"
+            :placeholder="getMessageInputPlaceholder()"
+            @keyup.enter.exact="sendMessage()"
+          ></textarea>
+        </div>
       </div>
       <UserList :users="users" />
     </div>
@@ -89,6 +91,12 @@ export default class Main extends Vue {
   currentUserUuid = "";
 
   showUserSettings = false;
+
+  getMessageInputPlaceholder(): string {
+    const channel = this.getChannelByUuid(this.currentChannelUuid);
+    if (!channel) return "Message";
+    return "Message in #" + channel.name;
+  }
 
   toggleUserSettings(): void {
     this.showUserSettings = !this.showUserSettings;
@@ -374,11 +382,16 @@ export default class Main extends Vue {
       flex-direction: column;
 
       .message {
-        min-height: 60px;
-        padding: 20px;
-        outline: 0;
-        border: none;
-        resize: none;
+        padding: 0px 15px;
+        margin-bottom: 20px;
+
+        textarea {
+          height: 50px;
+          padding: 16px 20px;
+          border-radius: 10px;
+          resize: none;
+          margin: 0;
+        }
       }
     }
   }

@@ -90,7 +90,6 @@ export default class MessageList extends Vue {
 .messages {
   flex-grow: 1;
   min-width: 400px;
-  border-bottom: 1px solid #ddd;
   height: 0;
   overflow: auto;
 
