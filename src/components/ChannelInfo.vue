@@ -30,6 +30,8 @@ export default class ChannelInfo extends Vue {}
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .channel {
   flex-grow: 1;
   display: flex;
@@ -50,7 +52,7 @@ export default class ChannelInfo extends Vue {}
   }
 
   .separator {
-    border-left: 1px solid #ddd;
+    border-left: 1px solid $border-color;
     width: 1px;
     height: 100%;
     margin: 0 20px;

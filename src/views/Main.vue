@@ -306,6 +306,8 @@ export default class Main extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .loading {
   width: 100%;
   height: 100%;
@@ -348,7 +350,7 @@ export default class Main extends Vue {
     display: flex;
     flex-direction: row;
     height: 64px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $border-color;
 
     .server {
       display: flex;
@@ -361,7 +363,7 @@ export default class Main extends Vue {
     }
 
     div {
-      border-right: 1px solid #ddd;
+      border-right: 1px solid $border-color;
     }
 
     div:last-child {
@@ -391,6 +393,12 @@ export default class Main extends Vue {
           border-radius: 10px;
           resize: none;
           margin: 0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+          &:focus {
+            border: 1px solid $border-color;
+          }
         }
       }
     }

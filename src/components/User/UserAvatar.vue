@@ -95,6 +95,7 @@ export default class UserAvatar extends Vue {
     justify-content: center;
     align-items: center;
     opacity: 0;
+    transition: all 200ms;
 
     svg {
       color: #ddd;

@@ -1,3 +1,5 @@
+@import "~@/assets/scss/variables.scss";
+
 input, textarea {
 	width: 100%;
 	max-width: 100%;
@@ -6,13 +8,14 @@ input, textarea {
 	font-size: 15px;
 	margin-bottom: 20px;
 	outline: 0;
-	border: 1px solid #ddd;
+	border: 1px solid $border-color;
 	box-sizing: border-box;
 	resize: none;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);
+	transition: all 300ms;
 
 	&:focus {
 		border-color: #3296ff;
+		box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);
 	}
 }
 

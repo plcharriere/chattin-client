@@ -41,16 +41,19 @@ export default class UserSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .menu {
   flex-shrink: 0;
   width: 150px;
   padding-right: 20px;
   margin-right: 30px;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid $border-color;
   display: flex;
   flex-direction: column;
 
   .item {
+    color: #333;
     padding: 8px 12px;
     margin-bottom: 6px;
     cursor: pointer;

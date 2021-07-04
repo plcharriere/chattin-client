@@ -56,6 +56,8 @@ export default class UserList extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .users {
   display: flex;
   flex-direction: column;
@@ -63,7 +65,7 @@ export default class UserList extends Vue {
   padding: 20px 10px;
   flex-grow: 1;
   flex-shrink: 0;
-  border-left: 1px solid #ddd;
+  border-left: 1px solid $border-color;
 
   .list {
     margin-bottom: 20px;
@@ -82,7 +84,7 @@ export default class UserList extends Vue {
         height: 1px;
         width: 100%;
         flex-grow: 1;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid $border-color;
         margin: 0px 16px;
       }
     }
