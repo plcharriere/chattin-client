@@ -31,7 +31,7 @@
 import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
-import UserListItem from "@/components/UserListItem.vue";
+import UserListItem from "@/components/User/UserListItem.vue";
 
 @Options({
   components: {

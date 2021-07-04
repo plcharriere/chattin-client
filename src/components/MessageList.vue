@@ -22,8 +22,8 @@ import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
-import UserAvatar from "@/components/UserAvatar.vue";
-import UserName from "@/components/UserName.vue";
+import UserAvatar from "@/components/User/UserAvatar.vue";
+import UserName from "@/components/User/UserName.vue";
 
 @Options({
   components: {

@@ -7,27 +7,13 @@
         avatarPreviewUrl.length > 0 ? 'url(' + avatarPreviewUrl + ')' : '',
     }"
   >
-    <div v-if="editable" class="edit" @click="editClick">
+    <div v-if="editable" class="edit" @click="editCallback">
       <input
         type="file"
         id="avatarFileInput"
         @change="avatarChange"
         style="display: none"
       />
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-        />
-      </svg>
     </div>
   </div>
 </template>
@@ -50,6 +36,9 @@ import { Options, Vue } from "vue-class-component";
     editable: {
       type: Boolean,
       default: false,
+    },
+    editCallback: {
+      type: Function,
     },
   },
 })
@@ -99,7 +88,9 @@ export default class UserAvatar extends Vue {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
+    background: url(~@/assets/svg/pencil.svg) no-repeat center
+      rgba(0, 0, 0, 0.5);
+    background-size: 32px;
     display: flex;
     justify-content: center;
     align-items: center;

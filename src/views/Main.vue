@@ -5,17 +5,17 @@
     <span v-else>totally <b title="not*">now</b> loading...</span>
   </div>
   <div v-else class="main">
-    <UserModal
-      v-if="showUserModal"
+    <UserSettings
+      v-if="showUserSettings"
       :user="getUserByUuid(currentUserUuid)"
-      :closeCallback="toggleUserModal"
+      :closeCallback="toggleUserSettings"
     />
     <div class="infos">
       <div class="server">Instant Messenger</div>
       <ChannelInfo :channel="getChannelByUuid(currentChannelUuid)" />
       <UserInfo
         :user="getUserByUuid(currentUserUuid)"
-        @click="toggleUserModal"
+        @click="toggleUserSettings"
       />
     </div>
     <div class="content">
@@ -49,17 +49,17 @@ import { Channel } from "@/dto/Channel";
 import { Message, MessageHistoryRequest, MessageInput } from "@/dto/Message";
 import { Packet, PacketData, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
-import UserInfo from "@/components/UserInfo.vue";
+import UserInfo from "@/components/User/UserInfo.vue";
 import ChannelList from "@/components/ChannelList.vue";
 import MessageList from "@/components/MessageList.vue";
-import UserList from "@/components/UserList.vue";
-import UserModal from "@/components/UserModal.vue";
+import UserList from "@/components/User/UserList.vue";
+import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 
 @Options({
   props: {},
   components: {
     ChannelList,
-    UserModal,
+    UserSettings,
     ChannelInfo,
     UserInfo,
     MessageList,
@@ -88,10 +88,10 @@ export default class Main extends Vue {
   currentChannelUuid = "";
   currentUserUuid = "";
 
-  showUserModal = false;
+  showUserSettings = false;
 
-  toggleUserModal(): void {
-    this.showUserModal = !this.showUserModal;
+  toggleUserSettings(): void {
+    this.showUserSettings = !this.showUserSettings;
   }
 
   getChannelMessageHistory(

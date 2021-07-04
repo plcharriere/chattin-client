@@ -1,0 +1,31 @@
+input, textarea {
+	width: 100%;
+	max-width: 100%;
+	padding: 8px 14px;
+	border-radius: 5px;
+	font-size: 15px;
+	margin-bottom: 20px;
+	outline: 0;
+	border: 1px solid #ddd;
+	box-sizing: border-box;
+	resize: none;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);
+
+	&:focus {
+		border-color: #3296ff;
+	}
+}
+
+.btn {
+	padding: 8px 25px;
+	border: 1px solid rgb(0, 180, 0);
+	border-radius: 5px;
+	background: transparent;
+	color: rgb(0, 180, 0);
+	cursor: pointer;
+	outline: 0;
+
+	&:hover {
+		background: rgba(0, 180, 0, 0.2);
+	}
+}

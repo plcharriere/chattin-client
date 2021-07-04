@@ -4,3 +4,8 @@ export interface User {
   nickname: string;
   online: boolean;
 }
+
+export interface UserProfileEdit {
+  nickname: string;
+  bio: string;
+}
