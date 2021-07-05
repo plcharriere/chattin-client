@@ -1,10 +1,10 @@
 <template>
   <div
     class="avatar"
-    :class="[size]"
+    :class="[size, { default: user.avatarUuid.length === 0 }]"
     :style="{
       backgroundImage:
-        avatarPreviewUrl.length > 0 ? 'url(' + avatarPreviewUrl + ')' : '',
+        user.avatarUuid.length > 0 ? 'url(' + avatarPreviewUrl + ')' : '',
     }"
   >
     <div v-if="editable" class="edit" @click="editCallback">
@@ -65,10 +65,11 @@ export default class UserAvatar extends Vue {
 .avatar {
   position: relative;
   border-radius: 100%;
-  background: #ddd;
-  overflow: hidden;
+  background-repeat: no-repeat;
+  background-color: #ddd;
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 
   &.small {
     width: 32px;
@@ -81,6 +82,20 @@ export default class UserAvatar extends Vue {
   &.large {
     width: 100px;
     height: 100px;
+  }
+
+  &.default {
+    background-image: url(~@/assets/svg/user.svg);
+
+    &.small {
+      background-size: 20px;
+    }
+    &.medium {
+      background-size: 25px;
+    }
+    &.large {
+      background-size: 64px;
+    }
   }
 
   .edit {
