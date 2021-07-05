@@ -256,7 +256,7 @@ export default class Main extends Vue {
         for (let i = 0; i < packet.data.length; i++) {
           let userUuid = packet.data[i] as string;
           const userIndex = this.users.findIndex(
-            (user) => user.uuid == userUuid
+            (user) => user.uuid === userUuid
           );
           if (userIndex >= 0) this.users[userIndex].online = false;
         }
@@ -267,9 +267,24 @@ export default class Main extends Vue {
         for (let i = 0; i < packet.data.length; i++) {
           let userUuid = packet.data[i] as string;
           const userIndex = this.users.findIndex(
-            (user) => user.uuid == userUuid
+            (user) => user.uuid === userUuid
           );
           if (userIndex >= 0) this.users.splice(userIndex, 1);
+        }
+      }
+    } else if (packet.type === PacketType.UPDATE_USERS) {
+      console.log("RECEIVED UPDATE_USERS:", packet.data);
+      if (packet.data instanceof Array) {
+        for (let i = 0; i < packet.data.length; i++) {
+          let packetUser = packet.data[i] as User;
+          const userIndex = this.users.findIndex(
+            (user) => user.uuid === packetUser.uuid
+          );
+          if (userIndex >= 0) {
+            let currentUser = this.users[userIndex];
+            packetUser.online = currentUser.online;
+            this.users[userIndex] = packetUser;
+          }
         }
       }
     } else if (packet.type === PacketType.GET_MESSAGES) {
@@ -309,6 +324,7 @@ export default class Main extends Vue {
 @import "~@/assets/scss/variables.scss";
 
 .loading {
+  position: absolute;
   width: 100%;
   height: 100%;
   display: flex;

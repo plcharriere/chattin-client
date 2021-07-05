@@ -10,10 +10,17 @@
       <span>Login :</span>
       <input type="text" disabled :value="user.login" />
       <span>Nickname :</span>
-      <input type="text" id="nickname" v-model="profileEdit.nickname" />
+      <input
+        type="text"
+        id="nickname"
+        v-model="profileEdit.nickname"
+        :disabled="loading"
+      />
       <span>Bio :</span>
-      <textarea type="text" v-model="profileEdit.bio" />
-      <button class="btn" @click="save">Save</button>
+      <textarea type="text" v-model="profileEdit.bio" :disabled="loading" />
+      <button class="btn" @click="save" :class="{ disabled: loading }">
+        Save
+      </button>
     </div>
   </div>
 </template>
@@ -40,13 +47,18 @@ import axios from "axios";
   },
 })
 export default class UserSettingsProfile extends Vue {
+  loading = false;
+
   profileEdit: UserProfileEdit = {
+    token: "",
     nickname: "",
     bio: "",
   };
 
   setProfileEdit(user: User): void {
+    this.profileEdit.token = this.$store.state.token;
     this.profileEdit.nickname = user.nickname;
+    this.profileEdit.bio = user.bio;
   }
 
   editAvatar(): void {
@@ -54,10 +66,11 @@ export default class UserSettingsProfile extends Vue {
   }
 
   save(): void {
+    this.loading = true;
     axios
       .post("http://localhost:2727/user/profile", this.profileEdit)
-      .then((resp) => {
-        console.log(resp);
+      .then(() => {
+        this.loading = false;
       });
   }
 }

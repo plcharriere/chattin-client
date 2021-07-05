@@ -8,6 +8,7 @@ export interface User {
 }
 
 export interface UserProfileEdit {
+  token: string;
   nickname: string;
   bio: string;
 }

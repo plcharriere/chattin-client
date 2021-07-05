@@ -24,6 +24,7 @@ export enum PacketType {
   OFFLINE_USERS = 4,
   ADD_USERS = 5,
   REMOVE_USERS = 6,
-  MESSAGE = 7,
-  GET_MESSAGES = 8,
+  UPDATE_USERS = 7,
+  MESSAGE = 8,
+  GET_MESSAGES = 9,
 }
