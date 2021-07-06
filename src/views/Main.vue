@@ -35,7 +35,7 @@
             class="message"
             v-model="message"
             :placeholder="getMessageInputPlaceholder()"
-            @keyup.enter.exact="sendMessage()"
+            v-on:keydown.prevent="messageInputKeydown"
           ></textarea>
         </div>
       </div>
@@ -92,6 +92,20 @@ export default class Main extends Vue {
   currentUserUuid = "";
 
   showUserSettings = false;
+
+  messageInputKeydown(e: KeyboardEvent): void {
+    if (e.key === "Enter") {
+      if (this.message.length > 0) {
+        this.sendPacket(PacketType.MESSAGE, {
+          channelUuid: this.currentChannelUuid,
+          content: this.message,
+        } as MessageInput);
+        this.message = "";
+      }
+    } else {
+      this.message += e.key;
+    }
+  }
 
   getMessageInputPlaceholder(): string {
     const channel = this.getChannelByUuid(this.currentChannelUuid);
