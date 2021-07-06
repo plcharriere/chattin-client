@@ -1,18 +1,12 @@
 <template>
   <div class="messages">
-    <div class="message" v-for="message in messages" v-bind:key="message.uuid">
-      <UserAvatar
-        :user="getUserByUuid(users, message.userUuid)"
-        size="medium"
-      />
-      <div class="container">
-        <div class="infos">
-          <UserName :user="getUserByUuid(users, message.userUuid)" />
-          <div class="date">{{ getMessageDateString(message) }}</div>
-        </div>
-        <div class="content">{{ message.content }}</div>
-      </div>
-    </div>
+    <MessageListItem
+      v-for="(message, index) in messages"
+      v-bind:key="message.uuid"
+      :message="message"
+      :user="getUserByUuid(users, message.userUuid)"
+      :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
+    />
   </div>
 </template>
 
@@ -21,14 +15,11 @@ import { Options, Vue } from "vue-class-component";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
-import { format, isToday, isYesterday } from "date-fns";
-import UserAvatar from "@/components/User/UserAvatar.vue";
-import UserName from "@/components/User/UserName.vue";
+import MessageListItem from "@/components/MessageListItem.vue";
 
 @Options({
   components: {
-    UserAvatar,
-    UserName,
+    MessageListItem,
   },
   props: {
     users: {
@@ -70,18 +61,14 @@ export default class MessageList extends Vue {
     return users.find((user) => user.uuid === uuid);
   }
 
-  getMessageUserName(message: Message, users: User[]): string {
-    const user = users.find((user) => user.uuid == message.userUuid);
-    if (user) return user.nickname.length > 0 ? user.nickname : user.login;
-    return "Deleted User";
-  }
-
-  getMessageDateString(message: Message): string {
-    if (isToday(message.date))
-      return format(message.date, "'Today at' h:mm aa");
-    if (isYesterday(message.date))
-      return format(message.date, "'Yesterday at' h:mm aa");
-    return format(message.date, "dd/MM/yyyy 'at' h:mm aa");
+  showUser(previousMessage: Message, currentMessage: Message): boolean {
+    if (previousMessage.userUuid !== currentMessage.userUuid) return true;
+    if (
+      currentMessage.date.getTime() - previousMessage.date.getTime() >
+      600 * 1000
+    )
+      return true;
+    return false;
   }
 }
 </script>
@@ -92,34 +79,6 @@ export default class MessageList extends Vue {
   min-width: 400px;
   height: 0;
   overflow: auto;
-
-  .message {
-    display: flex;
-    flex-direction: row;
-    padding: 6px 20px;
-    margin: 12px 0;
-
-    &:hover {
-      background: #eee;
-    }
-
-    .container {
-      margin-left: 10px;
-
-      .infos {
-        display: flex;
-        flex-direction: row;
-        margin-top: 1px;
-        margin-bottom: 6px;
-        align-items: center;
-
-        .date {
-          margin-left: 16px;
-          font-size: 12px;
-          color: #777;
-        }
-      }
-    }
-  }
+  padding-bottom: 20px;
 }
 </style>

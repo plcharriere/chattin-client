@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="name">
     {{ getUserName(user) }}
   </div>
 </template>
@@ -23,3 +23,9 @@ export default class UserName extends Vue {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.name {
+  color: #222;
+}
+</style>

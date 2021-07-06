@@ -29,6 +29,7 @@ body,
   margin: 0;
   background: #fff;
   box-sizing: border-box;
+  color: #444;
 }
 html,
 body,
