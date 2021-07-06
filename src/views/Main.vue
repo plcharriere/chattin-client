@@ -35,7 +35,7 @@
             class="message"
             v-model="message"
             :placeholder="getMessageInputPlaceholder()"
-            v-on:keydown.prevent="messageInputKeydown"
+            v-on:keydown.exact.enter="messageInputEnter"
           ></textarea>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default class Main extends Vue {
 
   showUserSettings = false;
 
-  messageInputKeydown(e: KeyboardEvent): void {
+  messageInputEnter(e: KeyboardEvent): void {
     if (e.key === "Enter") {
       if (this.message.length > 0) {
         this.sendPacket(PacketType.MESSAGE, {
@@ -102,8 +102,7 @@ export default class Main extends Vue {
         } as MessageInput);
         this.message = "";
       }
-    } else {
-      this.message += e.key;
+      e.preventDefault();
     }
   }
 
@@ -415,8 +414,7 @@ export default class Main extends Vue {
       flex-direction: column;
 
       .message {
-        padding: 0px 15px;
-        margin-bottom: 20px;
+        padding: 0px 15px 15px;
 
         textarea {
           height: 50px;
