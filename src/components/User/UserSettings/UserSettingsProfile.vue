@@ -32,6 +32,7 @@ import { User, UserProfileEdit } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
+import { httpUrl } from "@/env";
 
 @Options({
   components: {
@@ -68,11 +69,9 @@ export default class UserSettingsProfile extends Vue {
 
   save(): void {
     this.loading = true;
-    axios
-      .post("http://localhost:2727/user/profile", this.profileEdit)
-      .then(() => {
-        this.loading = false;
-      });
+    axios.post(httpUrl + "/user/profile", this.profileEdit).then(() => {
+      this.loading = false;
+    });
   }
 }
 </script>

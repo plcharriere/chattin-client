@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import { User } from "@/dto/User";
+import { httpUrl } from "@/env";
 import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 
@@ -57,7 +58,7 @@ import { Options, Vue } from "vue-class-component";
 })
 export default class UserAvatar extends Vue {
   getAvatarUrl(uuid: string): string {
-    return "http://localhost:2727/avatars/" + uuid;
+    return httpUrl + "/avatars/" + uuid;
   }
 }
 </script>

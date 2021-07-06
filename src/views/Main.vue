@@ -56,6 +56,7 @@ import ChannelList from "@/components/ChannelList.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
+import { webSocketUrl } from "@/env";
 
 @Options({
   props: {},
@@ -175,7 +176,7 @@ export default class Main extends Vue {
   }
 
   initWebSocket(): void {
-    this.ws = new WebSocket("ws://localhost:2727/ws");
+    this.ws = new WebSocket(webSocketUrl + "/ws");
     this.ws.onopen = () => {
       this.sendPacket(PacketType.AUTH, this.$store.state.token);
     };

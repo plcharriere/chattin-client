@@ -39,6 +39,7 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import axios from "axios";
+import { httpUrl } from "@/env";
 
 @Options({
   props: {},
@@ -57,7 +58,7 @@ export default class Main extends Vue {
   login(): void {
     this.loading = true;
     axios
-      .post("http://localhost:2727/login", {
+      .post(httpUrl + "/login", {
         login: (document.getElementById("login") as HTMLInputElement).value,
         password: (document.getElementById("password") as HTMLInputElement)
           .value,

@@ -34,6 +34,7 @@ import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
+import { httpUrl } from "@/env";
 
 @Options({
   components: {
@@ -76,7 +77,7 @@ export default class UserSettingsProfile extends Vue {
       const formData = new FormData();
       formData.append("token", this.$store.state.token);
       formData.append("file", this.avatarFile);
-      axios.post("http://localhost:2727/avatars", formData).then(() => {
+      axios.post(httpUrl + "/avatars", formData).then(() => {
         this.loading = false;
       });
     }
