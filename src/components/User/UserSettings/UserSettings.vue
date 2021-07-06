@@ -4,10 +4,11 @@
     <div class="settings">
       <UserSettingsMenu @setMenuIndex="setMenuIndex" :menuIndex="menuIndex" />
       <UserSettingsProfile
-        v-if="menuIndex == 0"
+        v-if="menuIndex === 0"
         :user="user"
         @setMenuIndex="setMenuIndex"
       />
+      <UserSettingsAvatars v-if="menuIndex === 1" :user="user" />
       <div class="close" @click="closeCallback"></div>
     </div>
   </div>
@@ -19,11 +20,13 @@ import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserSettingsMenu from "@/components/User/UserSettings/UserSettingsMenu.vue";
 import UserSettingsProfile from "@/components/User/UserSettings/UserSettingsProfile.vue";
+import UserSettingsAvatars from "@/components/User/UserSettings/UserSettingsAvatars.vue";
 
 @Options({
   components: {
     UserSettingsMenu,
     UserSettingsProfile,
+    UserSettingsAvatars,
   },
   props: {
     user: {

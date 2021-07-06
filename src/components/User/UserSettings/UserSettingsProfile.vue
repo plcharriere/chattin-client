@@ -4,6 +4,7 @@
       :user="user"
       size="large"
       :editable="true"
+      editIcon="pencil"
       :editCallback="editAvatar"
     />
     <div class="form">

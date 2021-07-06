@@ -1,20 +1,25 @@
 <template>
   <div
     class="avatar"
-    :class="[size, { default: user.avatarUuid.length === 0 }]"
+    :class="[
+      size,
+      { default: user.avatarUuid.length === 0 && overrideUrl.length === 0 },
+    ]"
     :style="{
       backgroundImage:
-        user.avatarUuid.length > 0 ? 'url(' + avatarPreviewUrl + ')' : '',
+        overrideUrl.length > 0
+          ? 'url(' + overrideUrl + ')'
+          : user.avatarUuid.length > 0
+          ? 'url(' + getAvatarUrl(user.avatarUuid) + ')'
+          : '',
     }"
   >
-    <div v-if="editable" class="edit" @click="editCallback">
-      <input
-        type="file"
-        id="avatarFileInput"
-        @change="avatarChange"
-        style="display: none"
-      />
-    </div>
+    <div
+      v-if="editable"
+      class="edit"
+      :class="editIcon"
+      @click="editCallback"
+    ></div>
   </div>
 </template>
 
@@ -37,26 +42,22 @@ import { Options, Vue } from "vue-class-component";
       type: Boolean,
       default: false,
     },
+    editIcon: {
+      type: String,
+      default: "pencil",
+    },
     editCallback: {
       type: Function,
+    },
+    overrideUrl: {
+      type: String,
+      default: "",
     },
   },
 })
 export default class UserAvatar extends Vue {
-  avatarPreviewUrl = "";
-
-  editClick(): void {
-    const avatarFileInput = document.getElementById("avatarFileInput");
-    if (avatarFileInput) avatarFileInput.click();
-  }
-
-  avatarChange(event: Event): void {
-    if (
-      event.target &&
-      event.target instanceof HTMLInputElement &&
-      event.target.files
-    )
-      this.avatarPreviewUrl = URL.createObjectURL(event.target.files[0]);
+  getAvatarUrl(uuid: string): string {
+    return "http://localhost:2727/avatars/" + uuid;
   }
 }
 </script>
@@ -66,7 +67,7 @@ export default class UserAvatar extends Vue {
   position: relative;
   border-radius: 100%;
   background-repeat: no-repeat;
-  background-color: #ddd;
+  background-color: transparent;
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -85,6 +86,7 @@ export default class UserAvatar extends Vue {
   }
 
   &.default {
+    background-color: #ddd;
     background-image: url(~@/assets/svg/user.svg);
 
     &.small {
@@ -103,8 +105,9 @@ export default class UserAvatar extends Vue {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    background: url(~@/assets/svg/pencil.svg) no-repeat center
-      rgba(0, 0, 0, 0.5);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0.5);
     background-size: 32px;
     display: flex;
     justify-content: center;
@@ -112,10 +115,12 @@ export default class UserAvatar extends Vue {
     opacity: 0;
     transition: all 200ms;
 
-    svg {
-      color: #ddd;
-      width: 32px;
-      height: 32px;
+    &.pencil {
+      background-image: url(~@/assets/svg/pencil.svg);
+    }
+
+    &.upload {
+      background-image: url(~@/assets/svg/upload.svg);
     }
 
     &:hover {
