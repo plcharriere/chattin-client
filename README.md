@@ -1,4 +1,4 @@
-# im-client
+# chattin-client
 
 ## Project setup
 ```

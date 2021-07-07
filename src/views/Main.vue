@@ -11,7 +11,7 @@
       :closeCallback="toggleUserSettings"
     />
     <div class="infos">
-      <div class="server">Instant Messenger</div>
+      <div class="server">Chattin</div>
       <ChannelInfo :channel="getChannelByUuid(currentChannelUuid)" />
       <UserInfo
         :user="getUserByUuid(currentUserUuid)"
