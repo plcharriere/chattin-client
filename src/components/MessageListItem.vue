@@ -11,7 +11,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="date">{{ getMessageDateString(message, true) }}</div>
+      <div class="date small">{{ getMessageDateString(message, true) }}</div>
       <div class="content">{{ message.content }}</div>
     </template>
   </div>
@@ -63,24 +63,31 @@ export default class MessageList extends Vue {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 6px 20px;
+  padding: 6px 0px;
 
   &:hover {
     background: #eee;
 
     .date {
-      visibility: visible;
+      &.small {
+        visibility: visible;
+      }
     }
   }
 
   .date {
-    visibility: hidden;
     font-size: 12px;
     color: #777;
-    margin-right: 13px;
+
+    &.small {
+      visibility: hidden;
+      text-align: center;
+      width: 74px;
+    }
   }
 
   &.user {
+    padding: 6px 16px;
     margin-top: 12px;
 
     .container {
@@ -94,7 +101,6 @@ export default class MessageList extends Vue {
         align-items: center;
 
         .date {
-          visibility: visible;
           margin-left: 16px;
         }
       }
