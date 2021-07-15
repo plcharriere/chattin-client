@@ -217,7 +217,6 @@ export default class Main extends Vue {
         this.currentUserUuid = packet.data;
         this.fetchChannels().then(() => {
           this.fetchUsers().then(() => {
-            this.sendPacket(PacketType.ONLINE_USERS);
             this.loading = false;
             this.reconnecting = false;
           });

@@ -41,9 +41,5 @@ export async function getUsers(token: string): Promise<User[]> {
       token,
     },
   });
-  const users = res.data as User[];
-  users.forEach((user) => {
-    user.online = false;
-  });
   return res.data;
 }
