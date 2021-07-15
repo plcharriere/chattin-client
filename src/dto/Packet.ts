@@ -23,4 +23,5 @@ export enum PacketType {
   REMOVE_USERS = 4,
   UPDATE_USERS = 5,
   MESSAGE = 6,
+  SET_CHANNEL_UUID = 7,
 }

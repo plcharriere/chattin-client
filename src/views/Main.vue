@@ -151,7 +151,12 @@ export default class Main extends Vue {
       0
     ) {
       const channel = this.getChannelByUuid(uuid);
-      if (channel && channel.saveMessages) this.fetchChannelMessages();
+      if (channel) {
+        this.sendPacket(PacketType.SET_CHANNEL_UUID, channel.uuid);
+        if (channel.saveMessages) {
+          this.fetchChannelMessages();
+        }
+      }
     }
   }
 
