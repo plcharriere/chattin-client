@@ -16,6 +16,7 @@ import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import MessageListItem from "@/components/Message/MessageListItem.vue";
+import { getUserByUuid } from "@/utils";
 
 @Options({
   components: {
@@ -30,6 +31,9 @@ import MessageListItem from "@/components/Message/MessageListItem.vue";
       type: Array as PropType<Message[]>,
       default: [],
     },
+  },
+  methods: {
+    getUserByUuid: getUserByUuid,
   },
   watch: {
     messages() {
@@ -55,10 +59,6 @@ export default class MessageList extends Vue {
       else if (this.$el.scrollTop === 0)
         this.$el.scrollTop = this.$el.scrollHeight - currentScrollHeight;
     });
-  }
-
-  getUserByUuid(users: User[], uuid: string): User | undefined {
-    return users.find((user) => user.uuid === uuid);
   }
 
   showUser(previousMessage: Message, currentMessage: Message): boolean {

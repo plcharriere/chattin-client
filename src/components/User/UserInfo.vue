@@ -1,6 +1,6 @@
 <template>
   <div class="user">
-    <UserAvatar :user="user" size="small" />
+    <UserAvatar :user="user" size="tiny" />
     <UserName :user="user" class="name" />
   </div>
 </template>

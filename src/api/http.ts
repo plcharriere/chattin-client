@@ -43,3 +43,12 @@ export async function getUsers(token: string): Promise<User[]> {
   });
   return res.data;
 }
+
+export async function getAvatars(token: string): Promise<string[]> {
+  const res = await axios.get(`${httpUrl}/avatars`, {
+    headers: {
+      token,
+    },
+  });
+  return res.data;
+}

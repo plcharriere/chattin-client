@@ -1,14 +1,17 @@
 <template>
   <div class="avatars">
-    <div class="avatar">
-      <UserAvatar
-        :user="user"
-        size="large"
-        :editable="!loading"
-        editIcon="upload"
-        :editCallback="avatarClick"
-        :overrideUrl="avatarPreviewUrl"
-      />
+    <div class="edit">
+      <div class="avatar">
+        <UserAvatar
+          :user="user"
+          size="large"
+          :editable="!loading"
+          editIcon="upload"
+          :editCallback="avatarClick"
+          :overrideUrl="avatarPreviewUrl"
+        />
+        <span class="remove" @click="removeCurrentAvatar">Remove</span>
+      </div>
       <input
         type="file"
         id="avatarFileInput"
@@ -19,12 +22,21 @@
       <button
         class="btn"
         @click="save"
-        :class="{ disabled: loading || avatarPreviewUrl.length === 0 }"
+        :class="{ disabled: loading || avatarPreviewUrl === null }"
       >
         Save
       </button>
     </div>
-    <div class="list"></div>
+    <div class="list" :class="{ empty: avatars.length === 0 }">
+      <span v-if="avatars.length === 0">You haven't uploaded any avatar.</span>
+      <UserAvatar
+        v-else
+        v-for="uuid in avatars"
+        v-bind:key="uuid"
+        size="medium"
+        :overrideUrl="getAvatarUrl(uuid)"
+      />
+    </div>
   </div>
 </template>
 
@@ -35,6 +47,7 @@ import { PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
 import { httpUrl } from "@/env";
+import { getAvatars } from "@/api/http";
 
 @Options({
   components: {
@@ -50,8 +63,22 @@ import { httpUrl } from "@/env";
 export default class UserSettingsProfile extends Vue {
   loading = false;
 
-  avatarPreviewUrl = "";
+  avatarPreviewUrl: string | null = null;
   avatarFile: File | null = null;
+
+  avatars: string[] = [];
+
+  mounted(): void {
+    this.fetchAvatars();
+  }
+
+  async fetchAvatars(): Promise<void> {
+    this.avatars = (await getAvatars(this.$store.state.token)).reverse() || [];
+  }
+
+  getAvatarUrl(uuid: string): string {
+    return `${httpUrl}/avatars/${uuid}`;
+  }
 
   avatarClick(): void {
     const avatarFileInput = document.getElementById("avatarFileInput");
@@ -70,17 +97,27 @@ export default class UserSettingsProfile extends Vue {
     this.avatarPreviewUrl = URL.createObjectURL(this.avatarFile);
   }
 
+  removeCurrentAvatar(): void {
+    this.avatarPreviewUrl = "";
+  }
+
   save(): void {
+    this.loading = true;
+    const avatarFileInput = document.getElementById(
+      "avatarFileInput"
+    ) as HTMLInputElement;
+    const formData = new FormData();
+    formData.append("token", this.$store.state.token);
     if (this.avatarFile) {
-      this.loading = true;
-      console.log(this.avatarFile.type);
-      const formData = new FormData();
-      formData.append("token", this.$store.state.token);
       formData.append("file", this.avatarFile);
-      axios.post(httpUrl + "/avatars", formData).then(() => {
-        this.loading = false;
-      });
     }
+    axios.post(httpUrl + "/avatars", formData).then(async () => {
+      await this.fetchAvatars();
+      this.loading = false;
+      this.avatarPreviewUrl = null;
+      this.avatarFile = null;
+      avatarFileInput.value = "";
+    });
   }
 }
 </script>
@@ -91,11 +128,28 @@ export default class UserSettingsProfile extends Vue {
   display: flex;
   flex-direction: column;
 
-  .avatar {
+  .edit {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    .avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .remove {
+        cursor: pointer;
+        color: #007fff;
+        margin-top: 8px;
+        font-size: 13px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
 
     input {
       border: 0;
@@ -112,8 +166,25 @@ export default class UserSettingsProfile extends Vue {
   }
 
   .list {
+    display: flex;
+    flex-direction: row;
     margin-top: 20px;
     border-top: 1px solid #ddd;
+    padding: 20px 0;
+
+    &.empty {
+      padding: 40px;
+      justify-content: center;
+      align-items: center;
+
+      span {
+        color: #666;
+      }
+    }
+
+    .avatar {
+      margin-right: 20px;
+    }
   }
 }
 </style>

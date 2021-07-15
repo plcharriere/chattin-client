@@ -3,13 +3,17 @@
     class="avatar"
     :class="[
       size,
-      { default: user.avatarUuid.length === 0 && overrideUrl.length === 0 },
+      {
+        default:
+          ((!user || user.avatarUuid.length === 0) && overrideUrl === null) ||
+          (overrideUrl !== null && overrideUrl.length === 0),
+      },
     ]"
     :style="{
       backgroundImage:
-        overrideUrl.length > 0
+        overrideUrl && overrideUrl.length > 0
           ? 'url(' + overrideUrl + ')'
-          : user.avatarUuid.length > 0
+          : overrideUrl == null && user.avatarUuid.length > 0
           ? 'url(' + getAvatarUrl(user.avatarUuid) + ')'
           : '',
     }"
@@ -33,7 +37,7 @@ import { Options, Vue } from "vue-class-component";
   props: {
     user: {
       type: Object as PropType<User>,
-      required: true,
+      default: null,
     },
     size: {
       type: String,
@@ -52,7 +56,7 @@ import { Options, Vue } from "vue-class-component";
     },
     overrideUrl: {
       type: String,
-      default: "",
+      default: null,
     },
   },
 })
@@ -73,13 +77,17 @@ export default class UserAvatar extends Vue {
   background-position: center;
   overflow: hidden;
 
-  &.small {
+  &.tiny {
     width: 32px;
     height: 32px;
   }
-  &.medium {
+  &.small {
     width: 42px;
     height: 42px;
+  }
+  &.medium {
+    width: 64px;
+    height: 64px;
   }
   &.large {
     width: 100px;
@@ -90,11 +98,14 @@ export default class UserAvatar extends Vue {
     background-color: #ddd;
     background-image: url(~@/assets/svg/user.svg);
 
-    &.small {
+    &.tiny {
       background-size: 20px;
     }
-    &.medium {
+    &.small {
       background-size: 25px;
+    }
+    &.medium {
+      background-size: 30px;
     }
     &.large {
       background-size: 64px;
