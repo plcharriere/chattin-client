@@ -15,7 +15,7 @@ import { Options, Vue } from "vue-class-component";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
-import MessageListItem from "@/components/MessageListItem.vue";
+import MessageListItem from "@/components/Message/MessageListItem.vue";
 
 @Options({
   components: {

@@ -34,5 +34,5 @@ export interface PacketAuth {
 
 export interface PacketMessage {
   channelUuid: string;
-  message: string;
+  content: string;
 }

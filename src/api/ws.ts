@@ -20,10 +20,10 @@ export function sendPacket(
 export function sendPacketMessage(
   ws: WebSocket | null,
   channelUuid: string,
-  message: string
+  content: string
 ): void {
   sendPacket(ws, PacketType.MESSAGE, {
-    channelUuid: channelUuid,
-    message: message,
+    channelUuid,
+    content,
   } as PacketMessage);
 }

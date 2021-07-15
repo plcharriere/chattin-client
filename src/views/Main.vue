@@ -28,12 +28,10 @@
           @scrolledTop="fetchChannelMessages"
         />
         <div class="message">
-          <textarea
-            class="message"
-            v-model="message"
-            :placeholder="getMessageInputPlaceholder()"
-            v-on:keydown.exact.enter="messageInputEnter"
-          ></textarea>
+          <MessageInput
+            :channel="getChannelByUuid(channelUuid)"
+            @sendMessage="sendMessage"
+          />
         </div>
       </div>
       <UserList :users="users" />
@@ -47,12 +45,13 @@ import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
 import { Packet, PacketAuth, PacketType } from "@/dto/Packet";
-import ChannelInfo from "@/components/ChannelInfo.vue";
+import ChannelInfo from "@/components/Channel/ChannelInfo.vue";
 import UserInfo from "@/components/User/UserInfo.vue";
-import ChannelList from "@/components/ChannelList.vue";
-import MessageList from "@/components/MessageList.vue";
+import ChannelList from "@/components/Channel/ChannelList.vue";
+import MessageList from "@/components/Message/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
+import MessageInput from "@/components/Message/MessageInput.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 import { sendPacket, sendPacketMessage } from "@/api/ws";
@@ -65,6 +64,7 @@ import { sendPacket, sendPacketMessage } from "@/api/ws";
     ChannelInfo,
     UserInfo,
     MessageList,
+    MessageInput,
     UserList,
   },
   watch: {
@@ -96,22 +96,6 @@ export default class Main extends Vue {
   message = "";
 
   showUserSettings = false;
-
-  messageInputEnter(e: KeyboardEvent): void {
-    if (e.key === "Enter") {
-      if (this.message.length > 0) {
-        sendPacketMessage(this.ws, this.channelUuid, this.message);
-        this.message = "";
-      }
-      e.preventDefault();
-    }
-  }
-
-  getMessageInputPlaceholder(): string {
-    const channel = this.getChannelByUuid(this.channelUuid);
-    if (!channel) return "Message";
-    return "Message in #" + channel.name;
-  }
 
   toggleUserSettings(): void {
     this.showUserSettings = !this.showUserSettings;
@@ -279,6 +263,10 @@ export default class Main extends Vue {
       this.initWebSocket();
     }
   }
+
+  sendMessage(content: string) {
+    sendPacketMessage(this.ws, this.channelUuid, content);
+  }
 }
 </script>
 
@@ -363,20 +351,6 @@ export default class Main extends Vue {
 
       .message {
         padding: 0px 15px 15px;
-
-        textarea {
-          height: 50px;
-          padding: 16px 20px;
-          border-radius: 10px;
-          resize: none;
-          margin: 0;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-            0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-          &:focus {
-            border: 1px solid $border-color;
-          }
-        }
       }
     }
   }
