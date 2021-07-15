@@ -17,12 +17,11 @@ export interface Packet {
 
 export enum PacketType {
   AUTH = 0,
-  CHANNEL_LIST = 1,
-  USER_LIST = 2,
-  ONLINE_USERS = 3,
-  OFFLINE_USERS = 4,
-  ADD_USERS = 5,
-  REMOVE_USERS = 6,
-  UPDATE_USERS = 7,
-  MESSAGE = 8,
+  USER_LIST = 1,
+  ONLINE_USERS = 2,
+  OFFLINE_USERS = 3,
+  ADD_USERS = 4,
+  REMOVE_USERS = 5,
+  UPDATE_USERS = 6,
+  MESSAGE = 7,
 }

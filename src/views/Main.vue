@@ -57,7 +57,7 @@ import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import { webSocketUrl } from "@/env";
-import { getChannelMessages } from "@/api/http";
+import { getChannelMessages, getChannels } from "@/api/http";
 
 @Options({
   props: {},
@@ -118,6 +118,12 @@ export default class Main extends Vue {
 
   toggleUserSettings(): void {
     this.showUserSettings = !this.showUserSettings;
+  }
+
+  async fetchChannels(): Promise<void> {
+    this.channels = await getChannels(this.$store.state.token);
+    if (this.currentChannelUuid == "")
+      this.setCurrentChannelUuid(this.channels[0].uuid);
   }
 
   async fetchChannelMessages(): Promise<void> {
@@ -205,8 +211,9 @@ export default class Main extends Vue {
       if (typeof packet.data == "string" && packet.data.length == 36) {
         console.log("RECEIVED AUTH:", packet.data);
         this.currentUserUuid = packet.data;
-        this.sendPacket(PacketType.CHANNEL_LIST);
-        this.sendPacket(PacketType.USER_LIST);
+        this.fetchChannels().then(() => {
+          this.sendPacket(PacketType.USER_LIST);
+        });
       } else {
         localStorage.removeItem("token");
         this.$store.state.token = "";
@@ -227,16 +234,6 @@ export default class Main extends Vue {
           this.users.push(user);
         }
         this.sendPacket(PacketType.ONLINE_USERS);
-      }
-    } else if (packet.type === PacketType.CHANNEL_LIST) {
-      console.log("RECEIVED CHANNEL_LIST:", packet.data);
-      if (packet.data instanceof Array) {
-        this.channels = [];
-        for (let i = 0; i < packet.data.length; i++) {
-          this.channels.push(packet.data[i] as Channel);
-          if (this.currentChannelUuid == "")
-            this.setCurrentChannelUuid((packet.data[i] as Channel).uuid);
-        }
       }
     } else if (packet.type === PacketType.MESSAGE) {
       console.log("RECEIVED MESSAGE:", packet.data);

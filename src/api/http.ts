@@ -1,6 +1,16 @@
+import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
 import { httpUrl } from "@/env";
 import axios from "axios";
+
+export async function getChannels(token: string): Promise<Channel[]> {
+  const res = await axios.get(`${httpUrl}/channels`, {
+    headers: {
+      token,
+    },
+  });
+  return res.data;
+}
 
 export async function getChannelMessages(
   token: string,
