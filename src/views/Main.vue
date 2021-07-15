@@ -57,7 +57,7 @@ import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import { webSocketUrl } from "@/env";
-import { getChannelMessages, getChannels } from "@/api/http";
+import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 
 @Options({
   props: {},
@@ -140,6 +140,10 @@ export default class Main extends Vue {
     this.sortMessages();
   }
 
+  async fetchUsers(): Promise<void> {
+    this.users = await getUsers(this.$store.state.token);
+  }
+
   setCurrentChannelUuid(uuid: string): void {
     this.currentChannelUuid = uuid;
     if (
@@ -212,21 +216,19 @@ export default class Main extends Vue {
         console.log("RECEIVED AUTH:", packet.data);
         this.currentUserUuid = packet.data;
         this.fetchChannels().then(() => {
-          this.sendPacket(PacketType.USER_LIST);
+          this.fetchUsers().then(() => {
+            this.sendPacket(PacketType.ONLINE_USERS);
+            this.loading = false;
+            this.reconnecting = false;
+          });
         });
       } else {
         localStorage.removeItem("token");
         this.$store.state.token = "";
         this.$router.push("/login");
       }
-    } else if (
-      packet.type === PacketType.USER_LIST ||
-      packet.type === PacketType.ADD_USERS
-    ) {
-      if (packet.type === PacketType.USER_LIST) {
-        console.log("RECEIVED USER_LIST:", packet.data);
-        this.users = [];
-      } else console.log("RECEIVED ADD_USERS:", packet.data);
+    } else if (packet.type === PacketType.ADD_USERS) {
+      console.log("RECEIVED ADD_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let user = packet.data[i] as User;
@@ -288,10 +290,6 @@ export default class Main extends Vue {
           }
         }
       }
-    }
-    if (this.channels.length > 0 && this.users.length > 0) {
-      this.loading = false;
-      this.reconnecting = false;
     }
   }
 

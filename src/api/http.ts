@@ -1,5 +1,6 @@
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
+import { User } from "@/dto/User";
 import { httpUrl } from "@/env";
 import axios from "axios";
 
@@ -32,4 +33,17 @@ export async function getChannelMessages(
     message.date = new Date(message.date);
   });
   return messages;
+}
+
+export async function getUsers(token: string): Promise<User[]> {
+  const res = await axios.get(`${httpUrl}/users`, {
+    headers: {
+      token,
+    },
+  });
+  const users = res.data as User[];
+  users.forEach((user) => {
+    user.online = false;
+  });
+  return res.data;
 }
