@@ -72,8 +72,8 @@ export default class MessageList extends Vue {
     return false;
   }
 
-  setUserPopoutUuid(userUuid: string): void {
-    this.$emit("setUserPopoutUuid", userUuid);
+  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
+    this.$emit("setUserPopoutUuid", userUuid, element);
   }
 }
 </script>

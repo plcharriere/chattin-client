@@ -10,6 +10,9 @@
             overrideUuid.length === 0) ||
           overrideUrl === 'default',
       },
+      {
+        clickable: openPopoutUuid.length > 0,
+      },
     ]"
     :style="{
       backgroundImage:
@@ -23,6 +26,7 @@
           ? 'url(' + getAvatarUrl(uuid) + ')'
           : '',
     }"
+    @click="avatarClick(openPopoutUuid)"
   >
     <div
       v-if="overlay"
@@ -66,11 +70,20 @@ import { Options, Vue } from "vue-class-component";
     overlayClickCallback: {
       type: Function,
     },
+    openPopoutUuid: {
+      type: String,
+      default: "",
+    },
   },
 })
 export default class UserAvatar extends Vue {
   getAvatarUrl(uuid: string): string {
     return httpUrl + "/avatars/" + uuid;
+  }
+
+  avatarClick(openPopoutUuid: string): void {
+    if (openPopoutUuid !== "")
+      this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);
   }
 }
 </script>
@@ -117,6 +130,16 @@ export default class UserAvatar extends Vue {
     }
     &.large {
       background-size: 64px;
+    }
+  }
+
+  &.clickable {
+    cursor: pointer;
+    transition: all 300ms;
+
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="user">
+  <div class="user" @click="setUserPopoutUuid(user.uuid)">
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
     <UserName :user="user" class="name" />
   </div>
@@ -24,7 +24,11 @@ import UserName from "@/components/User/UserName.vue";
     },
   },
 })
-export default class UserListItem extends Vue {}
+export default class UserListItem extends Vue {
+  setUserPopoutUuid(userUuid: string): void {
+    this.$emit("setUserPopoutUuid", userUuid, this.$el);
+  }
+}
 </script>
 
 <style scoped lang="scss">

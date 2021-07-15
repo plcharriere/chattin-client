@@ -1,5 +1,9 @@
 <template>
-  <div class="name">
+  <div
+    class="name"
+    :class="{ clickable: openPopoutUuid.length > 0 }"
+    @click="nameClick(openPopoutUuid)"
+  >
     {{ getUserName(user) }}
   </div>
 </template>
@@ -15,11 +19,20 @@ import { Options, Vue } from "vue-class-component";
       type: Object as PropType<User>,
       required: true,
     },
+    openPopoutUuid: {
+      type: String,
+      default: "",
+    },
   },
 })
 export default class UserName extends Vue {
   getUserName(user: User): string {
     return user.nickname.length > 0 ? user.nickname : user.login;
+  }
+
+  nameClick(openPopoutUuid: string): void {
+    if (openPopoutUuid !== "")
+      this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);
   }
 }
 </script>
@@ -27,5 +40,13 @@ export default class UserName extends Vue {
 <style scoped lang="scss">
 .name {
   color: #222;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 </style>

@@ -5,6 +5,10 @@
       v-if="userPopoutUuid.length > 0"
       :user="getUserByUuid(users, userPopoutUuid)"
       @clickedOutsidePopout="setUserPopoutUuid('')"
+      :style="{
+        left: userPopoutX + 'px',
+        top: userPopoutY + 'px',
+      }"
     />
     <UserSettings
       v-if="showUserSettings"
@@ -115,14 +119,30 @@ export default class Main extends Vue {
   message = "";
 
   userPopoutUuid = "";
+  userPopoutX = 0;
+  userPopoutY = 0;
+
   showUserSettings = false;
 
-  setUserPopoutUuid(userUuid: string): void {
+  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     if (userUuid === "") this.userPopoutUuid = userUuid;
-    else
+    else {
+      let rect = element.getBoundingClientRect();
+      let posX = rect.left + element.offsetWidth + 12;
+      let posY = rect.top;
+
+      if (posX + 300 > window.screen.width) {
+        posX = rect.left - element.offsetWidth - element.offsetWidth / 2 - 8;
+        posY = rect.bottom - element.offsetHeight;
+      }
+
+      this.userPopoutX = posX;
+      this.userPopoutY = posY;
+
       setTimeout(() => {
         this.userPopoutUuid = userUuid;
       });
+    }
   }
 
   mounted(): void {

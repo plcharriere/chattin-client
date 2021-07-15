@@ -10,7 +10,7 @@
         v-for="user in getOnlineUsers(users)"
         v-bind:key="user.uuid"
         :user="user"
-        @click="setUserPopoutUuid(user.uuid)"
+        @setUserPopoutUuid="setUserPopoutUuid"
       />
     </div>
     <div class="list" v-if="getOfflineUsers(users).length > 0">
@@ -23,7 +23,7 @@
         v-for="user in getOfflineUsers(users)"
         v-bind:key="user.uuid"
         :user="user"
-        @click="setUserPopoutUuid(user.uuid)"
+        @setUserPopoutUuid="setUserPopoutUuid"
       />
     </div>
   </div>
@@ -55,8 +55,8 @@ export default class UserList extends Vue {
     return users.filter((user) => user.online === false);
   }
 
-  setUserPopoutUuid(userUuid: string): void {
-    this.$emit("setUserPopoutUuid", userUuid);
+  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
+    this.$emit("setUserPopoutUuid", userUuid, element);
   }
 }
 </script>

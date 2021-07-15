@@ -4,11 +4,17 @@
       <UserAvatar
         :uuid="user.avatarUuid"
         size="small"
-        @click="setUserPopoutUuid(user.uuid)"
+        :openPopoutUuid="user.uuid"
+        @setUserPopoutUuid="setUserPopoutUuid"
       />
       <div class="container">
         <div class="infos">
-          <UserName :user="user" @click="setUserPopoutUuid(user.uuid)" />
+          <UserName
+            :user="user"
+            @click="setUserPopoutUuid(user.uuid)"
+            :openPopoutUuid="user.uuid"
+            @setUserPopoutUuid="setUserPopoutUuid"
+          />
           <div class="date">{{ getMessageDateString(message, false) }}</div>
         </div>
         <div class="content">{{ message.content }}</div>
@@ -51,8 +57,8 @@ import UserName from "@/components/User/UserName.vue";
   },
 })
 export default class MessageList extends Vue {
-  setUserPopoutUuid(userUuid: string): void {
-    this.$emit("setUserPopoutUuid", userUuid);
+  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
+    this.$emit("setUserPopoutUuid", userUuid, element);
   }
 
   getMessageDateString(message: Message, onlyHour: boolean): string {
@@ -97,24 +103,6 @@ export default class MessageList extends Vue {
   &.user {
     padding: 6px 16px;
     margin-top: 12px;
-
-    .avatar {
-      cursor: pointer;
-      transition: all 300ms;
-
-      &:hover {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      }
-    }
-
-    .name {
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
 
     .container {
       margin-left: 16px;
