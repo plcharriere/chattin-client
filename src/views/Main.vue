@@ -1,6 +1,11 @@
 <template>
   <Loading v-if="loading" :reconnecting="reconnecting" />
   <div v-else class="main">
+    <UserPopout
+      v-if="userPopoutUuid.length > 0"
+      :user="getUserByUuid(users, userPopoutUuid)"
+      @clickedOutsidePopout="setUserPopoutUuid('')"
+    />
     <UserSettings
       v-if="showUserSettings"
       :user="getUserByUuid(users, userUuid)"
@@ -25,6 +30,7 @@
           :messages="getMessagesByChannelUuid(messages, channelUuid)"
           :users="users"
           @scrolledTop="fetchChannelMessages"
+          @setUserPopoutUuid="setUserPopoutUuid"
         />
         <div class="message">
           <MessageInput
@@ -33,7 +39,7 @@
           />
         </div>
       </div>
-      <UserList :users="users" />
+      <UserList :users="users" @setUserPopoutUuid="setUserPopoutUuid" />
     </div>
   </div>
 </template>
@@ -52,6 +58,7 @@ import MessageList from "@/components/Message/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import MessageInput from "@/components/Message/MessageInput.vue";
+import UserPopout from "@/components/User/UserPopout.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 import { sendPacket, sendPacketMessage } from "@/api/ws";
@@ -72,6 +79,7 @@ import {
     MessageList,
     MessageInput,
     UserList,
+    UserPopout,
   },
   methods: {
     getUserByUuid: getUserByUuid,
@@ -106,7 +114,16 @@ export default class Main extends Vue {
 
   message = "";
 
+  userPopoutUuid = "";
   showUserSettings = false;
+
+  setUserPopoutUuid(userUuid: string): void {
+    if (userUuid === "") this.userPopoutUuid = userUuid;
+    else
+      setTimeout(() => {
+        this.userPopoutUuid = userUuid;
+      });
+  }
 
   mounted(): void {
     if (this.$store.state.token == "") {
@@ -278,6 +295,10 @@ export default class Main extends Vue {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+
+  .popout {
+    position: absolute;
+  }
 
   .infos {
     display: flex;

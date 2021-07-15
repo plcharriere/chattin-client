@@ -6,6 +6,7 @@
       :message="message"
       :user="getUserByUuid(users, message.userUuid)"
       :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
+      @setUserPopoutUuid="setUserPopoutUuid"
     />
   </div>
 </template>
@@ -69,6 +70,10 @@ export default class MessageList extends Vue {
     )
       return true;
     return false;
+  }
+
+  setUserPopoutUuid(userUuid: string): void {
+    this.$emit("setUserPopoutUuid", userUuid);
   }
 }
 </script>

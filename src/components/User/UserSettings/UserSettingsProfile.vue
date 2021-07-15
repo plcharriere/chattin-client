@@ -69,7 +69,7 @@ export default class UserSettingsProfile extends Vue {
 
   save(): void {
     this.loading = true;
-    axios.post(httpUrl + "/user/profile", this.profileEdit).then(() => {
+    axios.post(httpUrl + "/users/profile", this.profileEdit).then(() => {
       this.loading = false;
     });
   }
