@@ -122,8 +122,6 @@ export default class Main extends Vue {
 
   async fetchChannels(): Promise<void> {
     this.channels = await getChannels(this.$store.state.token);
-    if (this.currentChannelUuid == "")
-      this.setCurrentChannelUuid(this.channels[0].uuid);
   }
 
   async fetchChannelMessages(): Promise<void> {
@@ -144,19 +142,15 @@ export default class Main extends Vue {
     this.users = await getUsers(this.$store.state.token);
   }
 
-  setCurrentChannelUuid(uuid: string): void {
+  setCurrentChannelUuid(uuid: string, notify = true): void {
     this.currentChannelUuid = uuid;
+    if (notify) this.sendPacket(PacketType.SET_CHANNEL_UUID, uuid);
     if (
       this.messages.filter((message) => message.channelUuid === uuid).length ===
       0
     ) {
       const channel = this.getChannelByUuid(uuid);
-      if (channel) {
-        this.sendPacket(PacketType.SET_CHANNEL_UUID, channel.uuid);
-        if (channel.saveMessages) {
-          this.fetchChannelMessages();
-        }
-      }
+      if (channel && channel.saveMessages) this.fetchChannelMessages();
     }
   }
 
@@ -220,8 +214,12 @@ export default class Main extends Vue {
       this.reconnecting = false;
       if (packet.data instanceof Array) {
         this.currentUserUuid = packet.data[0] as string;
-        this.currentChannelUuid = packet.data[1] as string;
+        const channelUuid = packet.data[1] as string;
         this.fetchChannels().then(() => {
+          this.setCurrentChannelUuid(
+            channelUuid == "" ? this.channels[0].uuid : channelUuid,
+            false
+          );
           this.fetchUsers().then(() => {
             this.loading = false;
             this.reconnecting = false;
