@@ -4,8 +4,8 @@
       v-for="channel in channels"
       v-bind:key="channel.uuid"
       class="channel"
-      :class="{ active: currentChannelUuid == channel.uuid }"
-      @click="setCurrentChannelUuid(channel.uuid)"
+      :class="{ active: channelUuid == channel.uuid }"
+      @click="setChannelUuid(channel.uuid)"
     >
       <div class="hashtag"></div>
       {{ channel.name }}
@@ -24,15 +24,15 @@ import { Channel } from "@/dto/Channel";
       type: Array as PropType<Channel[]>,
       required: true,
     },
-    currentChannelUuid: {
+    channelUuid: {
       type: String,
       required: true,
     },
   },
 })
 export default class ChannelList extends Vue {
-  setCurrentChannelUuid(uuid: string): void {
-    this.$emit("setCurrentChannelUuid", uuid);
+  setChannelUuid(uuid: string): void {
+    this.$emit("setChannelUuid", uuid);
   }
 }
 </script>

@@ -7,26 +7,23 @@
   <div v-else class="main">
     <UserSettings
       v-if="showUserSettings"
-      :user="getUserByUuid(currentUserUuid)"
+      :user="getUserByUuid(userUuid)"
       :closeCallback="toggleUserSettings"
     />
     <div class="infos">
       <div class="server">Chattin</div>
-      <ChannelInfo :channel="getChannelByUuid(currentChannelUuid)" />
-      <UserInfo
-        :user="getUserByUuid(currentUserUuid)"
-        @click="toggleUserSettings"
-      />
+      <ChannelInfo :channel="getChannelByUuid(channelUuid)" />
+      <UserInfo :user="getUserByUuid(userUuid)" @click="toggleUserSettings" />
     </div>
     <div class="content">
       <ChannelList
         :channels="channels"
-        :currentChannelUuid="currentChannelUuid"
-        @setCurrentChannelUuid="setCurrentChannelUuid"
+        :channelUuid="channelUuid"
+        @setChannelUuid="setChannelUuid"
       />
       <div class="channel">
         <MessageList
-          :messages="getChannelMessages(currentChannelUuid)"
+          :messages="getChannelMessages(channelUuid)"
           :users="users"
           @scrolledTop="fetchChannelMessages"
         />
@@ -48,8 +45,8 @@
 import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
-import { Message, MessageInput } from "@/dto/Message";
-import { Packet, PacketData, PacketType } from "@/dto/Packet";
+import { Message } from "@/dto/Message";
+import { Packet, PacketAuth, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/User/UserInfo.vue";
 import ChannelList from "@/components/ChannelList.vue";
@@ -58,6 +55,7 @@ import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
+import { sendPacket, sendPacketMessage } from "@/api/ws";
 
 @Options({
   props: {},
@@ -69,6 +67,18 @@ import { getChannelMessages, getChannels, getUsers } from "@/api/http";
     MessageList,
     UserList,
   },
+  watch: {
+    messages() {
+      this.messages = this.messages.sort(function (
+        message1: Message,
+        message2: Message
+      ) {
+        return (
+          new Date(message1.date).getTime() - new Date(message2.date).getTime()
+        );
+      });
+    },
+  },
 })
 export default class Main extends Vue {
   loading = true;
@@ -76,34 +86,21 @@ export default class Main extends Vue {
 
   ws: WebSocket | null = null;
 
-  channels: Channel[] = [];
+  userUuid = "";
+  channelUuid = "";
 
   users: User[] = [];
-
+  channels: Channel[] = [];
   messages: Message[] = [];
 
   message = "";
 
-  currentChannelUuid = "";
-  currentUserUuid = "";
-
   showUserSettings = false;
-
-  sortMessages(): void {
-    this.messages = this.messages.sort(function (message1, message2) {
-      return (
-        new Date(message1.date).getTime() - new Date(message2.date).getTime()
-      );
-    });
-  }
 
   messageInputEnter(e: KeyboardEvent): void {
     if (e.key === "Enter") {
       if (this.message.length > 0) {
-        this.sendPacket(PacketType.MESSAGE, {
-          channelUuid: this.currentChannelUuid,
-          content: this.message,
-        } as MessageInput);
+        sendPacketMessage(this.ws, this.channelUuid, this.message);
         this.message = "";
       }
       e.preventDefault();
@@ -111,7 +108,7 @@ export default class Main extends Vue {
   }
 
   getMessageInputPlaceholder(): string {
-    const channel = this.getChannelByUuid(this.currentChannelUuid);
+    const channel = this.getChannelByUuid(this.channelUuid);
     if (!channel) return "Message";
     return "Message in #" + channel.name;
   }
@@ -126,25 +123,24 @@ export default class Main extends Vue {
 
   async fetchChannelMessages(): Promise<void> {
     const firstChannelMessage = this.messages.filter(
-      (message) => message.channelUuid === this.currentChannelUuid
+      (message) => message.channelUuid === this.channelUuid
     )[0];
     const messages = await getChannelMessages(
       this.$store.state.token,
-      this.currentChannelUuid,
+      this.channelUuid,
       firstChannelMessage !== undefined ? firstChannelMessage.uuid : "",
       50
     );
     this.messages = this.messages.concat(messages);
-    this.sortMessages();
   }
 
   async fetchUsers(): Promise<void> {
     this.users = await getUsers(this.$store.state.token);
   }
 
-  setCurrentChannelUuid(uuid: string, notify = true): void {
-    this.currentChannelUuid = uuid;
-    if (notify) this.sendPacket(PacketType.SET_CHANNEL_UUID, uuid);
+  setChannelUuid(uuid: string, notify = true): void {
+    this.channelUuid = uuid;
+    if (notify) sendPacket(this.ws, PacketType.SET_CHANNEL_UUID, uuid);
     if (
       this.messages.filter((message) => message.channelUuid === uuid).length ===
       0
@@ -162,27 +158,6 @@ export default class Main extends Vue {
     return this.users.find((user) => user.uuid === uuid);
   }
 
-  sendPacket(type: PacketType, data: PacketData = ""): void {
-    if (this.ws) {
-      console.log("SEND PACKET:", type, data);
-      const packet: Packet = {
-        type: type,
-        data: data,
-      };
-      this.ws.send(JSON.stringify(packet));
-    } else {
-      console.log("SEND PACKET: ws is null");
-    }
-  }
-
-  sendMessage(): void {
-    this.sendPacket(PacketType.MESSAGE, {
-      channelUuid: this.currentChannelUuid,
-      content: this.message,
-    } as MessageInput);
-    this.message = "";
-  }
-
   getChannelMessages(uuid: string): Message[] {
     return this.messages.filter((message) => message.channelUuid == uuid);
   }
@@ -190,7 +165,7 @@ export default class Main extends Vue {
   initWebSocket(): void {
     this.ws = new WebSocket(webSocketUrl + "/ws");
     this.ws.onopen = () => {
-      this.sendPacket(PacketType.AUTH, this.$store.state.token);
+      sendPacket(this.ws, PacketType.AUTH, this.$store.state.token);
     };
     this.ws.onclose = () => {
       console.log("CLOSE");
@@ -212,11 +187,12 @@ export default class Main extends Vue {
     if (packet.type === PacketType.AUTH) {
       console.log("RECEIVED AUTH:", packet.data);
       this.reconnecting = false;
-      if (packet.data instanceof Array) {
-        this.currentUserUuid = packet.data[0] as string;
-        const channelUuid = packet.data[1] as string;
+      const auth = packet.data as PacketAuth;
+      if (auth.userUuid && auth.channelUuid) {
+        this.userUuid = auth.userUuid;
+        const channelUuid = auth.channelUuid;
         this.fetchChannels().then(() => {
-          this.setCurrentChannelUuid(
+          this.setChannelUuid(
             channelUuid == "" ? this.channels[0].uuid : channelUuid,
             false
           );
@@ -238,7 +214,7 @@ export default class Main extends Vue {
           user.online = false;
           this.users.push(user);
         }
-        this.sendPacket(PacketType.ONLINE_USERS);
+        sendPacket(this.ws, PacketType.ONLINE_USERS);
       }
     } else if (packet.type === PacketType.MESSAGE) {
       console.log("RECEIVED MESSAGE:", packet.data);
