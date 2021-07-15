@@ -28,7 +28,7 @@
         <MessageList
           :messages="getChannelMessages(currentChannelUuid)"
           :users="users"
-          @scrolledTop="onMessageListScrolledTop"
+          @scrolledTop="fetchChannelMessages"
         />
         <div class="message">
           <textarea
@@ -56,8 +56,8 @@ import ChannelList from "@/components/ChannelList.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
-import { httpUrl, webSocketUrl } from "@/env";
-import axios from "axios";
+import { webSocketUrl } from "@/env";
+import { getChannelMessages } from "@/api/http";
 
 @Options({
   props: {},
@@ -68,11 +68,6 @@ import axios from "axios";
     UserInfo,
     MessageList,
     UserList,
-  },
-  watch: {
-    currentChannelUuid(uuid) {
-      this.onChangedCurrentChannelUuid(uuid);
-    },
   },
 })
 export default class Main extends Vue {
@@ -93,6 +88,14 @@ export default class Main extends Vue {
   currentUserUuid = "";
 
   showUserSettings = false;
+
+  sortMessages(): void {
+    this.messages = this.messages.sort(function (message1, message2) {
+      return (
+        new Date(message1.date).getTime() - new Date(message2.date).getTime()
+      );
+    });
+  }
 
   messageInputEnter(e: KeyboardEvent): void {
     if (e.key === "Enter") {
@@ -117,63 +120,29 @@ export default class Main extends Vue {
     this.showUserSettings = !this.showUserSettings;
   }
 
-  getChannelMessageHistory(
-    channelUuid: string,
-    fromMessageUuid: string,
-    count: number
-  ): void {
-    axios
-      .get(`${httpUrl}/channels/${channelUuid}/messages`, {
-        params: {
-          from: fromMessageUuid,
-          count: count,
-        },
-        headers: {
-          token: this.$store.state.token,
-        },
-      })
-      .then((resp) => {
-        if (resp.data instanceof Array) {
-          for (let i = 0; i < resp.data.length; i++) {
-            let message = resp.data[i] as Message;
-            message.date = new Date(message.date);
-            this.messages.push(message);
-            this.messages = this.messages.sort(function (message1, message2) {
-              return (
-                new Date(message1.date).getTime() -
-                new Date(message2.date).getTime()
-              );
-            });
-          }
-        }
-      });
-  }
-
-  onMessageListScrolledTop(): void {
-    const channelMessages = this.messages.filter(
+  async fetchChannelMessages(): Promise<void> {
+    const firstChannelMessage = this.messages.filter(
       (message) => message.channelUuid === this.currentChannelUuid
+    )[0];
+    const messages = await getChannelMessages(
+      this.$store.state.token,
+      this.currentChannelUuid,
+      firstChannelMessage !== undefined ? firstChannelMessage.uuid : "",
+      50
     );
-    if (channelMessages && channelMessages.length > 0)
-      this.getChannelMessageHistory(
-        this.currentChannelUuid,
-        channelMessages[0].uuid,
-        50
-      );
+    this.messages = this.messages.concat(messages);
+    this.sortMessages();
   }
 
-  onChangedCurrentChannelUuid(uuid: string): void {
+  setCurrentChannelUuid(uuid: string): void {
+    this.currentChannelUuid = uuid;
     if (
       this.messages.filter((message) => message.channelUuid === uuid).length ===
       0
     ) {
       const channel = this.getChannelByUuid(uuid);
-      if (channel && channel.saveMessages)
-        this.getChannelMessageHistory(uuid, "", 50);
+      if (channel && channel.saveMessages) this.fetchChannelMessages();
     }
-  }
-
-  setCurrentChannelUuid(uuid: string): void {
-    this.currentChannelUuid = uuid;
   }
 
   getChannelByUuid(uuid: string): Channel | undefined {
@@ -266,7 +235,7 @@ export default class Main extends Vue {
         for (let i = 0; i < packet.data.length; i++) {
           this.channels.push(packet.data[i] as Channel);
           if (this.currentChannelUuid == "")
-            this.currentChannelUuid = (packet.data[i] as Channel).uuid;
+            this.setCurrentChannelUuid((packet.data[i] as Channel).uuid);
         }
       }
     } else if (packet.type === PacketType.MESSAGE) {
