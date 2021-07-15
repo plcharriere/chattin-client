@@ -7,22 +7,26 @@
           size="large"
           :overlay="!loading"
           overlayIcon="upload"
-          :overlayClickCallback="avatarClick"
-          :overrideUrl="avatarPreviewUrl"
+          :overlayClickCallback="previewClick"
+          :overrideUrl="previewUrl"
+          :overrideUuid="previewUuid"
         />
-        <span class="remove" @click="removeCurrentAvatar">Remove</span>
+        <span class="remove" @click="previewRemove">Remove</span>
       </div>
       <input
         type="file"
-        id="avatarFileInput"
-        @change="avatarChange"
+        id="avatarFile"
+        @change="previewChange"
         :disabled="loading"
         accept="image/png, image/gif, image/jpeg, image/webp"
       />
       <button
         class="btn"
         @click="save"
-        :class="{ disabled: loading || avatarPreviewUrl === null }"
+        :class="{
+          disabled:
+            loading || (previewUrl.length === 0 && previewUuid.length === 0),
+        }"
       >
         Save
       </button>
@@ -37,6 +41,7 @@
         :overlay="true"
         overlayIcon="arrow-up"
         :overrideUuid="uuid"
+        @click="avatarClick(uuid)"
       />
     </div>
   </div>
@@ -65,10 +70,12 @@ import { getAvatars } from "@/api/http";
 export default class UserSettingsProfile extends Vue {
   loading = false;
 
-  avatarPreviewUrl = "";
-  avatarFile: File | null = null;
-
   avatars: string[] = [];
+
+  previewUrl = "";
+  previewUuid = "";
+
+  file: File | null = null;
 
   mounted(): void {
     this.fetchAvatars();
@@ -78,51 +85,46 @@ export default class UserSettingsProfile extends Vue {
     this.avatars = (await getAvatars(this.$store.state.token)).reverse() || [];
   }
 
-  getAvatarUrl(uuid: string): string {
-    return `${httpUrl}/avatars/${uuid}`;
+  previewClick(): void {
+    const fileInput = document.getElementById("avatarFile");
+    if (fileInput) fileInput.click();
   }
 
-  avatarClick(): void {
-    const avatarFileInput = document.getElementById("avatarFileInput");
-    if (avatarFileInput) avatarFileInput.click();
-  }
-
-  avatarChange(event: Event): void {
+  previewChange(event: Event): void {
     if (
       event.target &&
       event.target instanceof HTMLInputElement &&
       event.target.files &&
       event.target.files[0]
     )
-      this.avatarFile = event.target.files[0];
-    console.log(this.avatarFile?.type);
-    this.avatarPreviewUrl = URL.createObjectURL(this.avatarFile);
+      this.file = event.target.files[0];
+    this.previewUrl = URL.createObjectURL(this.file);
   }
 
-  removeCurrentAvatar(): void {
-    this.avatarPreviewUrl = "default";
+  previewRemove(): void {
+    this.previewUrl = "default";
   }
 
-  chooseAvatarUuid(uuid: string): void {
-    console.log(uuid);
+  avatarClick(uuid: string): void {
+    this.previewUrl = "";
+    this.file = null;
+    this.previewUuid = uuid;
   }
 
   save(): void {
     this.loading = true;
-    const avatarFileInput = document.getElementById(
-      "avatarFileInput"
-    ) as HTMLInputElement;
+
     const formData = new FormData();
     formData.append("token", this.$store.state.token);
-    if (this.avatarFile) {
-      formData.append("file", this.avatarFile);
-    }
+    if (this.file) formData.append("file", this.file);
+    else if (this.previewUuid) formData.append("uuid", this.previewUuid);
     axios.post(httpUrl + "/avatars", formData).then(async () => {
       await this.fetchAvatars();
       this.loading = false;
-      this.avatarPreviewUrl = "";
-      this.avatarFile = null;
-      avatarFileInput.value = "";
+      this.previewUrl = "";
+      this.previewUuid = "";
+      this.file = null;
+      (document.getElementById("avatarFile") as HTMLInputElement).value = "";
     });
   }
 }
@@ -174,6 +176,7 @@ export default class UserSettingsProfile extends Vue {
   .list {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     margin-top: 20px;
     border-top: 1px solid #ddd;
     padding: 20px 0;
@@ -189,7 +192,7 @@ export default class UserSettingsProfile extends Vue {
     }
 
     .avatar {
-      margin-right: 20px;
+      margin: 0px 10px 15px;
     }
   }
 }

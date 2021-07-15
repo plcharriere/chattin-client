@@ -68,7 +68,7 @@ export default class UserSettings extends Vue {
   .settings {
     position: relative;
     background: #fff;
-    min-width: 800px;
+    width: 800px;
     border-radius: 10px;
     display: flex;
     flex-direction: row;
