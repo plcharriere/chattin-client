@@ -1,7 +1,7 @@
 <template>
   <div class="message" :class="{ user: showUser }">
     <template v-if="showUser">
-      <UserAvatar :user="user" size="small" />
+      <UserAvatar :uuid="user.avatarUuid" size="small" />
       <div class="container">
         <div class="infos">
           <UserName :user="user" />

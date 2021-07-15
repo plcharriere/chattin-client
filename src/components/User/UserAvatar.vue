@@ -5,58 +5,66 @@
       size,
       {
         default:
-          ((!user || user.avatarUuid.length === 0) && overrideUrl === null) ||
-          (overrideUrl !== null && overrideUrl.length === 0),
+          (uuid.length === 0 &&
+            overrideUrl.length === 0 &&
+            overrideUuid.length === 0) ||
+          overrideUrl === 'default',
       },
     ]"
     :style="{
       backgroundImage:
-        overrideUrl && overrideUrl.length > 0
+        overrideUrl === 'default'
+          ? ''
+          : overrideUrl.length > 0
           ? 'url(' + overrideUrl + ')'
-          : overrideUrl == null && user.avatarUuid.length > 0
-          ? 'url(' + getAvatarUrl(user.avatarUuid) + ')'
+          : overrideUuid.length > 0
+          ? 'url(' + getAvatarUrl(overrideUuid) + ')'
+          : uuid.length > 0
+          ? 'url(' + getAvatarUrl(uuid) + ')'
           : '',
     }"
   >
     <div
-      v-if="editable"
-      class="edit"
-      :class="editIcon"
-      @click="editCallback"
+      v-if="overlay"
+      class="overlay"
+      :class="overlayIcon"
+      @click="overlayClickCallback"
     ></div>
   </div>
 </template>
 
 <script lang="ts">
-import { User } from "@/dto/User";
 import { httpUrl } from "@/env";
-import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {
-    user: {
-      type: Object as PropType<User>,
-      default: null,
+    uuid: {
+      type: String,
+      default: "",
+    },
+    overrideUuid: {
+      type: String,
+      default: "",
+    },
+    overrideUrl: {
+      type: String,
+      default: "",
     },
     size: {
       type: String,
       default: "medium",
     },
-    editable: {
+    overlay: {
       type: Boolean,
       default: false,
     },
-    editIcon: {
+    overlayIcon: {
       type: String,
       default: "pencil",
     },
-    editCallback: {
+    overlayClickCallback: {
       type: Function,
-    },
-    overrideUrl: {
-      type: String,
-      default: null,
     },
   },
 })
@@ -112,7 +120,7 @@ export default class UserAvatar extends Vue {
     }
   }
 
-  .edit {
+  .overlay {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -133,6 +141,10 @@ export default class UserAvatar extends Vue {
 
     &.upload {
       background-image: url(~@/assets/svg/upload.svg);
+    }
+
+    &.arrow-up {
+      background-image: url(~@/assets/svg/arrow-up.svg);
     }
 
     &:hover {

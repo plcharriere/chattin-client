@@ -1,11 +1,11 @@
 <template>
   <div class="user">
     <UserAvatar
-      :user="user"
+      :uuid="user.avatarUuid"
       size="large"
-      :editable="true"
-      editIcon="pencil"
-      :editCallback="editAvatar"
+      :overlay="true"
+      overlayIcon="pencil"
+      :overlayClickCallback="editAvatar"
     />
     <div class="form">
       <span>Login :</span>

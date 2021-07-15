@@ -3,11 +3,11 @@
     <div class="edit">
       <div class="avatar">
         <UserAvatar
-          :user="user"
+          :uuid="user.avatarUuid"
           size="large"
-          :editable="!loading"
-          editIcon="upload"
-          :editCallback="avatarClick"
+          :overlay="!loading"
+          overlayIcon="upload"
+          :overlayClickCallback="avatarClick"
           :overrideUrl="avatarPreviewUrl"
         />
         <span class="remove" @click="removeCurrentAvatar">Remove</span>
@@ -34,7 +34,9 @@
         v-for="uuid in avatars"
         v-bind:key="uuid"
         size="medium"
-        :overrideUrl="getAvatarUrl(uuid)"
+        :overlay="true"
+        overlayIcon="arrow-up"
+        :overrideUuid="uuid"
       />
     </div>
   </div>
@@ -63,7 +65,7 @@ import { getAvatars } from "@/api/http";
 export default class UserSettingsProfile extends Vue {
   loading = false;
 
-  avatarPreviewUrl: string | null = null;
+  avatarPreviewUrl = "";
   avatarFile: File | null = null;
 
   avatars: string[] = [];
@@ -98,7 +100,11 @@ export default class UserSettingsProfile extends Vue {
   }
 
   removeCurrentAvatar(): void {
-    this.avatarPreviewUrl = "";
+    this.avatarPreviewUrl = "default";
+  }
+
+  chooseAvatarUuid(uuid: string): void {
+    console.log(uuid);
   }
 
   save(): void {
@@ -114,7 +120,7 @@ export default class UserSettingsProfile extends Vue {
     axios.post(httpUrl + "/avatars", formData).then(async () => {
       await this.fetchAvatars();
       this.loading = false;
-      this.avatarPreviewUrl = null;
+      this.avatarPreviewUrl = "";
       this.avatarFile = null;
       avatarFileInput.value = "";
     });
