@@ -1,5 +1,5 @@
 import { Channel } from "./Channel";
-import { Message, MessageHistoryRequest, MessageInput } from "./Message";
+import { Message, MessageInput } from "./Message";
 import { User } from "./User";
 
 export type PacketData =
@@ -8,8 +8,7 @@ export type PacketData =
   | Channel[]
   | User[]
   | Message[]
-  | MessageInput
-  | MessageHistoryRequest;
+  | MessageInput;
 
 export interface Packet {
   type: PacketType;
@@ -26,5 +25,4 @@ export enum PacketType {
   REMOVE_USERS = 6,
   UPDATE_USERS = 7,
   MESSAGE = 8,
-  GET_MESSAGES = 9,
 }

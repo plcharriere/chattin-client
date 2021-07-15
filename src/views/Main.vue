@@ -48,7 +48,7 @@
 import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
-import { Message, MessageHistoryRequest, MessageInput } from "@/dto/Message";
+import { Message, MessageInput } from "@/dto/Message";
 import { Packet, PacketData, PacketType } from "@/dto/Packet";
 import ChannelInfo from "@/components/ChannelInfo.vue";
 import UserInfo from "@/components/User/UserInfo.vue";
@@ -56,7 +56,8 @@ import ChannelList from "@/components/ChannelList.vue";
 import MessageList from "@/components/MessageList.vue";
 import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
-import { webSocketUrl } from "@/env";
+import { httpUrl, webSocketUrl } from "@/env";
+import axios from "axios";
 
 @Options({
   props: {},
@@ -121,11 +122,31 @@ export default class Main extends Vue {
     fromMessageUuid: string,
     count: number
   ): void {
-    this.sendPacket(PacketType.GET_MESSAGES, {
-      channelUuid,
-      fromMessageUuid,
-      count,
-    } as MessageHistoryRequest);
+    axios
+      .get(`${httpUrl}/channels/${channelUuid}/messages`, {
+        params: {
+          from: fromMessageUuid,
+          count: count,
+        },
+        headers: {
+          token: this.$store.state.token,
+        },
+      })
+      .then((resp) => {
+        if (resp.data instanceof Array) {
+          for (let i = 0; i < resp.data.length; i++) {
+            let message = resp.data[i] as Message;
+            message.date = new Date(message.date);
+            this.messages.push(message);
+            this.messages = this.messages.sort(function (message1, message2) {
+              return (
+                new Date(message1.date).getTime() -
+                new Date(message2.date).getTime()
+              );
+            });
+          }
+        }
+      });
   }
 
   onMessageListScrolledTop(): void {
@@ -301,23 +322,7 @@ export default class Main extends Vue {
           }
         }
       }
-    } else if (packet.type === PacketType.GET_MESSAGES) {
-      console.log("RECEIVED GET_MESSAGES:", packet.data);
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let message = packet.data[i] as Message;
-          message.date = new Date(message.date);
-          this.messages.push(message);
-          this.messages = this.messages.sort(function (message1, message2) {
-            return (
-              new Date(message1.date).getTime() -
-              new Date(message2.date).getTime()
-            );
-          });
-        }
-      }
     }
-
     if (this.channels.length > 0 && this.users.length > 0) {
       this.loading = false;
       this.reconnecting = false;
