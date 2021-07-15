@@ -33,16 +33,16 @@
     </div>
     <div class="list" :class="{ empty: avatars.length === 0 }">
       <span v-if="avatars.length === 0">You haven't uploaded any avatar.</span>
-      <UserAvatar
-        v-else
-        v-for="uuid in avatars"
-        v-bind:key="uuid"
-        size="medium"
-        :overlay="true"
-        overlayIcon="arrow-up"
-        :overrideUuid="uuid"
-        @click="avatarClick(uuid)"
-      />
+      <div v-else v-for="uuid in avatars" v-bind:key="uuid" class="item">
+        <UserAvatar
+          size="medium"
+          :overlay="true"
+          overlayIcon="arrow-up"
+          :overrideUuid="uuid"
+          @click="avatarClick(uuid)"
+        />
+        <div class="delete" @click="deleteAvatar(uuid)"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -109,6 +109,18 @@ export default class UserSettingsProfile extends Vue {
     this.previewUrl = "";
     this.file = null;
     this.previewUuid = uuid;
+  }
+
+  deleteAvatar(uuid: string): void {
+    axios
+      .delete(`${httpUrl}/avatars/${uuid}`, {
+        headers: {
+          token: this.$store.state.token,
+        },
+      })
+      .then(async () => {
+        await this.fetchAvatars();
+      });
   }
 
   save(): void {
@@ -190,9 +202,23 @@ export default class UserSettingsProfile extends Vue {
         color: #666;
       }
     }
-
-    .avatar {
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       margin: 0px 10px 15px;
+
+      .delete {
+        cursor: pointer;
+        background-image: url(~@/assets/svg/trash.svg);
+        width: 16px;
+        height: 16px;
+        margin-top: 8px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
