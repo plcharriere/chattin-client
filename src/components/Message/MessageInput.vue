@@ -26,7 +26,7 @@ export default class MessageInput extends Vue {
     return "Message in #" + channel.name;
   }
 
-  sendMessage(e: KeyboardEvent) {
+  sendMessage(e: KeyboardEvent): void {
     if (this.message.length > 0) {
       this.$emit("sendMessage", this.message);
       this.message = "";

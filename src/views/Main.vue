@@ -1,19 +1,18 @@
 <template>
-  <div v-if="loading" class="loading">
-    <div></div>
-    <span v-if="reconnecting">connection lost, trying to reconnect...</span>
-    <span v-else>totally <b title="not*">now</b> loading...</span>
-  </div>
+  <Loading v-if="loading" :reconnecting="reconnecting" />
   <div v-else class="main">
     <UserSettings
       v-if="showUserSettings"
-      :user="getUserByUuid(userUuid)"
+      :user="getUserByUuid(users, userUuid)"
       :closeCallback="toggleUserSettings"
     />
     <div class="infos">
       <div class="server">Chattin</div>
-      <ChannelInfo :channel="getChannelByUuid(channelUuid)" />
-      <UserInfo :user="getUserByUuid(userUuid)" @click="toggleUserSettings" />
+      <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
+      <UserInfo
+        :user="getUserByUuid(users, userUuid)"
+        @click="toggleUserSettings"
+      />
     </div>
     <div class="content">
       <ChannelList
@@ -23,13 +22,13 @@
       />
       <div class="channel">
         <MessageList
-          :messages="getChannelMessages(channelUuid)"
+          :messages="getMessagesByChannelUuid(messages, channelUuid)"
           :users="users"
           @scrolledTop="fetchChannelMessages"
         />
         <div class="message">
           <MessageInput
-            :channel="getChannelByUuid(channelUuid)"
+            :channel="getChannelByUuid(channels, channelUuid)"
             @sendMessage="sendMessage"
           />
         </div>
@@ -45,6 +44,7 @@ import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
 import { Packet, PacketAuth, PacketType } from "@/dto/Packet";
+import Loading from "@/components/Loading.vue";
 import ChannelInfo from "@/components/Channel/ChannelInfo.vue";
 import UserInfo from "@/components/User/UserInfo.vue";
 import ChannelList from "@/components/Channel/ChannelList.vue";
@@ -55,10 +55,16 @@ import MessageInput from "@/components/Message/MessageInput.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 import { sendPacket, sendPacketMessage } from "@/api/ws";
+import {
+  getUserByUuid,
+  getChannelByUuid,
+  getMessagesByChannelUuid,
+} from "@/utils";
 
 @Options({
   props: {},
   components: {
+    Loading,
     ChannelList,
     UserSettings,
     ChannelInfo,
@@ -66,6 +72,11 @@ import { sendPacket, sendPacketMessage } from "@/api/ws";
     MessageList,
     MessageInput,
     UserList,
+  },
+  methods: {
+    getUserByUuid: getUserByUuid,
+    getChannelByUuid: getUserByUuid,
+    getMessagesByChannelUuid: getMessagesByChannelUuid,
   },
   watch: {
     messages() {
@@ -96,6 +107,33 @@ export default class Main extends Vue {
   message = "";
 
   showUserSettings = false;
+
+  mounted(): void {
+    if (this.$store.state.token == "") {
+      this.$router.push("/login");
+    } else {
+      this.initWebSocket();
+    }
+  }
+
+  initWebSocket(): void {
+    this.ws = new WebSocket(webSocketUrl + "/ws");
+    this.ws.onopen = () => {
+      sendPacket(this.ws, PacketType.AUTH, this.$store.state.token);
+    };
+    this.ws.onclose = () => {
+      console.log("CLOSE");
+      this.loading = true;
+      this.reconnecting = true;
+      setTimeout(this.initWebSocket, 3000);
+    };
+    this.ws.onmessage = (e: MessageEvent) => {
+      this.parseWebSocketMessage(e.data);
+    };
+    this.ws.onerror = function (e: Event) {
+      console.log("ERROR: " + e);
+    };
+  }
 
   toggleUserSettings(): void {
     this.showUserSettings = !this.showUserSettings;
@@ -129,40 +167,9 @@ export default class Main extends Vue {
       this.messages.filter((message) => message.channelUuid === uuid).length ===
       0
     ) {
-      const channel = this.getChannelByUuid(uuid);
+      const channel = getChannelByUuid(this.channels, uuid);
       if (channel && channel.saveMessages) this.fetchChannelMessages();
     }
-  }
-
-  getChannelByUuid(uuid: string): Channel | undefined {
-    return this.channels.find((channel) => channel.uuid === uuid);
-  }
-
-  getUserByUuid(uuid: string): User | undefined {
-    return this.users.find((user) => user.uuid === uuid);
-  }
-
-  getChannelMessages(uuid: string): Message[] {
-    return this.messages.filter((message) => message.channelUuid == uuid);
-  }
-
-  initWebSocket(): void {
-    this.ws = new WebSocket(webSocketUrl + "/ws");
-    this.ws.onopen = () => {
-      sendPacket(this.ws, PacketType.AUTH, this.$store.state.token);
-    };
-    this.ws.onclose = () => {
-      console.log("CLOSE");
-      this.loading = true;
-      this.reconnecting = true;
-      setTimeout(this.initWebSocket, 3000);
-    };
-    this.ws.onmessage = (e: MessageEvent) => {
-      this.parseWebSocketMessage(e.data);
-    };
-    this.ws.onerror = function (e: Event) {
-      console.log("ERROR: " + e);
-    };
   }
 
   parseWebSocketMessage(data: string): void {
@@ -256,15 +263,7 @@ export default class Main extends Vue {
     }
   }
 
-  mounted(): void {
-    if (this.$store.state.token == "") {
-      this.$router.push("/login");
-    } else {
-      this.initWebSocket();
-    }
-  }
-
-  sendMessage(content: string) {
+  sendMessage(content: string): void {
     sendPacketMessage(this.ws, this.channelUuid, content);
   }
 }
@@ -273,38 +272,6 @@ export default class Main extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.loading {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-
-  b {
-    cursor: pointer;
-  }
-
-  div {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    background: url(~@/assets/img/loading-catto-full.gif) !important;
-    border-radius: 100%;
-    background-position: center !important;
-    background-size: 400px !important;
-    box-shadow: 0 3px 0.5rem 0.25rem rgba(0, 0, 0, 0.15);
-    margin-bottom: 30px;
-    transition: all 300ms;
-
-    &:hover {
-      width: 200px;
-      height: 200px;
-    }
-  }
-}
 .main {
   width: 100%;
   height: 100%;
