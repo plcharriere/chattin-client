@@ -55,7 +55,7 @@ export default class ChannelList extends Vue {
     align-items: center;
 
     .hashtag {
-      background: url(~@/assets/svg/hashtag-outline.svg);
+      background: url(~@/assets/svg/heroicons/outline/hashtag.svg);
       width: 18px;
       height: 18px;
       margin-right: 10px;

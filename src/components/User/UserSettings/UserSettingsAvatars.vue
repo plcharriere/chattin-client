@@ -210,7 +210,7 @@ export default class UserSettingsProfile extends Vue {
 
       .delete {
         cursor: pointer;
-        background-image: url(~@/assets/svg/trash.svg);
+        background-image: url(~@/assets/svg/heroicons/outline/trash.svg);
         width: 16px;
         height: 16px;
         margin-top: 8px;

@@ -104,7 +104,7 @@ export default class UserAvatar extends Vue {
 
   &.default {
     background-color: #ddd;
-    background-image: url(~@/assets/svg/user.svg);
+    background-image: url(~@/assets/svg/heroicons/outline/user.svg);
 
     &.tiny {
       background-size: 20px;
@@ -136,15 +136,15 @@ export default class UserAvatar extends Vue {
     transition: all 200ms;
 
     &.pencil {
-      background-image: url(~@/assets/svg/pencil.svg);
+      background-image: url(~@/assets/svg/heroicons/outline/pencil.svg);
     }
 
     &.upload {
-      background-image: url(~@/assets/svg/upload.svg);
+      background-image: url(~@/assets/svg/heroicons/outline/upload.svg);
     }
 
     &.arrow-up {
-      background-image: url(~@/assets/svg/arrow-up.svg);
+      background-image: url(~@/assets/svg/heroicons/outline/arrow-up.svg);
     }
 
     &:hover {

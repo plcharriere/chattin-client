@@ -40,7 +40,7 @@ export default class ChannelInfo extends Vue {}
   padding: 20px;
 
   .hashtag {
-    background: url(~@/assets/svg/hashtag-solid.svg);
+    background: url(~@/assets/svg/heroicons/solid/hashtag.svg);
     width: 24px;
     height: 24px;
     margin-right: 10px;

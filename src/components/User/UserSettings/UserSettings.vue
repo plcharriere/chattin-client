@@ -81,7 +81,7 @@ export default class UserSettings extends Vue {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: url(~@/assets/svg/close.svg);
+      background: url(~@/assets/svg/heroicons/outline/close.svg);
       color: #555;
       width: 24px;
       height: 24px;
