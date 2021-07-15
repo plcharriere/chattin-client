@@ -211,10 +211,11 @@ export default class Main extends Vue {
     const packet = JSON.parse(data) as Packet;
 
     if (packet.type === PacketType.AUTH) {
+      console.log("RECEIVED AUTH:", packet.data);
       this.reconnecting = false;
-      if (typeof packet.data == "string" && packet.data.length == 36) {
-        console.log("RECEIVED AUTH:", packet.data);
-        this.currentUserUuid = packet.data;
+      if (packet.data instanceof Array) {
+        this.currentUserUuid = packet.data[0] as string;
+        this.currentChannelUuid = packet.data[1] as string;
         this.fetchChannels().then(() => {
           this.fetchUsers().then(() => {
             this.loading = false;
