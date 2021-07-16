@@ -19,3 +19,7 @@ export function getMessagesByChannelUuid(
 ): Message[] {
   return messages.filter((message) => message.channelUuid == channelUuid);
 }
+
+export function getUserName(user: User): string {
+  return user.nickname.length > 0 ? user.nickname : user.login;
+}

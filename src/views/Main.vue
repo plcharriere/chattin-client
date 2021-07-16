@@ -39,8 +39,10 @@
         <div class="message">
           <MessageInput
             :channel="getChannelByUuid(channels, channelUuid)"
+            @keyDown="messageKeyDown"
             @sendMessage="sendMessage"
           />
+          <TypingUsers :users="getTypingUsers(typingUsers)" />
         </div>
       </div>
       <UserList :users="users" @setUserPopoutUuid="setUserPopoutUuid" />
@@ -53,6 +55,7 @@ import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
+import { TypingUser } from "@/dto/TypingUser";
 import { Packet, PacketAuth, PacketType } from "@/dto/Packet";
 import Loading from "@/components/Loading.vue";
 import ChannelInfo from "@/components/Channel/ChannelInfo.vue";
@@ -63,6 +66,7 @@ import UserList from "@/components/User/UserList.vue";
 import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import MessageInput from "@/components/Message/MessageInput.vue";
 import UserPopout from "@/components/User/UserPopout.vue";
+import TypingUsers from "@/components/TypingUsers.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 import { sendPacket, sendPacketMessage } from "@/api/ws";
@@ -84,6 +88,7 @@ import {
     MessageInput,
     UserList,
     UserPopout,
+    TypingUsers,
   },
   methods: {
     getUserByUuid: getUserByUuid,
@@ -124,6 +129,9 @@ export default class Main extends Vue {
 
   showUserSettings = false;
 
+  typingUsers: TypingUser[] = [];
+  cleanTypingUsersTimeout = 0;
+
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     if (userUuid === "") this.userPopoutUuid = userUuid;
     else {
@@ -143,6 +151,34 @@ export default class Main extends Vue {
         this.userPopoutUuid = userUuid;
       });
     }
+  }
+
+  getTypingUsers(typingUsers: TypingUser[]): User[] {
+    let users: User[] = [];
+    let now = new Date();
+    typingUsers.forEach((typing) => {
+      if (now.getTime() - typing.date.getTime() < 3000) {
+        let user = this.users.find((user) => user.uuid === typing.userUuid);
+        if (user) users.push(user);
+      }
+    });
+    return users;
+  }
+
+  cleanTypingUsers(): void {
+    let outdatedTypingUsers = this.typingUsers.filter(
+      (typing) => new Date().getTime() - typing.date.getTime() >= 3000
+    );
+    outdatedTypingUsers.forEach((outdatedTyping) => {
+      let index = this.typingUsers.findIndex(
+        (typing) => typing.userUuid === outdatedTyping.userUuid
+      );
+      this.typingUsers.splice(index, 1);
+    });
+  }
+
+  messageKeyDown(): void {
+    sendPacket(this.ws, PacketType.TYPING, this.channelUuid);
   }
 
   mounted(): void {
@@ -216,7 +252,7 @@ export default class Main extends Vue {
       console.log("RECEIVED AUTH:", packet.data);
       this.reconnecting = false;
       const auth = packet.data as PacketAuth;
-      if (auth.userUuid && auth.channelUuid) {
+      if (auth.userUuid) {
         this.userUuid = auth.userUuid;
         const channelUuid = auth.channelUuid;
         this.fetchChannels().then(() => {
@@ -297,6 +333,29 @@ export default class Main extends Vue {
           }
         }
       }
+    } else if (packet.type === PacketType.TYPING) {
+      console.log("RECEIVED TYPING:", packet.data);
+      if (packet.data instanceof Array) {
+        let channelUuid = packet.data[0] as string;
+        let userUuid = packet.data[1] as string;
+        let index = this.typingUsers.findIndex(
+          (typing) => typing.userUuid == userUuid
+        );
+        if (index >= 0) {
+          this.typingUsers[index].channelUuid = channelUuid;
+          this.typingUsers[index].date = new Date();
+        } else {
+          this.typingUsers.push({
+            userUuid,
+            channelUuid,
+            date: new Date(),
+          } as TypingUser);
+        }
+        clearTimeout(this.cleanTypingUsersTimeout);
+        this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 3000);
+      }
+    } else {
+      console.log("RECEIVED UNKNOWN PACKET TYPE", packet.type);
     }
   }
 
@@ -358,7 +417,7 @@ export default class Main extends Vue {
       flex-direction: column;
 
       .message {
-        padding: 0px 15px 15px;
+        padding: 0px 15px;
       }
     }
   }

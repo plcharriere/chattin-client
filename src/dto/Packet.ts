@@ -25,6 +25,7 @@ export enum PacketType {
   UPDATE_USERS = 5,
   MESSAGE = 6,
   SET_CHANNEL_UUID = 7,
+  TYPING = 8,
 }
 
 export interface PacketAuth {

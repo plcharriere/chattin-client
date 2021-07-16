@@ -2,6 +2,7 @@
   <textarea
     v-model="message"
     :placeholder="getPlaceholder(channel)"
+    v-on:keydown="keyDown"
     v-on:keydown.exact.enter="sendMessage"
   ></textarea>
 </template>
@@ -24,6 +25,10 @@ export default class MessageInput extends Vue {
   getPlaceholder(channel: Channel): string {
     if (!channel) return "Message";
     return "Message in #" + channel.name;
+  }
+
+  keyDown(e: KeyboardEvent): void {
+    if (e.key !== "Enter") this.$emit("keyDown");
   }
 
   sendMessage(e: KeyboardEvent): void {

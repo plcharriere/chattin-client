@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { User } from "@/dto/User";
+import { getUserName } from "@/utils";
 import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 
@@ -24,12 +25,11 @@ import { Options, Vue } from "vue-class-component";
       default: "",
     },
   },
+  methods: {
+    getUserName: getUserName,
+  },
 })
 export default class UserName extends Vue {
-  getUserName(user: User): string {
-    return user.nickname.length > 0 ? user.nickname : user.login;
-  }
-
   nameClick(openPopoutUuid: string): void {
     if (openPopoutUuid !== "")
       this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);

@@ -20,6 +20,7 @@ import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
+import { getUserName } from "@/utils";
 
 @Options({
   components: {
@@ -32,12 +33,11 @@ import UserName from "@/components/User/UserName.vue";
       required: true,
     },
   },
+  methods: {
+    getUserName: getUserName,
+  },
 })
 export default class UserPopout extends Vue {
-  getUserName(user: User): string {
-    return user.nickname.length > 0 ? user.nickname : user.login;
-  }
-
   clickedOutside(): void {
     this.$emit("clickedOutsidePopout");
   }

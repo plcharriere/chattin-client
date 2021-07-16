@@ -135,7 +135,7 @@ export default class UserAvatar extends Vue {
 
   &.clickable {
     cursor: pointer;
-    transition: all 300ms;
+    transition: all 200ms;
 
     &:hover {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),

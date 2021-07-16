@@ -96,12 +96,12 @@ export default class MessageList extends Vue {
     &.small {
       visibility: hidden;
       text-align: center;
-      width: 74px;
+      width: 78px;
     }
   }
 
   &.user {
-    padding: 6px 16px;
+    padding: 6px 20px;
     margin-top: 12px;
 
     .container {
