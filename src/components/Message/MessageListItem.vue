@@ -155,13 +155,18 @@ export default class MessageList extends Vue {
     visibility: hidden;
 
     svg {
+      color: #666;
       width: 16px;
       height: 16px;
       cursor: pointer;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
-      margin-left: 10px;
+      margin-left: 15px;
+
+      &:hover {
+        color: #333;
+      }
     }
   }
 }
