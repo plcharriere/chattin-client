@@ -28,10 +28,10 @@ export default class UserSettings extends Vue {
   items: string[] = [
     "Profile",
     "Avatars",
-    "Messages",
-    "Files",
-    "Security",
-    "Other",
+    // "Messages",
+    // "Files",
+    // "Security",
+    // "Other",
   ];
 
   setMenuIndex(index: number): void {

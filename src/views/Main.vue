@@ -32,6 +32,7 @@
       <div class="channel">
         <MessageList
           :messages="getMessagesByChannelUuid(messages, channelUuid)"
+          :user="getUserByUuid(users, userUuid)"
           :users="users"
           @scrolledTop="fetchChannelMessages"
           @setUserPopoutUuid="setUserPopoutUuid"

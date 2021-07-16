@@ -7,6 +7,8 @@
       :user="getUserByUuid(users, message.userUuid)"
       :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
       @setUserPopoutUuid="setUserPopoutUuid"
+      :canEdit="user.uuid === message.userUuid"
+      :canDelete="user.uuid === message.userUuid"
     />
   </div>
 </template>
@@ -24,6 +26,10 @@ import { getUserByUuid } from "@/utils";
     MessageListItem,
   },
   props: {
+    user: {
+      type: Object as PropType<User>,
+      required: true,
+    },
     users: {
       type: Array as PropType<User[]>,
       default: [],

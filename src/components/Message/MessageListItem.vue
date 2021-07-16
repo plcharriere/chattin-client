@@ -24,6 +24,10 @@
       <div class="date small">{{ getMessageDateString(message, true) }}</div>
       <div class="content">{{ message.content }}</div>
     </template>
+    <div class="actions">
+      <div class="edit" @click="editMessage"></div>
+      <div class="delete" @click="deleteMessage"></div>
+    </div>
   </div>
 </template>
 
@@ -54,6 +58,14 @@ import UserName from "@/components/User/UserName.vue";
       type: Boolean,
       default: true,
     },
+    canEdit: {
+      type: Boolean,
+      default: false,
+    },
+    canDelete: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class MessageList extends Vue {
@@ -69,6 +81,14 @@ export default class MessageList extends Vue {
       return format(message.date, "'Yesterday at' h:mm aa");
     return format(message.date, "dd/MM/yyyy 'at' h:mm aa");
   }
+
+  editMessage(): void {
+    //
+  }
+
+  deleteMessage(): void {
+    //
+  }
 }
 </script>
 
@@ -77,7 +97,7 @@ export default class MessageList extends Vue {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 6px 0px;
+  padding: 6px 20px 6px 0;
 
   &:hover {
     background: #eee;
@@ -86,6 +106,9 @@ export default class MessageList extends Vue {
       &.small {
         visibility: visible;
       }
+    }
+    .actions {
+      visibility: visible;
     }
   }
 
@@ -117,6 +140,30 @@ export default class MessageList extends Vue {
         .date {
           margin-left: 16px;
         }
+      }
+    }
+  }
+
+  .actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    visibility: hidden;
+
+    div {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin-left: 10px;
+
+      &.edit {
+        background-image: url(~@/assets/svg/heroicons/outline/pencil-dark.svg);
+      }
+      &.delete {
+        background-image: url(~@/assets/svg/heroicons/outline/trash.svg);
       }
     }
   }
