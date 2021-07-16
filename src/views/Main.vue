@@ -76,6 +76,7 @@ import {
   getUserByUuid,
   getChannelByUuid,
   getMessagesByChannelUuid,
+  getUserName,
 } from "@/utils";
 
 @Options({
@@ -98,15 +99,20 @@ import {
     getMessagesByChannelUuid: getMessagesByChannelUuid,
   },
   watch: {
-    messages() {
-      this.messages = this.messages.sort(function (
-        message1: Message,
-        message2: Message
-      ) {
-        return (
-          new Date(message1.date).getTime() - new Date(message2.date).getTime()
-        );
+    users() {
+      this.users = this.users.sort((user1: User, user2: User) => {
+        return getUserName(user1).localeCompare(getUserName(user2));
       });
+    },
+    messages() {
+      this.messages = this.messages.sort(
+        (message1: Message, message2: Message) => {
+          return (
+            new Date(message1.date).getTime() -
+            new Date(message2.date).getTime()
+          );
+        }
+      );
     },
   },
 })
