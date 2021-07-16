@@ -16,9 +16,15 @@
         id="nickname"
         v-model="profileEdit.nickname"
         :disabled="loading"
+        placeholder="How would you like to be called ?"
       />
       <span>Bio :</span>
-      <textarea type="text" v-model="profileEdit.bio" :disabled="loading" />
+      <textarea
+        type="text"
+        v-model="profileEdit.bio"
+        :disabled="loading"
+        placholder="Tell us more about yourself..."
+      />
       <button class="btn" @click="save" :class="{ disabled: loading }">
         Save
       </button>

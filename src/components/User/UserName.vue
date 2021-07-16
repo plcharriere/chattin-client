@@ -5,6 +5,9 @@
     @click="nameClick(openPopoutUuid)"
   >
     {{ getUserName(user) }}
+    <small v-if="showLogin && user.nickname.length > 0" class="login">
+      {{ user.login }}
+    </small>
   </div>
 </template>
 
@@ -24,6 +27,10 @@ import { Options, Vue } from "vue-class-component";
       type: String,
       default: "",
     },
+    showLogin: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     getUserName: getUserName,
@@ -39,7 +46,14 @@ export default class UserName extends Vue {
 
 <style scoped lang="scss">
 .name {
+  display: flex;
+  flex-direction: column;
   color: #222;
+
+  .login {
+    color: #666;
+    margin-top: 2px;
+  }
 
   &.clickable {
     cursor: pointer;

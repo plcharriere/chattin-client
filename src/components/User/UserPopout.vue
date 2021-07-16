@@ -2,7 +2,7 @@
   <div class="popout" v-click-outside="clickedOutside">
     <div class="infos">
       <UserAvatar :uuid="user.avatarUuid" size="medium" />
-      <UserName :user="user" />
+      <UserName :user="user" :showLogin="true" />
     </div>
     <div class="bio" v-if="user.bio.length > 0">
       <div class="separator">
@@ -65,6 +65,10 @@ export default class UserPopout extends Vue {
     .name {
       margin-left: 20px;
       font-size: 20px;
+
+      .login {
+        font-size: 14px;
+      }
     }
   }
 
