@@ -19,7 +19,7 @@ import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import MessageListItem from "@/components/Message/MessageListItem.vue";
-import { getUserByUuid } from "@/utils";
+import { datesAreOnSameDay, getUserByUuid } from "@/utils";
 
 @Options({
   components: {
@@ -70,6 +70,8 @@ export default class MessageList extends Vue {
 
   showUser(previousMessage: Message, currentMessage: Message): boolean {
     if (previousMessage.userUuid !== currentMessage.userUuid) return true;
+    if (!datesAreOnSameDay(currentMessage.date, previousMessage.date))
+      return true;
     if (
       currentMessage.date.getTime() - previousMessage.date.getTime() >
       600 * 1000
