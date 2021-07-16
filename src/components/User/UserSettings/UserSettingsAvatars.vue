@@ -145,6 +145,8 @@ export default class UserSettingsProfile extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .avatars {
   width: 100%;
   display: flex;
@@ -192,7 +194,7 @@ export default class UserSettingsProfile extends Vue {
     flex-direction: row;
     flex-wrap: wrap;
     margin-top: 20px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid $border-color;
     padding: 20px 0;
 
     &.empty {

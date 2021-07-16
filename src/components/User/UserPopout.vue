@@ -45,13 +45,15 @@ export default class UserPopout extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .popout {
   background: #fff;
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ddd;
+  border: 1px solid $border-color;
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -85,7 +87,7 @@ export default class UserPopout extends Vue {
       div {
         width: 100%;
         margin-left: 10px;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid $border-color;
       }
     }
   }
