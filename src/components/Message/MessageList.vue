@@ -9,6 +9,7 @@
       @setUserPopoutUuid="setUserPopoutUuid"
       :canEdit="user.uuid === message.userUuid"
       :canDelete="user.uuid === message.userUuid"
+      @deleteMessage="deleteMessage"
     />
   </div>
 </template>
@@ -82,6 +83,10 @@ export default class MessageList extends Vue {
 
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     this.$emit("setUserPopoutUuid", userUuid, element);
+  }
+
+  deleteMessage(uuid: string): void {
+    this.$emit("deleteMessage", uuid);
   }
 }
 </script>

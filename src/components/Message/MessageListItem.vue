@@ -26,7 +26,7 @@
     </template>
     <div class="actions">
       <PencilIcon @click="editMessage" />
-      <TrashIcon @click="deleteMessage" />
+      <TrashIcon @click="deleteMessage(message.uuid)" />
     </div>
   </div>
 </template>
@@ -90,8 +90,8 @@ export default class MessageList extends Vue {
     //
   }
 
-  deleteMessage(): void {
-    //
+  deleteMessage(uuid: string): void {
+    this.$emit("deleteMessage", uuid);
   }
 }
 </script>

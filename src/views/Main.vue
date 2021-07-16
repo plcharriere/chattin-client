@@ -36,6 +36,7 @@
           :users="users"
           @scrolledTop="fetchChannelMessages"
           @setUserPopoutUuid="setUserPopoutUuid"
+          @deleteMessage="deleteMessage"
         />
         <div class="message">
           <MessageInput
@@ -132,6 +133,10 @@ export default class Main extends Vue {
 
   typingUsers: TypingUser[] = [];
   cleanTypingUsersTimeout = 0;
+
+  deleteMessage(uuid: string): void {
+    sendPacket(this.ws, PacketType.DELETE_MESSAGE, uuid);
+  }
 
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     if (userUuid === "") this.userPopoutUuid = userUuid;
@@ -359,6 +364,12 @@ export default class Main extends Vue {
         clearTimeout(this.cleanTypingUsersTimeout);
         this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 1000);
       }
+    } else if (packet.type === PacketType.DELETE_MESSAGE) {
+      console.log("RECEIVED DELETE_MESSAGE:", packet.data);
+      let index = this.messages.findIndex(
+        (message) => message.uuid === (packet.data as string)
+      );
+      if (index >= 0) this.messages.splice(index, 1);
     } else {
       console.log("RECEIVED UNKNOWN PACKET TYPE", packet.type);
     }
