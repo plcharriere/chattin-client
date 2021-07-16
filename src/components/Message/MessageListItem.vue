@@ -25,8 +25,8 @@
       <div class="content">{{ message.content }}</div>
     </template>
     <div class="actions">
-      <PencilIcon @click="editMessage" />
-      <TrashIcon @click="deleteMessage(message.uuid)" />
+      <PencilIcon @click="editMessage" v-if="canEdit" />
+      <TrashIcon @click="deleteMessage(message.uuid)" v-if="canDelete" />
     </div>
   </div>
 </template>
