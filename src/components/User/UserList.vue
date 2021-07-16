@@ -13,7 +13,7 @@
         @setUserPopoutUuid="setUserPopoutUuid"
       />
     </div>
-    <div class="list" v-if="getOfflineUsers(users).length > 0">
+    <div class="list offline" v-if="getOfflineUsers(users).length > 0">
       <div class="status">
         <div>Offline</div>
         <div class="separator"></div>
@@ -92,6 +92,16 @@ export default class UserList extends Vue {
         flex-grow: 1;
         border-top: 1px solid $border-color;
         margin: 0px 16px;
+      }
+    }
+
+    &.offline {
+      .user {
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
+        }
       }
     }
   }
