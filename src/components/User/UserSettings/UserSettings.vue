@@ -51,6 +51,8 @@ export default class UserSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .overlay {
   position: absolute;
   width: 100%;
@@ -69,7 +71,7 @@ export default class UserSettings extends Vue {
 
   .settings {
     position: relative;
-    background: #fff;
+    background: $background-color;
     width: 800px;
     border-radius: 10px;
     display: flex;
@@ -83,11 +85,15 @@ export default class UserSettings extends Vue {
       position: absolute;
       top: 10px;
       right: 10px;
-      color: #555;
+      color: $icon-button-color;
       width: 24px;
       height: 24px;
       cursor: pointer;
       background-size: contain;
+
+      &:hover {
+        color: $icon-button-hover-color;
+      }
     }
   }
 }

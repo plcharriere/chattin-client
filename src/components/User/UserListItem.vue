@@ -32,6 +32,8 @@ export default class UserListItem extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .user {
   display: flex;
   flex-direction: row;
@@ -45,7 +47,7 @@ export default class UserListItem extends Vue {
   }
 
   &:hover {
-    background: #eee;
+    background: $hover-color;
     border-radius: 5px;
   }
 }

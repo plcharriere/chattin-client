@@ -28,6 +28,8 @@ export default class UserInfo extends Vue {}
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .user {
   flex-shrink: 0;
   display: flex;
@@ -41,7 +43,7 @@ export default class UserInfo extends Vue {}
   }
 
   &:hover {
-    background: #eee;
+    background: $hover-color;
     cursor: pointer;
   }
 }

@@ -53,14 +53,13 @@ export default class UserSettings extends Vue {
   flex-direction: column;
 
   .item {
-    color: #333;
     padding: 8px 12px;
     margin-bottom: 6px;
     cursor: pointer;
 
     &:hover,
     &.active {
-      background: #eee;
+      background: $hover-color;
       border-radius: 5px;
     }
   }

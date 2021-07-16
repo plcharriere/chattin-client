@@ -113,6 +113,8 @@ export default class UserAvatar extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .avatar {
   position: relative;
   border-radius: 100%;
@@ -140,8 +142,8 @@ export default class UserAvatar extends Vue {
   }
 
   &.default {
-    color: #666;
-    background-color: #ddd;
+    color: $default-avatar-icon-color;
+    background-color: $default-avatar-background-color;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,7 +197,7 @@ export default class UserAvatar extends Vue {
     transition: all 200ms;
 
     svg {
-      color: #eee;
+      color: $hover-color;
       width: 32px;
       height: 32px;
     }

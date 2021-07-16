@@ -27,9 +27,9 @@ body,
   width: 100%;
   height: 100%;
   margin: 0;
-  background: #fff;
+  background: $background-color;
   box-sizing: border-box;
-  color: #444;
+  color: $default-color;
 }
 html,
 body,
@@ -44,14 +44,14 @@ textarea {
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
-  background: #eee;
+  background: $scrollbar-track-color;
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #999;
+  background: $scrollbar-thumb-color;
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #666;
+  background: $scrollbar-thumb-hover-color;
 }
 </style>

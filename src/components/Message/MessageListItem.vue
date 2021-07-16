@@ -97,6 +97,8 @@ export default class MessageList extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .message {
   display: flex;
   flex-direction: row;
@@ -104,7 +106,7 @@ export default class MessageList extends Vue {
   padding: 6px 20px 6px 0;
 
   &:hover {
-    background: #eee;
+    background: $hover-color;
 
     .date {
       &.small {
@@ -118,7 +120,7 @@ export default class MessageList extends Vue {
 
   .date {
     font-size: 12px;
-    color: #777;
+    color: $lighter-color;
 
     &.small {
       visibility: hidden;
@@ -155,7 +157,7 @@ export default class MessageList extends Vue {
     visibility: hidden;
 
     svg {
-      color: #666;
+      color: $icon-button-color;
       width: 16px;
       height: 16px;
       cursor: pointer;
@@ -165,7 +167,7 @@ export default class MessageList extends Vue {
       margin-left: 15px;
 
       &:hover {
-        color: #333;
+        color: $icon-button-hover-color;
       }
     }
   }

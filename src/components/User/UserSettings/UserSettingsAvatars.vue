@@ -165,7 +165,7 @@ export default class UserSettingsProfile extends Vue {
 
       .remove {
         cursor: pointer;
-        color: #007fff;
+        color: $link-color;
         margin-top: 8px;
         font-size: 13px;
 
@@ -203,7 +203,7 @@ export default class UserSettingsProfile extends Vue {
       align-items: center;
 
       span {
-        color: #666;
+        color: $light-color;
       }
     }
     .item {
@@ -217,9 +217,11 @@ export default class UserSettingsProfile extends Vue {
         width: 16px;
         height: 16px;
         margin-top: 8px;
+        color: $icon-button-color;
 
         &:hover {
           text-decoration: underline;
+          color: $icon-button-hover-color;
         }
       }
     }

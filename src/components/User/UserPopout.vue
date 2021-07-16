@@ -79,7 +79,7 @@ export default class UserPopout extends Vue {
     .separator {
       display: flex;
       flex-direction: row;
-      color: #999;
+      color: $lighter-color;
       font-size: 13px;
       align-items: center;
       margin-bottom: 10px;

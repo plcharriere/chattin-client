@@ -45,13 +45,14 @@ export default class UserName extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .name {
   display: flex;
   flex-direction: column;
-  color: #222;
 
   .login {
-    color: #666;
+    color: $light-color;
     margin-top: 2px;
   }
 

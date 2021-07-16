@@ -66,7 +66,7 @@ export default class ChannelList extends Vue {
 
     &.active,
     &:hover {
-      background: #eee;
+      background: $hover-color;
       border-radius: 5px;
     }
   }
