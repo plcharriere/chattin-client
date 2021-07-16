@@ -286,9 +286,10 @@ export default class Main extends Vue {
       let message = packet.data as Message;
       message.date = new Date(message.date);
       this.messages.push(message);
-			let index = this.typingUsers.findIndex((typing) => typing.userUuid === message.userUuid);
-			if (index >= 0)
-				this.typingUsers.splice(index, 1);
+      let index = this.typingUsers.findIndex(
+        (typing) => typing.userUuid === message.userUuid
+      );
+      if (index >= 0) this.typingUsers.splice(index, 1);
     } else if (packet.type === PacketType.ONLINE_USERS) {
       console.log("RECEIVED ONLINE_USERS:", packet.data);
       if (packet.data instanceof Array) {

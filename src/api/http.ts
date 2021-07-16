@@ -10,7 +10,7 @@ export async function getChannels(token: string): Promise<Channel[]> {
       token,
     },
   });
-  return res.data;
+  return res.data || [];
 }
 
 export async function getChannelMessages(
@@ -28,6 +28,7 @@ export async function getChannelMessages(
       token,
     },
   });
+  if (res.data === null) return [];
   const messages = res.data as Message[];
   messages.forEach((message) => {
     message.date = new Date(message.date);
@@ -41,7 +42,7 @@ export async function getUsers(token: string): Promise<User[]> {
       token,
     },
   });
-  return res.data;
+  return res.data || [];
 }
 
 export async function getAvatars(token: string): Promise<string[]> {
@@ -50,5 +51,6 @@ export async function getAvatars(token: string): Promise<string[]> {
       token,
     },
   });
-  return res.data;
+
+  return res.data || [];
 }
