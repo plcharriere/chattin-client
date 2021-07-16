@@ -39,7 +39,7 @@ export default class TypingUsers extends Vue {}
   display: flex;
   align-items: center;
   height: 15px;
-  padding: 5px;
+  padding: 3px 5px 5px;
   font-size: 13px;
 }
 </style>

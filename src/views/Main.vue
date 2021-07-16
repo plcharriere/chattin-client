@@ -157,7 +157,7 @@ export default class Main extends Vue {
     let users: User[] = [];
     let now = new Date();
     typingUsers.forEach((typing) => {
-      if (now.getTime() - typing.date.getTime() < 3000) {
+      if (now.getTime() - typing.date.getTime() < 1000) {
         let user = this.users.find((user) => user.uuid === typing.userUuid);
         if (user) users.push(user);
       }
@@ -167,7 +167,7 @@ export default class Main extends Vue {
 
   cleanTypingUsers(): void {
     let outdatedTypingUsers = this.typingUsers.filter(
-      (typing) => new Date().getTime() - typing.date.getTime() >= 3000
+      (typing) => new Date().getTime() - typing.date.getTime() >= 1000
     );
     outdatedTypingUsers.forEach((outdatedTyping) => {
       let index = this.typingUsers.findIndex(
@@ -352,7 +352,7 @@ export default class Main extends Vue {
           } as TypingUser);
         }
         clearTimeout(this.cleanTypingUsersTimeout);
-        this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 3000);
+        this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 1000);
       }
     } else {
       console.log("RECEIVED UNKNOWN PACKET TYPE", packet.type);
