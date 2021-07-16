@@ -65,10 +65,6 @@ export default class UserPopout extends Vue {
     .name {
       margin-left: 20px;
       font-size: 20px;
-
-      .login {
-        font-size: 14px;
-      }
     }
   }
 
