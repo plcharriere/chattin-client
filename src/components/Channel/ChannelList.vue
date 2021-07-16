@@ -7,7 +7,7 @@
       :class="{ active: channelUuid == channel.uuid }"
       @click="setChannelUuid(channel.uuid)"
     >
-      <div class="hashtag"></div>
+      <HashtagIcon class="hashtag" />
       {{ channel.name }}
     </div>
   </div>
@@ -17,8 +17,12 @@
 import { Options, Vue } from "vue-class-component";
 import { PropType } from "@vue/runtime-core";
 import { Channel } from "@/dto/Channel";
+import { HashtagIcon } from "@heroicons/vue/outline";
 
 @Options({
+  components: {
+    HashtagIcon,
+  },
   props: {
     channels: {
       type: Array as PropType<Channel[]>,
@@ -55,7 +59,6 @@ export default class ChannelList extends Vue {
     align-items: center;
 
     .hashtag {
-      background: url(~@/assets/svg/heroicons/outline/hashtag.svg);
       width: 18px;
       height: 18px;
       margin-right: 10px;

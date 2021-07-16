@@ -37,11 +37,11 @@
         <UserAvatar
           size="medium"
           :overlay="true"
-          overlayIcon="arrow-up"
+          overlayIcon="arrowUp"
           :overrideUuid="uuid"
           @click="avatarClick(uuid)"
         />
-        <div class="delete" @click="deleteAvatar(uuid)"></div>
+        <TrashIcon class="delete" @click="deleteAvatar(uuid)" />
       </div>
     </div>
   </div>
@@ -55,9 +55,11 @@ import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
 import { httpUrl } from "@/env";
 import { getAvatars } from "@/api/http";
+import { TrashIcon } from "@heroicons/vue/solid";
 
 @Options({
   components: {
+    TrashIcon,
     UserAvatar,
   },
   props: {
@@ -210,7 +212,6 @@ export default class UserSettingsProfile extends Vue {
 
       .delete {
         cursor: pointer;
-        background-image: url(~@/assets/svg/heroicons/outline/trash.svg);
         width: 16px;
         height: 16px;
         margin-top: 8px;

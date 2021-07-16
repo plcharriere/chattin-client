@@ -1,6 +1,6 @@
 <template>
   <div class="channel">
-    <div class="hashtag"></div>
+    <HashtagIcon class="hashtag" />
     <div class="name">
       {{ channel.name }}
     </div>
@@ -17,8 +17,12 @@
 import { Channel } from "@/dto/Channel";
 import { PropType } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
+import { HashtagIcon } from "@heroicons/vue/solid";
 
 @Options({
+  components: {
+    HashtagIcon,
+  },
   props: {
     channel: {
       type: Object as PropType<Channel>,
@@ -40,7 +44,6 @@ export default class ChannelInfo extends Vue {}
   padding: 20px;
 
   .hashtag {
-    background: url(~@/assets/svg/heroicons/solid/hashtag.svg);
     width: 24px;
     height: 24px;
     margin-right: 10px;

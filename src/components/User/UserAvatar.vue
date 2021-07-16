@@ -28,20 +28,44 @@
     }"
     @click="avatarClick(openPopoutUuid)"
   >
-    <div
-      v-if="overlay"
-      class="overlay"
-      :class="overlayIcon"
-      @click="overlayClickCallback"
-    ></div>
+    <UserIcon
+      class="user"
+      v-if="
+        (uuid.length === 0 &&
+          overrideUrl.length === 0 &&
+          overrideUuid.length === 0) ||
+        overrideUrl === 'default'
+      "
+    />
+    <div v-if="overlay" class="overlay" @click="overlayClickCallback">
+      <template v-if="overlayIcon === 'pencil'">
+        <PencilIcon />
+      </template>
+      <template v-else-if="overlayIcon === 'upload'">
+        <UploadIcon />
+      </template>
+      <template v-else-if="overlayIcon === 'arrowUp'">
+        <ArrowUpIcon />
+      </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { httpUrl } from "@/env";
 import { Options, Vue } from "vue-class-component";
+import { UserIcon } from "@heroicons/vue/outline";
+import { PencilIcon } from "@heroicons/vue/solid";
+import { UploadIcon } from "@heroicons/vue/outline";
+import { ArrowUpIcon } from "@heroicons/vue/solid";
 
 @Options({
+  components: {
+    UserIcon,
+    PencilIcon,
+    UploadIcon,
+    ArrowUpIcon,
+  },
   props: {
     uuid: {
       type: String,
@@ -116,20 +140,35 @@ export default class UserAvatar extends Vue {
   }
 
   &.default {
+    color: #666;
     background-color: #ddd;
-    background-image: url(~@/assets/svg/heroicons/outline/user.svg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &.tiny {
-      background-size: 20px;
+      .user {
+        width: 18px;
+        height: 18px;
+      }
     }
     &.small {
-      background-size: 25px;
+      .user {
+        width: 25px;
+        height: 25px;
+      }
     }
     &.medium {
-      background-size: 30px;
+      .user {
+        width: 30px;
+        height: 30px;
+      }
     }
     &.large {
-      background-size: 64px;
+      .user {
+        width: 60px;
+        height: 60px;
+      }
     }
   }
 
@@ -148,26 +187,17 @@ export default class UserAvatar extends Vue {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    background-repeat: no-repeat;
-    background-position: center;
     background-color: rgba(0, 0, 0, 0.5);
-    background-size: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     transition: all 200ms;
 
-    &.pencil {
-      background-image: url(~@/assets/svg/heroicons/outline/pencil.svg);
-    }
-
-    &.upload {
-      background-image: url(~@/assets/svg/heroicons/outline/upload.svg);
-    }
-
-    &.arrow-up {
-      background-image: url(~@/assets/svg/heroicons/outline/arrow-up.svg);
+    svg {
+      color: #eee;
+      width: 32px;
+      height: 32px;
     }
 
     &:hover {

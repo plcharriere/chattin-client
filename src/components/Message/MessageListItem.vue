@@ -25,8 +25,8 @@
       <div class="content">{{ message.content }}</div>
     </template>
     <div class="actions">
-      <div class="edit" @click="editMessage"></div>
-      <div class="delete" @click="deleteMessage"></div>
+      <PencilIcon @click="editMessage" />
+      <TrashIcon @click="deleteMessage" />
     </div>
   </div>
 </template>
@@ -39,11 +39,15 @@ import { PropType } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
+import { PencilIcon } from "@heroicons/vue/solid";
+import { TrashIcon } from "@heroicons/vue/solid";
 
 @Options({
   components: {
     UserAvatar,
     UserName,
+    PencilIcon,
+    TrashIcon,
   },
   props: {
     message: {
@@ -150,7 +154,7 @@ export default class MessageList extends Vue {
     flex-direction: row;
     visibility: hidden;
 
-    div {
+    svg {
       width: 16px;
       height: 16px;
       cursor: pointer;
@@ -158,13 +162,6 @@ export default class MessageList extends Vue {
       background-repeat: no-repeat;
       background-position: center;
       margin-left: 10px;
-
-      &.edit {
-        background-image: url(~@/assets/svg/heroicons/outline/pencil-dark.svg);
-      }
-      &.delete {
-        background-image: url(~@/assets/svg/heroicons/outline/trash.svg);
-      }
     }
   }
 }

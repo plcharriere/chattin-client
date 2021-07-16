@@ -9,7 +9,7 @@
         @setMenuIndex="setMenuIndex"
       />
       <UserSettingsAvatars v-if="menuIndex === 1" :user="user" />
-      <div class="close" @click="closeCallback"></div>
+      <XIcon class="close" @click="closeCallback" />
     </div>
   </div>
 </template>
@@ -21,9 +21,11 @@ import { PropType } from "@vue/runtime-core";
 import UserSettingsMenu from "@/components/User/UserSettings/UserSettingsMenu.vue";
 import UserSettingsProfile from "@/components/User/UserSettings/UserSettingsProfile.vue";
 import UserSettingsAvatars from "@/components/User/UserSettings/UserSettingsAvatars.vue";
+import { XIcon } from "@heroicons/vue/outline";
 
 @Options({
   components: {
+    XIcon,
     UserSettingsMenu,
     UserSettingsProfile,
     UserSettingsAvatars,
@@ -81,7 +83,6 @@ export default class UserSettings extends Vue {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: url(~@/assets/svg/heroicons/outline/close.svg);
       color: #555;
       width: 24px;
       height: 24px;
