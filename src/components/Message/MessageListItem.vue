@@ -143,6 +143,10 @@ export default class MessageList extends Vue {
         margin-bottom: 8px;
         align-items: center;
 
+        .name {
+          font-size: 15px;
+        }
+
         .date {
           margin-left: 16px;
         }
