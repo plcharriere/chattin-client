@@ -3,6 +3,7 @@
   <div v-else class="main">
     <UserPopout
       v-if="userPopoutUuid.length > 0"
+      ref="userPopout"
       :user="getUserByUuid(users, userPopoutUuid)"
       @clickedOutsidePopout="setUserPopoutUuid('')"
       :style="{
@@ -161,6 +162,7 @@ export default class Main extends Vue {
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     if (userUuid === "") this.userPopoutUuid = userUuid;
     else {
+      let clientHeight = window.document.documentElement.clientHeight;
       let rect = element.getBoundingClientRect();
       let posX = rect.left + element.offsetWidth + 12;
       let posY = rect.top;
@@ -173,8 +175,13 @@ export default class Main extends Vue {
       this.userPopoutX = posX;
       this.userPopoutY = posY;
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.userPopoutUuid = userUuid;
+        await this.$nextTick();
+        let userPopout = (this.$refs.userPopout as Vue).$el as HTMLElement;
+        if (userPopout.offsetHeight + this.userPopoutY >= clientHeight) {
+          this.userPopoutY = clientHeight - userPopout.offsetHeight - 12;
+        }
       });
     }
   }
