@@ -6,14 +6,11 @@ export function sendPacket(
   data: PacketData = ""
 ): void {
   if (ws) {
-    console.log("SEND PACKET:", type, data);
     const packet: Packet = {
       type: type,
       data: data,
     };
     ws.send(JSON.stringify(packet));
-  } else {
-    console.log("SEND PACKET: ws is null");
   }
 }
 

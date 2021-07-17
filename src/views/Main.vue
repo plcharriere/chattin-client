@@ -221,7 +221,6 @@ export default class Main extends Vue {
       sendPacket(this.ws, PacketType.AUTH, this.$store.state.token);
     };
     this.ws.onclose = () => {
-      console.log("CLOSE");
       this.loading = true;
       this.reconnecting = true;
       setTimeout(this.initWebSocket, 3000);
@@ -229,8 +228,8 @@ export default class Main extends Vue {
     this.ws.onmessage = (e: MessageEvent) => {
       this.parseWebSocketMessage(e.data);
     };
-    this.ws.onerror = function (e: Event) {
-      console.log("ERROR: " + e);
+    this.ws.onerror = function () {
+      //
     };
   }
 
@@ -275,7 +274,6 @@ export default class Main extends Vue {
     const packet = JSON.parse(data) as Packet;
 
     if (packet.type === PacketType.AUTH) {
-      console.log("RECEIVED AUTH:", packet.data);
       this.reconnecting = false;
       const auth = packet.data as PacketAuth;
       if (auth.userUuid) {
@@ -297,7 +295,6 @@ export default class Main extends Vue {
         this.$router.push("/login");
       }
     } else if (packet.type === PacketType.ADD_USERS) {
-      console.log("RECEIVED ADD_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let user = packet.data[i] as User;
@@ -307,7 +304,6 @@ export default class Main extends Vue {
         sendPacket(this.ws, PacketType.ONLINE_USERS);
       }
     } else if (packet.type === PacketType.MESSAGE) {
-      console.log("RECEIVED MESSAGE:", packet.data);
       let message = packet.data as Message;
       message.date = new Date(message.date);
       message.edited = new Date(message.edited);
@@ -317,7 +313,6 @@ export default class Main extends Vue {
       );
       if (index >= 0) this.typingUsers.splice(index, 1);
     } else if (packet.type === PacketType.ONLINE_USERS) {
-      console.log("RECEIVED ONLINE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let userUuid = packet.data[i] as string;
@@ -328,7 +323,6 @@ export default class Main extends Vue {
         }
       }
     } else if (packet.type === PacketType.OFFLINE_USERS) {
-      console.log("RECEIVED OFFLINE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let userUuid = packet.data[i] as string;
@@ -339,7 +333,6 @@ export default class Main extends Vue {
         }
       }
     } else if (packet.type === PacketType.REMOVE_USERS) {
-      console.log("RECEIVED REMOVE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let userUuid = packet.data[i] as string;
@@ -350,7 +343,6 @@ export default class Main extends Vue {
         }
       }
     } else if (packet.type === PacketType.UPDATE_USERS) {
-      console.log("RECEIVED UPDATE_USERS:", packet.data);
       if (packet.data instanceof Array) {
         for (let i = 0; i < packet.data.length; i++) {
           let packetUser = packet.data[i] as User;
@@ -365,7 +357,6 @@ export default class Main extends Vue {
         }
       }
     } else if (packet.type === PacketType.TYPING) {
-      console.log("RECEIVED TYPING:", packet.data);
       if (packet.data instanceof Array) {
         let channelUuid = packet.data[0] as string;
         let userUuid = packet.data[1] as string;
@@ -386,13 +377,11 @@ export default class Main extends Vue {
         this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 1000);
       }
     } else if (packet.type === PacketType.DELETE_MESSAGE) {
-      console.log("RECEIVED DELETE_MESSAGE:", packet.data);
       let index = this.messages.findIndex(
         (message) => message.uuid === (packet.data as string)
       );
       if (index >= 0) this.messages.splice(index, 1);
     } else if (packet.type === PacketType.EDIT_MESSAGE) {
-      console.log("RECEIVED EDIT_MESSAGE:", packet.data);
       let editMessage = packet.data as PacketReceiveEditMessage;
       let index = this.messages.findIndex(
         (message) => message.uuid === editMessage.messageUuid
@@ -402,7 +391,7 @@ export default class Main extends Vue {
         this.messages[index].edited = new Date(editMessage.date);
       }
     } else {
-      console.log("RECEIVED UNKNOWN PACKET TYPE", packet.type);
+      // Unkown PacketType
     }
   }
 
