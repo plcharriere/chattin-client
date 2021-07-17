@@ -135,20 +135,20 @@ export default class UserAvatar extends Vue {
   &.medium {
     width: 64px;
     height: 64px;
-	
-		svg {
-			width: 25px;
-			height: 25px;
-		}
+
+    svg {
+      width: 25px;
+      height: 25px;
+    }
   }
   &.large {
     width: 100px;
     height: 100px;
 
-		svg {
-			width: 40px;
-			height: 40px;
-		}
+    svg {
+      width: 40px;
+      height: 40px;
+    }
   }
 
   &.default {

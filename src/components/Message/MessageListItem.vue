@@ -44,9 +44,13 @@
         <CheckIcon class="icon-btn" @click="saveEdit(message.uuid)" />
       </div>
     </template>
-    <div class="actions">
+    <div class="actions" v-if="!editMode">
       <PencilIcon class="icon-btn" @click="toggleEditMode()" v-if="canEdit" />
-      <TrashIcon class="icon-btn" @click="deleteMessage(message.uuid)" v-if="canDelete" />
+      <TrashIcon
+        class="icon-btn"
+        @click="deleteMessage(message.uuid)"
+        v-if="canDelete"
+      />
     </div>
   </div>
 </template>
@@ -205,11 +209,11 @@ export default class MessageList extends Vue {
     flex-direction: row;
     visibility: hidden;
 
-		.icon-btn {
-			width: 16px;
-			height: 16px;
-			margin-left: 10px;
-		}
+    .icon-btn {
+      width: 16px;
+      height: 16px;
+      margin-left: 10px;
+    }
   }
 
   .edit {
