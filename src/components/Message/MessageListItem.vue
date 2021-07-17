@@ -168,8 +168,8 @@ export default class MessageList extends Vue {
   }
 
   .edited {
-    font-size: 13px;
-    color: $light-color;
+    font-size: 12px;
+    color: $lighter-color;
     margin-left: 8px;
   }
 

@@ -1,5 +1,10 @@
 <template>
-  <div class="user" @click="setUserPopoutUuid(user.uuid)">
+  <div
+    class="user"
+    @click="setUserPopoutUuid(user.uuid)"
+    :class="{ active: active, offline: offline }"
+    v-click-outside="clickOutside"
+  >
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
     <UserName :user="user" class="name" />
   </div>
@@ -22,11 +27,22 @@ import UserName from "@/components/User/UserName.vue";
       type: Object as PropType<User>,
       required: true,
     },
+    offline: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class UserListItem extends Vue {
+  active = false;
+
   setUserPopoutUuid(userUuid: string): void {
+    this.active = true;
     this.$emit("setUserPopoutUuid", userUuid, this.$el);
+  }
+
+  clickOutside(): void {
+    if (this.active) this.active = false;
   }
 }
 </script>
@@ -46,7 +62,13 @@ export default class UserListItem extends Vue {
     padding-left: 10px;
   }
 
-  &:hover {
+  &.offline {
+    opacity: 0.5;
+  }
+
+  &:hover,
+  &.active {
+    opacity: 1;
     background: $hover-color;
     border-radius: 5px;
   }
