@@ -38,3 +38,12 @@ input, textarea {
 		cursor: not-allowed;
 	}
 }
+
+.icon-btn {
+	color: $icon-button-color;
+	cursor: pointer;
+
+	&:hover {
+		color: $icon-button-hover-color;
+	}
+}

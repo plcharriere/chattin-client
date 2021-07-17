@@ -25,8 +25,8 @@
         </div>
         <div v-else class="edit">
           <textarea ref="edit" :value="message.content" />
-          <XIcon @click="toggleEditMode()" />
-          <CheckIcon @click="saveEdit(message.uuid)" />
+          <XIcon class="icon-btn" @click="toggleEditMode()" />
+          <CheckIcon class="icon-btn" @click="saveEdit(message.uuid)" />
         </div>
       </div>
     </template>
@@ -40,13 +40,13 @@
       </div>
       <div v-else class="edit">
         <textarea ref="edit" :value="message.content" />
-        <XIcon @click="toggleEditMode()" />
-        <CheckIcon @click="saveEdit(message.uuid)" />
+        <XIcon class="icon-btn" @click="toggleEditMode()" />
+        <CheckIcon class="icon-btn" @click="saveEdit(message.uuid)" />
       </div>
     </template>
     <div class="actions">
-      <PencilIcon @click="toggleEditMode()" v-if="canEdit" />
-      <TrashIcon @click="deleteMessage(message.uuid)" v-if="canDelete" />
+      <PencilIcon class="icon-btn" @click="toggleEditMode()" v-if="canEdit" />
+      <TrashIcon class="icon-btn" @click="deleteMessage(message.uuid)" v-if="canDelete" />
     </div>
   </div>
 </template>
@@ -193,7 +193,7 @@ export default class MessageList extends Vue {
         }
 
         .date {
-          margin-left: 16px;
+          margin-left: 8px;
         }
       }
     }
@@ -205,20 +205,11 @@ export default class MessageList extends Vue {
     flex-direction: row;
     visibility: hidden;
 
-    svg {
-      color: $icon-button-color;
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      margin-left: 15px;
-
-      &:hover {
-        color: $icon-button-hover-color;
-      }
-    }
+		.icon-btn {
+			width: 16px;
+			height: 16px;
+			margin-left: 10px;
+		}
   }
 
   .edit {
@@ -245,16 +236,10 @@ export default class MessageList extends Vue {
       }
     }
 
-    svg {
-      color: $icon-button-color;
-      cursor: pointer;
+    .icon-btn {
       width: 24px;
       height: 24px;
       margin-left: 10px;
-
-      &:hover {
-        color: $icon-button-hover-color;
-      }
     }
   }
 }

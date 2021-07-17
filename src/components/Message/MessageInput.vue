@@ -74,16 +74,5 @@ export default class MessageInput extends Vue {
       box-shadow: none;
     }
   }
-
-  svg {
-    color: $icon-button-color;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-
-    &:hover {
-      color: $icon-button-hover-color;
-    }
-  }
 }
 </style>
