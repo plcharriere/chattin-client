@@ -3,7 +3,7 @@ export interface Message {
   channelUuid: string;
   userUuid: string;
   date: Date;
-  edited: number;
+  edited: Date;
   content: string;
 }
 

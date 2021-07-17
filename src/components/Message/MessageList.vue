@@ -1,5 +1,5 @@
 <template>
-  <div class="messages">
+  <div class="message-list">
     <MessageListItem
       v-for="(message, index) in messages"
       v-bind:key="message.uuid"
@@ -9,6 +9,7 @@
       @setUserPopoutUuid="setUserPopoutUuid"
       :canEdit="user.uuid === message.userUuid"
       :canDelete="user.uuid === message.userUuid"
+      @editMessage="editMessage"
       @deleteMessage="deleteMessage"
     />
   </div>
@@ -85,6 +86,10 @@ export default class MessageList extends Vue {
     this.$emit("setUserPopoutUuid", userUuid, element);
   }
 
+  editMessage(uuid: string, content: string): void {
+    this.$emit("editMessage", uuid, content);
+  }
+
   deleteMessage(uuid: string): void {
     this.$emit("deleteMessage", uuid);
   }
@@ -92,7 +97,7 @@ export default class MessageList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.messages {
+.message-list {
   flex-grow: 1;
   min-width: 400px;
   height: 0;

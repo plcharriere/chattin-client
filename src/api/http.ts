@@ -32,6 +32,7 @@ export async function getChannelMessages(
   const messages = res.data as Message[];
   messages.forEach((message) => {
     message.date = new Date(message.date);
+    message.edited = new Date(message.edited);
   });
   return messages;
 }

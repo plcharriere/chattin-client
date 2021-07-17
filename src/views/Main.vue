@@ -36,6 +36,7 @@
           :users="users"
           @scrolledTop="fetchChannelMessages"
           @setUserPopoutUuid="setUserPopoutUuid"
+          @editMessage="editMessage"
           @deleteMessage="deleteMessage"
         />
         <div class="message">
@@ -58,7 +59,13 @@ import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
 import { TypingUser } from "@/dto/TypingUser";
-import { Packet, PacketAuth, PacketType } from "@/dto/Packet";
+import {
+  Packet,
+  PacketAuth,
+  PacketReceiveEditMessage,
+  PacketSendEditMessage,
+  PacketType,
+} from "@/dto/Packet";
 import Loading from "@/components/Loading.vue";
 import ChannelInfo from "@/components/Channel/ChannelInfo.vue";
 import UserInfo from "@/components/User/UserInfo.vue";
@@ -139,6 +146,13 @@ export default class Main extends Vue {
 
   typingUsers: TypingUser[] = [];
   cleanTypingUsersTimeout = 0;
+
+  editMessage(messageUuid: string, content: string): void {
+    sendPacket(this.ws, PacketType.EDIT_MESSAGE, {
+      messageUuid,
+      content,
+    } as PacketSendEditMessage);
+  }
 
   deleteMessage(uuid: string): void {
     sendPacket(this.ws, PacketType.DELETE_MESSAGE, uuid);
@@ -296,6 +310,7 @@ export default class Main extends Vue {
       console.log("RECEIVED MESSAGE:", packet.data);
       let message = packet.data as Message;
       message.date = new Date(message.date);
+      message.edited = new Date(message.edited);
       this.messages.push(message);
       let index = this.typingUsers.findIndex(
         (typing) => typing.userUuid === message.userUuid
@@ -376,6 +391,16 @@ export default class Main extends Vue {
         (message) => message.uuid === (packet.data as string)
       );
       if (index >= 0) this.messages.splice(index, 1);
+    } else if (packet.type === PacketType.EDIT_MESSAGE) {
+      console.log("RECEIVED EDIT_MESSAGE:", packet.data);
+      let editMessage = packet.data as PacketReceiveEditMessage;
+      let index = this.messages.findIndex(
+        (message) => message.uuid === editMessage.messageUuid
+      );
+      if (index >= 0) {
+        this.messages[index].content = editMessage.content;
+        this.messages[index].edited = new Date(editMessage.date);
+      }
     } else {
       console.log("RECEIVED UNKNOWN PACKET TYPE", packet.type);
     }

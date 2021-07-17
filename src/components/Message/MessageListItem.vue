@@ -1,5 +1,5 @@
 <template>
-  <div class="message" :class="{ user: showUser }">
+  <div class="message-list-item" :class="{ user: showUser }">
     <template v-if="showUser">
       <UserAvatar
         :uuid="user.avatarUuid"
@@ -17,15 +17,35 @@
           />
           <div class="date">{{ getMessageDateString(message, false) }}</div>
         </div>
-        <div class="content">{{ message.content }}</div>
+        <div v-if="!editMode" class="content">
+          {{ message.content
+          }}<span class="edited" v-if="message.edited.getTime() > 0"
+            >(edited)</span
+          >
+        </div>
+        <div v-else class="edit">
+          <textarea ref="edit" :value="message.content" />
+          <XIcon @click="toggleEditMode()" />
+          <CheckIcon @click="saveEdit(message.uuid)" />
+        </div>
       </div>
     </template>
     <template v-else>
       <div class="date small">{{ getMessageDateString(message, true) }}</div>
-      <div class="content">{{ message.content }}</div>
+      <div v-if="!editMode" class="content">
+        {{ message.content
+        }}<span class="edited" v-if="message.edited.getTime() > 0"
+          >(edited)</span
+        >
+      </div>
+      <div v-else class="edit">
+        <textarea ref="edit" :value="message.content" />
+        <XIcon @click="toggleEditMode()" />
+        <CheckIcon @click="saveEdit(message.uuid)" />
+      </div>
     </template>
     <div class="actions">
-      <PencilIcon @click="editMessage" v-if="canEdit" />
+      <PencilIcon @click="toggleEditMode()" v-if="canEdit" />
       <TrashIcon @click="deleteMessage(message.uuid)" v-if="canDelete" />
     </div>
   </div>
@@ -41,6 +61,9 @@ import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { TrashIcon } from "@heroicons/vue/solid";
+import { CheckIcon } from "@heroicons/vue/solid";
+import { XIcon } from "@heroicons/vue/solid";
+import { ref } from "vue";
 
 @Options({
   components: {
@@ -48,6 +71,8 @@ import { TrashIcon } from "@heroicons/vue/solid";
     UserName,
     PencilIcon,
     TrashIcon,
+    CheckIcon,
+    XIcon,
   },
   props: {
     message: {
@@ -73,6 +98,19 @@ import { TrashIcon } from "@heroicons/vue/solid";
   },
 })
 export default class MessageList extends Vue {
+  edit = ref();
+
+  editMode = false;
+
+  toggleEditMode(): void {
+    this.editMode = !this.editMode;
+  }
+
+  saveEdit(uuid: string): void {
+    this.$emit("editMessage", uuid, this.edit.value);
+    this.toggleEditMode();
+  }
+
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
     this.$emit("setUserPopoutUuid", userUuid, element);
   }
@@ -99,7 +137,7 @@ export default class MessageList extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.message {
+.message-list-item {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -129,12 +167,19 @@ export default class MessageList extends Vue {
     }
   }
 
+  .edited {
+    font-size: 13px;
+    color: $light-color;
+    margin-left: 8px;
+  }
+
   &.user {
     padding: 6px 20px;
     margin-top: 12px;
 
     .container {
       margin-left: 16px;
+      flex-grow: 1;
 
       .infos {
         display: flex;
@@ -169,6 +214,43 @@ export default class MessageList extends Vue {
       background-repeat: no-repeat;
       background-position: center;
       margin-left: 15px;
+
+      &:hover {
+        color: $icon-button-hover-color;
+      }
+    }
+  }
+
+  .edit {
+    background: $background-color;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 10px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    resize: none;
+    margin: 0;
+    flex-grow: 1;
+
+    textarea {
+      height: 16px;
+      border: 0;
+      padding: 0 5px;
+      margin: 0;
+
+      &:focus {
+        border: 0;
+        box-shadow: none;
+      }
+    }
+
+    svg {
+      color: $icon-button-color;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      margin-left: 10px;
 
       &:hover {
         color: $icon-button-hover-color;

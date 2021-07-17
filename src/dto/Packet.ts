@@ -9,7 +9,9 @@ export type PacketData =
   | User[]
   | Message[]
   | PacketAuth
-  | PacketMessage;
+  | PacketMessage
+  | PacketSendEditMessage
+  | PacketReceiveEditMessage;
 
 export interface Packet {
   type: PacketType;
@@ -27,6 +29,7 @@ export enum PacketType {
   SET_CHANNEL_UUID = 7,
   TYPING = 8,
   DELETE_MESSAGE = 9,
+  EDIT_MESSAGE = 10,
 }
 
 export interface PacketAuth {
@@ -37,4 +40,15 @@ export interface PacketAuth {
 export interface PacketMessage {
   channelUuid: string;
   content: string;
+}
+
+export interface PacketSendEditMessage {
+  messageUuid: string;
+  content: string;
+}
+
+export interface PacketReceiveEditMessage {
+  messageUuid: string;
+  content: string;
+  date: Date;
 }
