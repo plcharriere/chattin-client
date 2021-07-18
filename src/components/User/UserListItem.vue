@@ -1,11 +1,11 @@
 <template>
   <div
-    class="user"
+    class="user open-user-popout"
     @click="setUserPopoutUuid(user.uuid)"
     :class="{ active: active, offline: offline }"
     v-click-outside="clickOutside"
   >
-    <UserAvatar :uuid="user.avatarUuid" size="tiny" />
+    <UserAvatar :uuid="user.avatarUuid" size="tiny"/>
     <UserName :user="user" class="name" />
   </div>
 </template>

@@ -38,8 +38,9 @@ import { Options, Vue } from "vue-class-component";
 })
 export default class UserName extends Vue {
   nameClick(openPopoutUuid: string): void {
-    if (openPopoutUuid !== "")
+    if (openPopoutUuid !== "") {
       this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);
+    }
   }
 }
 </script>

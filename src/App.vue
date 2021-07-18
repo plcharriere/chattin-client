@@ -30,6 +30,7 @@ body,
   background: $background-color;
   box-sizing: border-box;
   color: $default-color;
+	overflow: hidden;
 }
 html,
 body,

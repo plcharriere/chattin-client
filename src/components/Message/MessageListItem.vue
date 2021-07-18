@@ -4,6 +4,7 @@
       <UserAvatar
         :uuid="user.avatarUuid"
         size="small"
+        class="open-user-popout"
         :openPopoutUuid="user.uuid"
         @setUserPopoutUuid="setUserPopoutUuid"
       />
@@ -11,7 +12,7 @@
         <div class="infos">
           <UserName
             :user="user"
-            @click="setUserPopoutUuid(user.uuid)"
+            class="open-user-popout"
             :openPopoutUuid="user.uuid"
             @setUserPopoutUuid="setUserPopoutUuid"
           />

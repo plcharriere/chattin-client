@@ -1,5 +1,12 @@
 <template>
-  <div class="popout" v-click-outside="clickedOutside">
+  <div
+    ref="popout"
+    class="user-popout"
+    :style="{
+      left: left + 'px',
+      top: top + 'px',
+    }"
+  >
     <div class="infos">
       <UserAvatar :uuid="user.avatarUuid" size="medium" />
       <UserName :user="user" :showLogin="true" />
@@ -16,13 +23,12 @@
 
 <script lang="ts">
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, onUnmounted, PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
-import { getUserName } from "@/utils";
+import { computed, ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     UserAvatar,
     UserName,
@@ -32,22 +38,74 @@ import { getUserName } from "@/utils";
       type: Object as PropType<User>,
       required: true,
     },
+    element: {
+      type: HTMLElement,
+      required: true,
+    },
   },
-  methods: {
-    getUserName: getUserName,
+  setup(props, { emit }) {
+    const popout = ref();
+    const left = computed(() => {
+			let rect = props.element.getBoundingClientRect();
+			let left = rect.left + props.element.offsetWidth + 12;
+      if (popout.value) {
+        let clientWidth = window.document.documentElement.clientWidth;
+        let popoutWidth = popout.value.offsetWidth;
+        if (left + popoutWidth > clientWidth) {
+          left =
+            rect.left -
+            props.element.offsetWidth -
+            props.element.offsetWidth / 2 -
+            8;
+        }
+      }
+      return left;
+    });
+    const top = computed(() => {
+      let rect = props.element.getBoundingClientRect();
+      let top = rect.top;
+      if (popout.value) {
+        let clientWidth = window.document.documentElement.clientWidth;
+        let clientHeight = window.document.documentElement.clientHeight;
+        let popoutWidth = popout.value.offsetWidth;
+        let popoutHeight = popout.value.offsetHeight;
+        if (left.value + popoutWidth > clientWidth)
+          top = rect.bottom - props.element.offsetHeight;
+        if (popoutHeight + top >= clientHeight)
+          top = clientHeight - popoutHeight - 12;
+      }
+      return top;
+    });
+
+    let documentClick = (e: MouseEvent) => {
+      if (popout.value && !(popout.value === e.target || popout.value.contains(e.target))) {
+        if (!(e.target as HTMLElement).closest(".open-user-popout")) {
+          emit("closeUserPopout");
+        }
+      }
+    };
+
+    document.body.addEventListener("click", documentClick);
+
+    onUnmounted(() => {
+      document.body.removeEventListener("click", documentClick);
+    });
+
+    return {
+      popout,
+      left,
+      top,
+    };
   },
-})
-export default class UserPopout extends Vue {
-  clickedOutside(): void {
-    this.$emit("clickedOutsidePopout");
-  }
-}
+});
 </script>
 
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.popout {
+.user-popout {
+  transition: all 200ms;
+  position: absolute;
   background: #fff;
   border-radius: 10px;
   padding: 15px;

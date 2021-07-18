@@ -2,14 +2,10 @@
   <Loading v-if="loading" :reconnecting="reconnecting" />
   <div v-else class="main">
     <UserPopout
-      v-if="userPopoutUuid.length > 0"
-      ref="userPopout"
+      v-if="userPopoutUuid.length > 0 && userPopoutElement"
+      :element="userPopoutElement"
       :user="getUserByUuid(users, userPopoutUuid)"
-      @clickedOutsidePopout="setUserPopoutUuid('')"
-      :style="{
-        left: userPopoutX + 'px',
-        top: userPopoutY + 'px',
-      }"
+      @closeUserPopout="setUserPopoutUuid('')"
     />
     <UserSettings
       v-if="showUserSettings"
@@ -140,8 +136,7 @@ export default class Main extends Vue {
   message = "";
 
   userPopoutUuid = "";
-  userPopoutX = 0;
-  userPopoutY = 0;
+  userPopoutElement: HTMLElement | null = null;
 
   showUserSettings = false;
 
@@ -160,30 +155,8 @@ export default class Main extends Vue {
   }
 
   setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
-    if (userUuid === "") this.userPopoutUuid = userUuid;
-    else {
-      let clientHeight = window.document.documentElement.clientHeight;
-      let rect = element.getBoundingClientRect();
-      let posX = rect.left + element.offsetWidth + 12;
-      let posY = rect.top;
-
-      if (posX + 300 > window.screen.width) {
-        posX = rect.left - element.offsetWidth - element.offsetWidth / 2 - 8;
-        posY = rect.bottom - element.offsetHeight;
-      }
-
-      this.userPopoutX = posX;
-      this.userPopoutY = posY;
-
-      setTimeout(async () => {
-        this.userPopoutUuid = userUuid;
-        await this.$nextTick();
-        let userPopout = (this.$refs.userPopout as Vue).$el as HTMLElement;
-        if (userPopout.offsetHeight + this.userPopoutY >= clientHeight) {
-          this.userPopoutY = clientHeight - userPopout.offsetHeight - 12;
-        }
-      });
-    }
+    this.userPopoutUuid = userUuid;
+    this.userPopoutElement = element;
   }
 
   getTypingUsers(typingUsers: TypingUser[]): User[] {
@@ -417,10 +390,6 @@ export default class Main extends Vue {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-
-  .popout {
-    position: absolute;
-  }
 
   .infos {
     display: flex;
