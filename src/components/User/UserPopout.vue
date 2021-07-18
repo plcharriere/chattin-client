@@ -46,8 +46,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const popout = ref();
     const left = computed(() => {
-			let rect = props.element.getBoundingClientRect();
-			let left = rect.left + props.element.offsetWidth + 6;
+      let rect = props.element.getBoundingClientRect();
+      let left = rect.left + props.element.offsetWidth + 6;
       if (popout.value) {
         let clientWidth = window.document.documentElement.clientWidth;
         let popoutWidth = popout.value.offsetWidth;
@@ -78,7 +78,10 @@ export default defineComponent({
     });
 
     let documentClick = (e: MouseEvent) => {
-      if (popout.value && !(popout.value === e.target || popout.value.contains(e.target))) {
+      if (
+        popout.value &&
+        !(popout.value === e.target || popout.value.contains(e.target))
+      ) {
         if (!(e.target as HTMLElement).closest(".open-user-popout")) {
           emit("closeUserPopout");
         }

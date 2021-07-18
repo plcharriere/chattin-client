@@ -17,7 +17,8 @@
       <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
       <UserInfo
         :user="getUserByUuid(users, userUuid)"
-        @click="toggleUserSettings"
+        @openUserSettings="toggleUserSettings"
+        @logout="logout"
       />
     </div>
     <div class="content">
@@ -142,6 +143,13 @@ export default class Main extends Vue {
 
   typingUsers: TypingUser[] = [];
   cleanTypingUsersTimeout = 0;
+
+  logout(): void {
+    this.ws = null;
+    this.$store.state.token = "";
+    localStorage.removeItem("token");
+    this.$router.push("/login");
+  }
 
   editMessage(messageUuid: string, content: string): void {
     sendPacket(this.ws, PacketType.EDIT_MESSAGE, {

@@ -1,21 +1,40 @@
 <template>
   <div class="user-info">
-    <UserAvatar :uuid="user.avatarUuid" size="tiny" />
-    <UserName :user="user" />
+    <div class="user" @click="toggleDropdown">
+      <UserAvatar :uuid="user.avatarUuid" size="tiny" />
+      <UserName :user="user" />
+      <ChevronDownIcon :class="{ active: dropdownActive }" />
+    </div>
+    <div ref="dropdown" class="dropdown" v-if="dropdownActive">
+      <div class="item" @click="openUserSettings">
+        <CogIcon />
+        My settings
+      </div>
+      <div class="item red" @click="logout">
+        <LogoutIcon />
+        Logout
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
+import { CogIcon } from "@heroicons/vue/outline";
+import { LogoutIcon } from "@heroicons/vue/outline";
+import { ChevronDownIcon } from "@heroicons/vue/outline";
+import { defineComponent, onUnmounted, ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     UserAvatar,
     UserName,
+    CogIcon,
+    LogoutIcon,
+    ChevronDownIcon,
   },
   props: {
     user: {
@@ -23,28 +42,119 @@ import UserName from "@/components/User/UserName.vue";
       required: true,
     },
   },
-})
-export default class UserInfo extends Vue {}
+  setup(props, { emit }) {
+    let dropdown = ref();
+    let dropdownActive = ref(false);
+    let toggleDropdown = () => {
+      dropdownActive.value = !dropdownActive.value;
+    };
+    let disableDropdown = () => {
+      dropdownActive.value = false;
+    };
+
+    let clickedOutside = (e: MouseEvent) => {
+      if (
+        dropdown.value &&
+        !(dropdown.value === e.target || dropdown.value.contains(e.target))
+      ) {
+        if (!(e.target as HTMLElement).closest(".user-info")) {
+          console.log("closed");
+          disableDropdown();
+        }
+      }
+    };
+    document.body.addEventListener("click", clickedOutside);
+    onUnmounted(() => {
+      document.body.removeEventListener("click", clickedOutside);
+    });
+
+    let openUserSettings = () => {
+      disableDropdown();
+      emit("openUserSettings");
+    };
+
+    let logout = () => {
+      emit("logout");
+    };
+
+    return {
+      dropdown,
+      dropdownActive,
+      toggleDropdown,
+      disableDropdown,
+      openUserSettings,
+      logout,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
 .user-info {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: row;
-  width: 200px;
-  padding: 20px 20px;
-  align-items: center;
+  .user {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    width: 200px;
+    padding: 16px 20px;
+    align-items: center;
 
-  .user-name {
-    padding-left: 10px;
+    .user-name {
+      padding-left: 10px;
+    }
+
+    &:hover {
+      background: $hover-color;
+      cursor: pointer;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      margin-left: auto;
+      transition: all 200ms;
+
+      &.active {
+        transform: rotate(180deg);
+      }
+    }
   }
 
-  &:hover {
-    background: $hover-color;
-    cursor: pointer;
+  .dropdown {
+    transition: all 200ms;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    background: $background-color;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+
+    .item {
+      display: flex;
+      flex-direction: row;
+      padding: 16px;
+      cursor: pointer;
+      align-items: center;
+
+      &.red {
+        color: red;
+      }
+
+      &:hover {
+        background: $hover-color;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 20px;
+      }
+    }
   }
 }
 </style>

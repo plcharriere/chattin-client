@@ -103,5 +103,8 @@ export default class MessageList extends Vue {
   height: 0;
   overflow: auto;
   padding-bottom: 20px;
+  padding-right: 4px;
+  margin-top: 3px;
+  margin-right: 4px;
 }
 </style>
