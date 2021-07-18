@@ -1,6 +1,6 @@
 <template>
   <div
-    class="user open-user-popout"
+    class="user-list-item open-user-popout"
     @click="setUserPopoutUuid(user.uuid)"
     :class="{ active: active, offline: offline }"
     v-click-outside="clickOutside"
@@ -50,7 +50,7 @@ export default class UserListItem extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.user {
+.user-list-item {
   display: flex;
   flex-direction: row;
   padding: 5px 10px;

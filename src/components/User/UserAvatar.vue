@@ -1,6 +1,6 @@
 <template>
   <div
-    class="avatar"
+    class="user-avatar"
     :class="[
       size,
       {
@@ -115,7 +115,7 @@ export default class UserAvatar extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.avatar {
+.user-avatar {
   position: relative;
   border-radius: 100%;
   background-repeat: no-repeat;

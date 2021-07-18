@@ -1,5 +1,5 @@
 <template>
-  <div class="channels">
+  <div class="channel-list">
     <div
       v-for="channel in channels"
       v-bind:key="channel.uuid"
@@ -44,7 +44,7 @@ export default class ChannelList extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.channels {
+.channel-list {
   min-width: 200px;
   padding: 20px;
   border-right: 1px solid $border-color;

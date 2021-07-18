@@ -1,5 +1,5 @@
 <template>
-  <div class="user">
+  <div class="user-info">
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
     <UserName :user="user" class="name" />
   </div>
@@ -30,7 +30,7 @@ export default class UserInfo extends Vue {}
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.user {
+.user-info {
   flex-shrink: 0;
   display: flex;
   flex-direction: row;

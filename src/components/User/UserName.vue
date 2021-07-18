@@ -1,6 +1,6 @@
 <template>
   <div
-    class="name"
+    class="user-name"
     :class="{ clickable: openPopoutUuid.length > 0 }"
     @click="nameClick(openPopoutUuid)"
   >
@@ -48,7 +48,7 @@ export default class UserName extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.name {
+.user-name {
   display: flex;
   flex-direction: column;
 

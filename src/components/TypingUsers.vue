@@ -1,5 +1,5 @@
 <template>
-  <div class="typing">
+  <div class="typing-users">
     <div v-if="users.length > 0">
       <span v-for="(user, index) in users" v-bind:key="user.uuid">
         <b>{{ getUserName(user) }}</b>
@@ -35,7 +35,7 @@ export default class TypingUsers extends Vue {}
 </script>
 
 <style scoped lang="scss">
-.typing {
+.typing-users {
   display: flex;
   align-items: center;
   height: 15px;

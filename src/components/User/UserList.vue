@@ -1,5 +1,5 @@
 <template>
-  <div class="users">
+  <div class="user-list">
     <div class="list" v-if="getOnlineUsers(users).length > 0">
       <div class="status">
         <div>Online</div>
@@ -65,7 +65,7 @@ export default class UserList extends Vue {
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.users {
+.user-list {
   display: flex;
   flex-direction: column;
   width: 220px;

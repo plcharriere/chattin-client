@@ -1,5 +1,5 @@
 <template>
-  <div class="channel">
+  <div class="channel-info">
     <HashtagIcon class="hashtag" />
     <div class="name">
       {{ channel.name }}
@@ -36,7 +36,7 @@ export default class ChannelInfo extends Vue {}
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
 
-.channel {
+.channel-info {
   flex-grow: 1;
   display: flex;
   flex-direction: row;
