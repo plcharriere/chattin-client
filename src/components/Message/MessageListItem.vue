@@ -193,7 +193,7 @@ export default class MessageList extends Vue {
         margin-bottom: 8px;
         align-items: center;
 
-        .name {
+        .user-name {
           font-size: 15px;
         }
 

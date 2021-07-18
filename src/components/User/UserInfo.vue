@@ -1,7 +1,7 @@
 <template>
   <div class="user-info">
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
-    <UserName :user="user" class="name" />
+    <UserName :user="user" />
   </div>
 </template>
 
@@ -38,7 +38,7 @@ export default class UserInfo extends Vue {}
   padding: 20px 20px;
   align-items: center;
 
-  .name {
+  .user-name {
     padding-left: 10px;
   }
 

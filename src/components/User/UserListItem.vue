@@ -58,7 +58,7 @@ export default class UserListItem extends Vue {
   align-items: center;
   cursor: pointer;
 
-  .name {
+  .user-name {
     padding-left: 10px;
   }
 

@@ -122,7 +122,7 @@ export default defineComponent({
     flex-direction: row;
     align-items: center;
 
-    .name {
+    .user-name {
       margin-left: 20px;
       font-size: 20px;
     }
