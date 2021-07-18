@@ -47,7 +47,7 @@ export default defineComponent({
     const popout = ref();
     const left = computed(() => {
 			let rect = props.element.getBoundingClientRect();
-			let left = rect.left + props.element.offsetWidth + 12;
+			let left = rect.left + props.element.offsetWidth + 6;
       if (popout.value) {
         let clientWidth = window.document.documentElement.clientWidth;
         let popoutWidth = popout.value.offsetWidth;

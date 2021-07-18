@@ -6,7 +6,7 @@
       v-on:keydown="keyDown"
       v-on:keydown.exact.enter="sendMessage"
     ></textarea>
-    <PaperAirplaneIcon @click="sendMessage()" />
+    <PaperAirplaneIcon class="icon-btn" @click="sendMessage()" />
   </div>
 </template>
 
@@ -74,5 +74,10 @@ export default class MessageInput extends Vue {
       box-shadow: none;
     }
   }
+
+	svg {
+    width: 20px;
+    height: 20px;
+	}
 }
 </style>
