@@ -51,6 +51,7 @@ export default class UserSettings extends Vue {
   border-right: 1px solid $border-color;
   display: flex;
   flex-direction: column;
+  user-select: none;
 
   .item {
     padding: 8px 12px;

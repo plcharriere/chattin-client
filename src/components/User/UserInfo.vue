@@ -10,6 +10,7 @@
         <CogIcon />
         My settings
       </div>
+      <div class="separator"></div>
       <div class="item red" @click="logout">
         <LogoutIcon />
         Logout
@@ -93,6 +94,8 @@ export default defineComponent({
 @import "~@/assets/scss/variables.scss";
 
 .user-info {
+  user-select: none;
+
   .user {
     flex-shrink: 0;
     display: flex;
@@ -130,9 +133,10 @@ export default defineComponent({
     flex-direction: column;
     background: $background-color;
     border-top: 1px solid $border-color;
-    border-bottom: 1px solid $border-color;
     border-radius: 0 0 10px 10px;
     overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     .item {
       display: flex;
@@ -154,6 +158,12 @@ export default defineComponent({
         height: 20px;
         margin-right: 20px;
       }
+    }
+
+    .separator {
+      border-top: 1px solid $hover-color;
+      padding: 0 20px;
+      margin: 0 15px;
     }
   }
 }
