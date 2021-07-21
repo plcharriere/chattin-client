@@ -47,7 +47,6 @@ export default class ChannelList extends Vue {
 .channel-list {
   min-width: 200px;
   padding: 20px;
-  border-right: 1px solid $border-color;
   user-select: none;
 
   .channel {

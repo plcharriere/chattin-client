@@ -72,7 +72,6 @@ export default class UserList extends Vue {
   padding: 20px 10px;
   flex-grow: 1;
   flex-shrink: 0;
-  border-left: 1px solid $border-color;
   user-select: none;
 
   .list {

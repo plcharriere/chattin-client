@@ -1,7 +1,7 @@
 <template>
   <div class="overlay" @click="closeCallback"></div>
   <div class="container">
-    <div class="settings">
+    <div class="settings" ref="modal">
       <UserSettingsMenu @setMenuIndex="setMenuIndex" :menuIndex="menuIndex" />
       <UserSettingsProfile
         v-if="menuIndex === 0"
@@ -15,15 +15,15 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import UserSettingsMenu from "@/components/User/UserSettings/UserSettingsMenu.vue";
 import UserSettingsProfile from "@/components/User/UserSettings/UserSettingsProfile.vue";
 import UserSettingsAvatars from "@/components/User/UserSettings/UserSettingsAvatars.vue";
 import { XIcon } from "@heroicons/vue/outline";
+import { onUnmounted, ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     XIcon,
     UserSettingsMenu,
@@ -40,26 +40,40 @@ import { XIcon } from "@heroicons/vue/outline";
       default: null,
     },
   },
-})
-export default class UserSettings extends Vue {
-  menuIndex = 0;
+  setup(props) {
+		const modal = ref()
+    const menuIndex = ref(0);
 
-  setMenuIndex(index: number): void {
-    this.menuIndex = index;
-  }
-}
+    const setMenuIndex = (index: number) => {
+      menuIndex.value = index;
+    };
+
+    let clickedOutside = (e: MouseEvent) => {
+      if (
+        modal.value &&
+        !(modal.value === e.target || modal.value.contains(e.target))
+      ) {
+				if (!(e.target as HTMLElement).closest(".open-modal")) {
+        	props.closeCallback();
+        }
+      }
+    };
+    document.body.addEventListener("click", clickedOutside);
+    onUnmounted(() => {
+      document.body.removeEventListener("click", clickedOutside);
+    });
+
+    return {
+			modal,
+      menuIndex,
+      setMenuIndex,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
-
-.overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 1;
-}
 
 .container {
   position: absolute;
@@ -68,6 +82,8 @@ export default class UserSettings extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+	z-index: 1000;
 
   .settings {
     position: relative;

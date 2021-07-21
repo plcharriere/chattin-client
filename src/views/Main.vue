@@ -403,10 +403,10 @@ export default class Main extends Vue {
   flex-direction: column;
 
   .infos {
+		position: relative;
     display: flex;
     flex-direction: row;
     height: 64px;
-    border-bottom: 1px solid $border-color;
 
     .server {
       display: flex;
@@ -418,8 +418,11 @@ export default class Main extends Vue {
       padding: 20px;
     }
 
-    div {
+    &>div {
+			background: #fff;
+			z-index: 2;
       border-right: 1px solid $border-color;
+    	border-bottom: 1px solid $border-color;
     }
 
     div:last-child {
@@ -431,6 +434,14 @@ export default class Main extends Vue {
     flex-grow: 1;
     display: flex;
     flex-direction: row;
+
+		&>div {
+      border-right: 1px solid $border-color;
+    }
+
+    div:last-child {
+      border-right: 0;
+    }
 
     .channel {
       width: 100%;

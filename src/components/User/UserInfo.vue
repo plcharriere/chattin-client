@@ -7,7 +7,7 @@
     </div>
     <transition name="slide-down">
       <div ref="dropdown" class="dropdown" v-if="dropdownActive">
-        <div class="item" @click="openUserSettings">
+        <div class="item open-modal" @click="openUserSettings">
           <CogIcon />
           My settings
         </div>
@@ -60,10 +60,7 @@ export default defineComponent({
         dropdown.value &&
         !(dropdown.value === e.target || dropdown.value.contains(e.target))
       ) {
-        if (!(e.target as HTMLElement).closest(".user-info")) {
-          console.log("closed");
-          disableDropdown();
-        }
+        if (!(e.target as HTMLElement).closest(".user-info")) disableDropdown();
       }
     };
     document.body.addEventListener("click", clickedOutside);
@@ -101,13 +98,16 @@ export default defineComponent({
 
   .user {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     flex-shrink: 0;
     display: flex;
     flex-direction: row;
     width: 200px;
-    padding: 16px 20px;
+    height: 100%;
+    padding: 0 20px;
     align-items: center;
+    background: $background-color;
+    border-bottom: 1px solid $border-color;
 
     .user-name {
       padding-left: 10px;
@@ -136,7 +136,6 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     background: $background-color;
-    border-top: 1px solid $border-color;
     border-radius: 0 0 10px 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
