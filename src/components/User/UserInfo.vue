@@ -1,6 +1,10 @@
 <template>
   <div class="user-info">
-    <div class="user" @click="toggleDropdown">
+    <div
+      class="user"
+      :class="{ active: dropdownActive }"
+      @click="toggleDropdown"
+    >
       <UserAvatar :uuid="user.avatarUuid" size="tiny" />
       <UserName :user="user" />
       <ChevronDownIcon :class="{ active: dropdownActive }" />
@@ -108,7 +112,8 @@ export default defineComponent({
       padding-left: 10px;
     }
 
-    &:hover {
+    &:hover,
+    &.active {
       background: $hover-color;
       cursor: pointer;
     }

@@ -1,42 +1,84 @@
 <template>
-  <div class="main">
-    <div
-      :class="[
-        'catto',
-        { loading: loading },
-        { polite: authenticated },
-        { menacing: !loading && !authenticated },
-      ]"
-    ></div>
-    <span v-if="loading">wait lemmi check dis out...</span>
-    <span v-else-if="authenticated"
-      >looks like everithing is fine, pls proceed sir</span
-    >
-    <span v-else-if="wrong"><b>wrong credentials!!!!</b></span>
-    <span v-else>hold on sir, authenticate <b>now!!!!</b></span>
-    <template v-if="authenticated">
-      <button @click="proceed">alright, lets proceed then!!!1</button>
-    </template>
-    <template v-else>
+  <div class="login">
+    <div class="container">
+      <h1>Chattin</h1>
+      <span>{{ error.length > 0 ? error : "Please sign in" }}</span>
       <input
         type="text"
         id="login"
-        placeholder="ok my name is"
+        placeholder="Username"
         :disabled="loading"
       />
       <input
         type="password"
         id="password"
-        placeholder="and my secret is"
+        placeholder="Password"
         :disabled="loading"
       />
-      <button @click="login" :disabled="loading">sure catto</button>
-      <span class="register" @click="register">i wanna register pls</span>
-    </template>
+      <button @click="login" :disabled="loading">Sign in</button>
+      <span class="register" @click="register">Register</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { httpUrl } from "@/env";
+import { defineComponent } from "@vue/runtime-core";
+import axios from "axios";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+
+export default defineComponent({
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+
+    if (store.state.token != "") router.push("/");
+    else {
+      const loading = ref(false);
+      const error = ref("");
+
+      const login = () => {
+        loading.value = true;
+        const formData = new FormData();
+        formData.append(
+          "login",
+          (document.getElementById("login") as HTMLInputElement).value
+        );
+        formData.append(
+          "password",
+          (document.getElementById("password") as HTMLInputElement).value
+        );
+        axios.post(httpUrl + "/login", formData).then((resp) => {
+          if (resp.status === 200) {
+            store.state.token = resp.data;
+            localStorage.setItem("token", resp.data);
+            router.push("/");
+          } else {
+            error.value =
+              resp.status === 401 ? "Wrong credentials" : "Unexpected error";
+            loading.value = false;
+          }
+        });
+      };
+
+      const register = () => {
+        router.push("/register");
+      };
+
+      return {
+        loading,
+        error,
+        login,
+        register,
+      };
+    }
+  },
+});
+</script>
+
+<!--<script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import axios from "axios";
 import { httpUrl } from "@/env";
@@ -57,25 +99,28 @@ export default class Main extends Vue {
 
   login(): void {
     this.loading = true;
-    axios
-      .post(httpUrl + "/login", {
-        login: (document.getElementById("login") as HTMLInputElement).value,
-        password: (document.getElementById("password") as HTMLInputElement)
-          .value,
-      })
-      .then((resp) => {
-        setTimeout(() => {
-          if (resp.data == -1) {
-            this.wrong = true;
-          } else {
-            this.$store.state.token = resp.data;
-            localStorage.setItem("token", resp.data);
-            this.wrong = false;
-            this.authenticated = true;
-          }
-          this.loading = false;
-        }, 2000);
-      });
+    const formData = new FormData();
+    formData.append(
+      "login",
+      (document.getElementById("login") as HTMLInputElement).value
+    );
+    formData.append(
+      "password",
+      (document.getElementById("password") as HTMLInputElement).value
+    );
+    axios.post(httpUrl + "/login", formData).then((resp) => {
+      setTimeout(() => {
+        if (resp.data == -1) {
+          this.wrong = true;
+        } else {
+          this.$store.state.token = resp.data;
+          localStorage.setItem("token", resp.data);
+          this.wrong = false;
+          this.authenticated = true;
+        }
+        this.loading = false;
+      }, 2000);
+    });
   }
 
   register(): void {
@@ -90,10 +135,10 @@ export default class Main extends Vue {
     }
   }
 }
-</script>
+</script>-->
 
 <style scoped lang="scss">
-.main {
+.login {
   width: 100%;
   height: 100%;
   padding: 15px;
@@ -105,77 +150,39 @@ export default class Main extends Vue {
   justify-content: center;
   align-items: center;
 
-  .catto {
-    width: 64px;
-    height: 64px;
-    border-radius: 2px;
-    margin-bottom: 15px;
-    transition: all 300ms;
+  .container {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-    &:hover {
-      transform: scale(1.15);
+    span {
+      margin-bottom: 20px;
     }
 
-    &.menacing {
-      background: url(~@/assets/img/menacing-catto.png);
-      background-size: contain;
+    button {
+      margin-top: 10px;
+      padding: 10px 30px;
+      border-radius: 20px;
+      border: 0;
+      background: #ccc;
+      outline: 0;
+      cursor: pointer;
+      transition: all 300ms;
+
+      &:hover {
+        background: #bbb;
+        transform: scale(1.06);
+      }
     }
 
-    &.loading {
-      background: url(h~@/assets/img/loading-catto.gif);
-      background-size: contain;
+    .register {
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: underline;
+      font-size: 12px;
     }
-
-    &.polite {
-      background: url(~@/assets/img/polite-catto.png);
-      background-size: contain;
-    }
-  }
-
-  span {
-    margin-bottom: 20px;
-  }
-
-  input {
-    margin-bottom: 10px;
-    padding: 10px 20px;
-    width: 200px;
-    border-radius: 20px;
-    border: 2px solid #ccc;
-    outline: 0;
-    transition: all 300ms;
-
-    &:hover {
-      transform: scale(1.04);
-      border-color: #3296ff;
-    }
-    &:focus {
-      transform: scale(1.06);
-      border-color: #3296ff;
-    }
-  }
-
-  button {
-    margin-top: 10px;
-    padding: 10px 30px;
-    border-radius: 20px;
-    border: 0;
-    background: #ccc;
-    outline: 0;
-    cursor: pointer;
-    transition: all 300ms;
-
-    &:hover {
-      background: #bbb;
-      transform: scale(1.06);
-    }
-  }
-
-  .register {
-    cursor: pointer;
-    margin-top: 20px;
-    text-decoration: underline;
-    font-size: 12px;
   }
 }
 </style>
