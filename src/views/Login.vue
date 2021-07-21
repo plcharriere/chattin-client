@@ -78,65 +78,6 @@ export default defineComponent({
 });
 </script>
 
-<!--<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import axios from "axios";
-import { httpUrl } from "@/env";
-
-@Options({
-  props: {},
-})
-export default class Main extends Vue {
-  loading = false;
-  authenticated = false;
-  wrong = false;
-
-  mounted(): void {
-    if (this.$store.state.token != "") {
-      this.$router.push("/");
-    }
-  }
-
-  login(): void {
-    this.loading = true;
-    const formData = new FormData();
-    formData.append(
-      "login",
-      (document.getElementById("login") as HTMLInputElement).value
-    );
-    formData.append(
-      "password",
-      (document.getElementById("password") as HTMLInputElement).value
-    );
-    axios.post(httpUrl + "/login", formData).then((resp) => {
-      setTimeout(() => {
-        if (resp.data == -1) {
-          this.wrong = true;
-        } else {
-          this.$store.state.token = resp.data;
-          localStorage.setItem("token", resp.data);
-          this.wrong = false;
-          this.authenticated = true;
-        }
-        this.loading = false;
-      }, 2000);
-    });
-  }
-
-  register(): void {
-    this.$router.push("/register");
-  }
-
-  proceed(): void {
-    if (this.$store.state.token != "") {
-      this.$router.push("/");
-    } else {
-      this.$router.push("/login");
-    }
-  }
-}
-</script>-->
-
 <style scoped lang="scss">
 .login {
   width: 100%;
