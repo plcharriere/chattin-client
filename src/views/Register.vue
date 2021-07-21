@@ -51,7 +51,7 @@ export default defineComponent({
           (document.getElementById("password") as HTMLInputElement).value
         );
 
-        axios.post(httpUrl + "/register", formData).then((resp) => {
+        axios.post(httpUrl + "/users/register", formData).then((resp) => {
           if (resp.status === 200) {
             store.state.token = resp.data;
             localStorage.setItem("token", resp.data);
