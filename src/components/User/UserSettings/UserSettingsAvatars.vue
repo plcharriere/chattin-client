@@ -129,17 +129,22 @@ export default class UserSettingsProfile extends Vue {
     this.loading = true;
 
     const formData = new FormData();
-    formData.append("token", this.$store.state.token);
     if (this.file) formData.append("file", this.file);
     else if (this.previewUuid) formData.append("uuid", this.previewUuid);
-    axios.post(httpUrl + "/avatars", formData).then(async () => {
-      await this.fetchAvatars();
-      this.loading = false;
-      this.previewUrl = "";
-      this.previewUuid = "";
-      this.file = null;
-      (document.getElementById("avatarFile") as HTMLInputElement).value = "";
-    });
+    axios
+      .post(httpUrl + "/avatars", formData, {
+        headers: {
+          token: this.$store.state.token,
+        },
+      })
+      .then(async () => {
+        await this.fetchAvatars();
+        this.loading = false;
+        this.previewUrl = "";
+        this.previewUuid = "";
+        this.file = null;
+        (document.getElementById("avatarFile") as HTMLInputElement).value = "";
+      });
   }
 }
 </script>
