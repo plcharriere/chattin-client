@@ -14,14 +14,14 @@
       <input
         type="text"
         id="nickname"
-        v-model="profileEdit.nickname"
+        v-model="nickname"
         :disabled="loading"
         placeholder="How would you like to be called ?"
       />
       <span>Bio :</span>
       <textarea
         type="text"
-        v-model="profileEdit.bio"
+        v-model="bio"
         :disabled="loading"
         placholder="Tell us more about yourself..."
       />
@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { User, UserProfileEdit } from "@/dto/User";
+import { User } from "@/dto/User";
 import { PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
@@ -57,16 +57,12 @@ import { httpUrl } from "@/env";
 export default class UserSettingsProfile extends Vue {
   loading = false;
 
-  profileEdit: UserProfileEdit = {
-    token: "",
-    nickname: "",
-    bio: "",
-  };
+  nickname = "";
+  bio = "";
 
   setProfileEdit(user: User): void {
-    this.profileEdit.token = this.$store.state.token;
-    this.profileEdit.nickname = user.nickname;
-    this.profileEdit.bio = user.bio;
+    this.nickname = user.nickname;
+    this.bio = user.bio;
   }
 
   editAvatar(): void {
@@ -75,9 +71,18 @@ export default class UserSettingsProfile extends Vue {
 
   save(): void {
     this.loading = true;
-    axios.post(httpUrl + "/users/profile", this.profileEdit).then(() => {
-      this.loading = false;
-    });
+    const formData = new FormData();
+    formData.append("nickname", this.nickname);
+    formData.append("bio", this.bio);
+    axios
+      .post(httpUrl + "/users/profile", formData, {
+        headers: {
+          token: this.$store.state.token,
+        },
+      })
+      .then(() => {
+        this.loading = false;
+      });
   }
 }
 </script>

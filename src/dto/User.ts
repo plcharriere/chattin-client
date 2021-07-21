@@ -6,9 +6,3 @@ export interface User {
   bio: string;
   online: boolean;
 }
-
-export interface UserProfileEdit {
-  token: string;
-  nickname: string;
-  bio: string;
-}
