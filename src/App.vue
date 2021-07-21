@@ -3,19 +3,17 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
+import { defineComponent } from "@vue/runtime-core";
+import { useStore } from "vuex";
 
-@Options({
-  components: {},
-})
-export default class App extends Vue {
-  created(): void {
+export default defineComponent({
+  setup() {
+    const store = useStore();
+
     const token = localStorage.getItem("token");
-    if (token) {
-      this.$store.state.token = token;
-    }
-  }
-}
+    if (token) store.state.token = token;
+  },
+});
 </script>
 
 <style lang="scss">
