@@ -17,21 +17,21 @@
 <script lang="ts">
 import { User } from "@/dto/User";
 import { getUserName } from "@/utils";
-import { PropType } from "vue";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, PropType } from "vue";
 
-@Options({
+export default defineComponent({
   props: {
     users: {
       type: Array as PropType<User[]>,
-      default: [],
+      default() {
+        return [];
+      },
     },
   },
   methods: {
     getUserName: getUserName,
   },
-})
-export default class TypingUsers extends Vue {}
+});
 </script>
 
 <style scoped lang="scss">

@@ -7,17 +7,16 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
+import { defineComponent } from "@vue/runtime-core";
 
-@Options({
+export default defineComponent({
   props: {
     reconnecting: {
       type: Boolean,
       default: false,
     },
   },
-})
-export default class Loading extends Vue {}
+});
 </script>
 
 <style scoped lang="scss">

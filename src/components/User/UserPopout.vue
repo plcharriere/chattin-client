@@ -48,16 +48,14 @@ export default defineComponent({
     const left = computed(() => {
       let rect = props.element.getBoundingClientRect();
       let left = rect.left + props.element.offsetWidth + 6;
-      if (popout.value) {
-        let clientWidth = window.document.documentElement.clientWidth;
-        let popoutWidth = popout.value.offsetWidth;
-        if (left + popoutWidth > clientWidth) {
-          left =
-            rect.left -
-            props.element.offsetWidth -
-            props.element.offsetWidth / 2 -
-            8;
-        }
+      let clientWidth = window.document.documentElement.clientWidth;
+      let popoutWidth = popout.value ? popout.value.offsetWidth : 300;
+      if (left + popoutWidth > clientWidth) {
+        left =
+          rect.left -
+          props.element.offsetWidth -
+          props.element.offsetWidth / 2 -
+          8;
       }
       return left;
     });

@@ -1,12 +1,14 @@
 <template>
   <Loading v-if="loading" :reconnecting="reconnecting" />
   <div v-else class="main">
-    <UserPopout
-      v-if="userPopoutUuid.length > 0 && userPopoutElement"
-      :element="userPopoutElement"
-      :user="getUserByUuid(users, userPopoutUuid)"
-      @closeUserPopout="setUserPopoutUuid('')"
-    />
+    <transition name="zoom">
+      <UserPopout
+        v-if="userPopoutUuid.length > 0 && userPopoutElement"
+        :element="userPopoutElement"
+        :user="getUserByUuid(users, userPopoutUuid)"
+        @closeUserPopout="setUserPopoutUuid('')"
+      />
+    </transition>
     <UserSettings
       v-if="showUserSettings"
       :user="getUserByUuid(users, userUuid)"
@@ -391,6 +393,7 @@ export default class Main extends Vue {
 
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
+@import "~@/assets/scss/animations.scss";
 
 .main {
   width: 100%;

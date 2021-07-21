@@ -1,25 +1,23 @@
 <template>
-  <div class="user-info">
-    <div
-      class="user"
-      :class="{ active: dropdownActive }"
-      @click="toggleDropdown"
-    >
+  <div class="user-info visible">
+    <div class="user" @click="toggleDropdown">
       <UserAvatar :uuid="user.avatarUuid" size="tiny" />
       <UserName :user="user" />
       <ChevronDownIcon :class="{ active: dropdownActive }" />
     </div>
-    <div ref="dropdown" class="dropdown" v-if="dropdownActive">
-      <div class="item" @click="openUserSettings">
-        <CogIcon />
-        My settings
+    <transition name="slide-down">
+      <div ref="dropdown" class="dropdown" v-if="dropdownActive">
+        <div class="item" @click="openUserSettings">
+          <CogIcon />
+          My settings
+        </div>
+        <div class="separator"></div>
+        <div class="item red" @click="logout">
+          <LogoutIcon />
+          Logout
+        </div>
       </div>
-      <div class="separator"></div>
-      <div class="item red" @click="logout">
-        <LogoutIcon />
-        Logout
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -96,11 +94,14 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import "~@/assets/scss/variables.scss";
+@import "~@/assets/scss/animations.scss";
 
 .user-info {
   user-select: none;
 
   .user {
+    position: relative;
+    z-index: 2;
     flex-shrink: 0;
     display: flex;
     flex-direction: row;
@@ -112,8 +113,7 @@ export default defineComponent({
       padding-left: 10px;
     }
 
-    &:hover,
-    &.active {
+    &:hover {
       background: $hover-color;
       cursor: pointer;
     }
@@ -122,7 +122,7 @@ export default defineComponent({
       width: 20px;
       height: 20px;
       margin-left: auto;
-      transition: all 200ms;
+      transition: transform 200ms;
 
       &.active {
         transform: rotate(180deg);
@@ -131,9 +131,8 @@ export default defineComponent({
   }
 
   .dropdown {
-    transition: all 200ms;
     position: relative;
-    z-index: 2;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     background: $background-color;
