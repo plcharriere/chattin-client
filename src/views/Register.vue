@@ -1,99 +1,88 @@
 <template>
-  <div class="main">
-    <div class="doggo"></div>
-    <span v-if="loading">mmmh let me think about it...</span>
-    <span v-else-if="registered"
-      >thanks for bepis hooman!!!!<br />looks like everithing is fine, pls
-      proceed sir</span
-    >
-    <span v-else-if="wrong"
-      >sorry hooman, <b>something went wrong...</b><br />pls try again</span
-    >
-    <span v-else
-      >henlo sir, i am register doggo<br />pls <b>register</b> below</span
-    >
-    <template v-if="registered">
-      <button @click="proceed">thamks register doggo!!!!</button>
-    </template>
-    <template v-else>
+  <div class="register">
+    <div class="container">
+      <h1>Chattin</h1>
+      <span>{{ error.length > 0 ? error : "Register" }}</span>
       <input
         type="text"
         id="login"
-        placeholder="ok my name is"
+        placeholder="Username"
         :disabled="loading"
       />
       <input
         type="password"
         id="password"
-        placeholder="and my secret is"
+        placeholder="Password"
         :disabled="loading"
       />
-      <button @click="register" :disabled="loading">
-        here doggo, have some bepis
-      </button>
-      <span class="login" @click="login">pranked i wanna login pls</span>
-    </template>
+      <button @click="register" :disabled="loading">Sign up</button>
+      <span class="login" @click="login">Login</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import axios from "axios";
 import { httpUrl } from "@/env";
+import { defineComponent } from "@vue/runtime-core";
+import axios from "axios";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
-@Options({
-  props: {},
-})
-export default class Main extends Vue {
-  loading = false;
-  registered = false;
-  wrong = false;
+export default defineComponent({
+  setup() {
+    const router = useRouter();
+    const store = useStore();
 
-  mounted(): void {
-    if (this.$store.state.token != "") {
-      this.$router.push("/");
-    }
-  }
+    if (store.state.token != "") router.push("/");
+    else {
+      const loading = ref(false);
+      const error = ref("");
 
-  register(): void {
-    this.loading = true;
-    axios
-      .post(httpUrl + "/register", {
-        login: (document.getElementById("login") as HTMLInputElement).value,
-        password: (document.getElementById("password") as HTMLInputElement)
-          .value,
-      })
-      .then((resp) => {
-        setTimeout(() => {
-          if (resp.data.length != 64) {
-            this.wrong = true;
-          } else {
-            this.$store.state.token = resp.data;
+      const register = () => {
+        loading.value = true;
+        const formData = new FormData();
+        formData.append(
+          "login",
+          (document.getElementById("login") as HTMLInputElement).value
+        );
+        formData.append(
+          "password",
+          (document.getElementById("password") as HTMLInputElement).value
+        );
+
+        axios.post(httpUrl + "/register", formData).then((resp) => {
+          if (resp.status === 200) {
+            store.state.token = resp.data;
             localStorage.setItem("token", resp.data);
-            this.wrong = false;
-            this.registered = true;
+            router.push("/");
+          } else {
+            error.value =
+              resp.status === 409
+                ? "Username already taken"
+                : "Unexpected error";
+            loading.value = false;
           }
-          this.loading = false;
-        }, 2000);
-      });
-  }
+        });
+      };
 
-  login(): void {
-    this.$router.push("/login");
-  }
+      const login = () => {
+        router.push("/login");
+      };
 
-  proceed(): void {
-    if (this.$store.state.token != "") {
-      this.$router.push("/");
-    } else {
-      this.$router.push("/login");
+      return {
+        loading,
+        error,
+        register,
+        login,
+      };
     }
-  }
-}
+  },
+});
 </script>
 
 <style scoped lang="scss">
-.main {
+.register {
   width: 100%;
   height: 100%;
   padding: 15px;
@@ -105,66 +94,41 @@ export default class Main extends Vue {
   justify-content: center;
   align-items: center;
 
-  .doggo {
-    width: 64px;
-    height: 64px;
-    border-radius: 2px;
-    margin-bottom: 15px;
-    transition: all 300ms;
-    background: url(~@/assets/img/polite-doggo.png);
-    background-size: contain;
+  .container {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-    &:hover {
-      transform: scale(1.15);
+    span {
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 18px;
     }
-  }
 
-  span {
-    margin-bottom: 20px;
-    text-align: center;
-    line-height: 18px;
-  }
+    button {
+      margin-top: 10px;
+      padding: 10px 30px;
+      border-radius: 20px;
+      border: 0;
+      background: #ccc;
+      outline: 0;
+      cursor: pointer;
+      transition: all 300ms;
 
-  input {
-    margin-bottom: 10px;
-    padding: 10px 20px;
-    width: 200px;
-    border-radius: 20px;
-    border: 2px solid #ccc;
-    outline: 0;
-    transition: all 300ms;
-
-    &:hover {
-      transform: scale(1.04);
-      border-color: #3296ff;
+      &:hover {
+        background: #bbb;
+        transform: scale(1.06);
+      }
     }
-    &:focus {
-      transform: scale(1.06);
-      border-color: #3296ff;
+
+    .login {
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: underline;
+      font-size: 12px;
     }
-  }
-
-  button {
-    margin-top: 10px;
-    padding: 10px 30px;
-    border-radius: 20px;
-    border: 0;
-    background: #ccc;
-    outline: 0;
-    cursor: pointer;
-    transition: all 300ms;
-
-    &:hover {
-      background: #bbb;
-      transform: scale(1.06);
-    }
-  }
-
-  .login {
-    cursor: pointer;
-    margin-top: 20px;
-    text-decoration: underline;
-    font-size: 12px;
   }
 }
 </style>
