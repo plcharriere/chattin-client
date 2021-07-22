@@ -182,6 +182,10 @@ export default class MessageList extends Vue {
     padding: 6px 20px;
     margin-top: 12px;
 
+    .user-avatar {
+      align-self: flex-start;
+    }
+
     .container {
       margin-left: 16px;
       flex-grow: 1;

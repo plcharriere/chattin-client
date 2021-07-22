@@ -1,5 +1,4 @@
 <template>
-  <div class="overlay" @click="closeCallback"></div>
   <div class="container">
     <div class="settings" ref="modal">
       <UserSettingsMenu @setMenuIndex="setMenuIndex" :menuIndex="menuIndex" />
@@ -41,7 +40,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-		const modal = ref()
+    const modal = ref();
     const menuIndex = ref(0);
 
     const setMenuIndex = (index: number) => {
@@ -53,8 +52,8 @@ export default defineComponent({
         modal.value &&
         !(modal.value === e.target || modal.value.contains(e.target))
       ) {
-				if (!(e.target as HTMLElement).closest(".open-modal")) {
-        	props.closeCallback();
+        if (!(e.target as HTMLElement).closest(".open-modal")) {
+          props.closeCallback();
         }
       }
     };
@@ -64,7 +63,7 @@ export default defineComponent({
     });
 
     return {
-			modal,
+      modal,
       menuIndex,
       setMenuIndex,
     };
@@ -83,7 +82,7 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0.3);
-	z-index: 1000;
+  z-index: 1000;
 
   .settings {
     position: relative;
