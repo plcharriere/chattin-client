@@ -55,7 +55,7 @@ export default defineComponent({
       dropdownActive.value = false;
     };
 
-    let clickedOutside = (e: MouseEvent) => {
+    let onDocumentClick = (e: MouseEvent) => {
       if (
         dropdown.value &&
         !(dropdown.value === e.target || dropdown.value.contains(e.target))
@@ -63,9 +63,9 @@ export default defineComponent({
         if (!(e.target as HTMLElement).closest(".user-info")) disableDropdown();
       }
     };
-    document.body.addEventListener("click", clickedOutside);
+    document.body.addEventListener("click", onDocumentClick);
     onUnmounted(() => {
-      document.body.removeEventListener("click", clickedOutside);
+      document.body.removeEventListener("click", onDocumentClick);
     });
 
     let openUserSettings = () => {

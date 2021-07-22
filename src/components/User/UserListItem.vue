@@ -1,9 +1,9 @@
 <template>
   <div
+    ref="userListItem"
     class="user-list-item open-user-popout"
     @click="setUserPopoutUuid(user.uuid)"
     :class="{ active: active, offline: offline }"
-    v-click-outside="clickOutside"
   >
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
     <UserName :user="user" class="name" />
@@ -12,12 +12,12 @@
 
 <script lang="ts">
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
+import { onUnmounted, ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     UserAvatar,
     UserName,
@@ -32,19 +32,40 @@ import UserName from "@/components/User/UserName.vue";
       default: false,
     },
   },
-})
-export default class UserListItem extends Vue {
-  active = false;
+  setup(props, { emit }) {
+    const userListItem = ref();
+    const active = ref(false);
 
-  setUserPopoutUuid(userUuid: string): void {
-    this.active = true;
-    this.$emit("setUserPopoutUuid", userUuid, this.$el);
-  }
+    const setUserPopoutUuid = (userUuid: string) => {
+      if (userListItem.value) {
+        active.value = true;
+        emit("setUserPopoutUuid", userUuid, userListItem.value);
+      }
+    };
 
-  clickOutside(): void {
-    if (this.active) this.active = false;
-  }
-}
+    let onDocumentClick = (e: MouseEvent) => {
+      if (
+        userListItem.value &&
+        !(
+          userListItem.value === e.target ||
+          userListItem.value.contains(e.target)
+        )
+      ) {
+        if (active.value) active.value = false;
+      }
+    };
+    document.body.addEventListener("click", onDocumentClick);
+    onUnmounted(() => {
+      document.body.removeEventListener("click", onDocumentClick);
+    });
+
+    return {
+      userListItem,
+      active,
+      setUserPopoutUuid,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

@@ -25,7 +25,7 @@ export default defineComponent({
   setup(props) {
     const modal = ref();
 
-    let clickedOutside = (e: MouseEvent) => {
+    let onDocumentClick = (e: MouseEvent) => {
       if (
         modal.value &&
         !(modal.value === e.target || modal.value.contains(e.target))
@@ -39,9 +39,9 @@ export default defineComponent({
         }
       }
     };
-    document.body.addEventListener("click", clickedOutside);
+    document.body.addEventListener("click", onDocumentClick);
     onUnmounted(() => {
-      document.body.removeEventListener("click", clickedOutside);
+      document.body.removeEventListener("click", onDocumentClick);
     });
 
     return {
