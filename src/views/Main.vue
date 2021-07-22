@@ -1,56 +1,58 @@
 <template>
-  <Loading v-if="loading" :reconnecting="reconnecting" />
-  <div v-else class="main">
-    <transition name="zoom">
-      <UserPopout
-        v-if="userPopoutUuid.length > 0 && userPopoutElement"
-        :element="userPopoutElement"
-        :user="getUserByUuid(users, userPopoutUuid)"
-        @closeUserPopout="setUserPopoutUuid('')"
-      />
-    </transition>
-    <UserSettings
-      v-if="showUserSettings"
-      :user="getUserByUuid(users, userUuid)"
-      :closeCallback="toggleUserSettings"
-    />
-    <div class="infos">
-      <div class="server">Chattin</div>
-      <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
-      <UserInfo
-        :user="getUserByUuid(users, userUuid)"
-        @openUserSettings="toggleUserSettings"
-        @logout="logout"
-      />
-    </div>
-    <div class="content">
-      <ChannelList
-        :channels="channels"
-        :channelUuid="channelUuid"
-        @setChannelUuid="setChannelUuid"
-      />
-      <div class="channel">
-        <MessageList
-          :messages="getMessagesByChannelUuid(messages, channelUuid)"
-          :user="getUserByUuid(users, userUuid)"
-          :users="users"
-          @scrolledTop="fetchChannelMessages"
-          @setUserPopoutUuid="setUserPopoutUuid"
-          @editMessage="editMessage"
-          @deleteMessage="deleteMessage"
+  <transition name="fade">
+    <Loading v-if="loading" :reconnecting="reconnecting" />
+    <div v-else class="main">
+      <transition name="zoom">
+        <UserPopout
+          v-if="userPopoutUuid.length > 0 && userPopoutElement"
+          :element="userPopoutElement"
+          :user="getUserByUuid(users, userPopoutUuid)"
+          @closeUserPopout="setUserPopoutUuid('')"
         />
-        <div class="message">
-          <MessageInput
-            :channel="getChannelByUuid(channels, channelUuid)"
-            @keyDown="messageKeyDown"
-            @sendMessage="sendMessage"
-          />
-          <TypingUsers :users="getTypingUsers(typingUsers)" />
-        </div>
+      </transition>
+      <UserSettings
+        v-if="showUserSettings"
+        :user="getUserByUuid(users, userUuid)"
+        :closeCallback="toggleUserSettings"
+      />
+      <div class="infos">
+        <div class="server">Chattin</div>
+        <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
+        <UserInfo
+          :user="getUserByUuid(users, userUuid)"
+          @openUserSettings="toggleUserSettings"
+          @logout="logout"
+        />
       </div>
-      <UserList :users="users" @setUserPopoutUuid="setUserPopoutUuid" />
+      <div class="content">
+        <ChannelList
+          :channels="channels"
+          :channelUuid="channelUuid"
+          @setChannelUuid="setChannelUuid"
+        />
+        <div class="channel">
+          <MessageList
+            :messages="getMessagesByChannelUuid(messages, channelUuid)"
+            :user="getUserByUuid(users, userUuid)"
+            :users="users"
+            @scrolledTop="fetchChannelMessages"
+            @setUserPopoutUuid="setUserPopoutUuid"
+            @editMessage="editMessage"
+            @deleteMessage="deleteMessage"
+          />
+          <div class="message">
+            <MessageInput
+              :channel="getChannelByUuid(channels, channelUuid)"
+              @keyDown="messageKeyDown"
+              @sendMessage="sendMessage"
+            />
+            <TypingUsers :users="getTypingUsers(typingUsers)" />
+          </div>
+        </div>
+        <UserList :users="users" @setUserPopoutUuid="setUserPopoutUuid" />
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script lang="ts">
