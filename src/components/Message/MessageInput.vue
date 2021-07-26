@@ -1,11 +1,11 @@
 <template>
   <div class="message-input">
     <textarea
+      ref="textarea"
       class="input"
       v-model="message"
       :placeholder="getPlaceholder()"
       v-on:keydown="keyDown"
-      v-on:keydown.exact.enter="sendMessage"
     ></textarea>
     <PaperAirplaneIcon class="icon-btn" @click="sendMessage()" />
   </div>
@@ -15,7 +15,7 @@
 import { Channel } from "@/dto/Channel";
 import { defineComponent, PropType } from "@vue/runtime-core";
 import { PaperAirplaneIcon } from "@heroicons/vue/solid";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 export default defineComponent({
   components: {
@@ -28,25 +28,40 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const textarea = ref();
     const message = ref("");
+    const textareaHeight = 16;
 
     const getPlaceholder = () => {
       return "Message in #" + props.channel.name;
     };
 
-    const keyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Enter") emit("keyDown");
-    };
-
-    const sendMessage = (e: KeyboardEvent | null = null) => {
+    const sendMessage = () => {
       if (message.value.length > 0) {
         emit("sendMessage", message.value);
         message.value = "";
       }
-      if (e) e.preventDefault();
+    };
+
+    watch(message, () => {
+      emit("typed");
+      const textareaElement = textarea.value as HTMLTextAreaElement;
+      let newline = 0;
+      for (let i = 0; i < message.value.length; i++) {
+        if (message.value[i] === "\n") newline++;
+      }
+      textareaElement.style.height = textareaHeight * (newline + 1) + "px";
+    });
+
+    const keyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        sendMessage();
+        e.preventDefault();
+      }
     };
 
     return {
+      textarea,
       message,
       getPlaceholder,
       keyDown,
@@ -73,9 +88,10 @@ export default defineComponent({
 
   .input {
     height: 16px;
+    max-height: 200px;
     border: 0;
-    padding: 0 5px;
     margin: 0;
+    padding: 0 5px;
 
     &:focus {
       border: 0;
@@ -84,6 +100,7 @@ export default defineComponent({
   }
 
   svg {
+    padding-left: 15px;
     width: 20px;
     height: 20px;
   }

@@ -103,8 +103,6 @@ export default defineComponent({
 
 .message-list-item-content {
   .message {
-    .content {
-    }
     .edited {
       font-size: 12px;
       color: $lighter-color;

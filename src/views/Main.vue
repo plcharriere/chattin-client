@@ -43,7 +43,7 @@
           <div class="message">
             <MessageInput
               :channel="getChannelByUuid(channels, channelUuid)"
-              @keyDown="messageKeyDown"
+              @typed="messageTyping"
               @sendMessage="sendMessage"
             />
             <TypingUsers :users="getTypingUsers(typingUsers)" />
@@ -195,7 +195,7 @@ export default class Main extends Vue {
     });
   }
 
-  messageKeyDown(): void {
+  messageTyping(): void {
     sendPacket(this.ws, PacketType.TYPING, this.channelUuid);
   }
 
