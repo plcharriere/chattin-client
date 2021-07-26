@@ -1,8 +1,9 @@
 <template>
   <div class="message-input">
     <textarea
+      class="input"
       v-model="message"
-      :placeholder="getPlaceholder(channel)"
+      :placeholder="getPlaceholder()"
       v-on:keydown="keyDown"
       v-on:keydown.exact.enter="sendMessage"
     ></textarea>
@@ -12,40 +13,47 @@
 
 <script lang="ts">
 import { Channel } from "@/dto/Channel";
-import { PropType } from "@vue/runtime-core";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import { PaperAirplaneIcon } from "@heroicons/vue/solid";
+import { ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     PaperAirplaneIcon,
   },
   props: {
     channel: {
       type: Object as PropType<Channel>,
+      required: true,
     },
   },
-})
-export default class MessageInput extends Vue {
-  message = "";
+  setup(props, { emit }) {
+    const message = ref("");
 
-  getPlaceholder(channel: Channel): string {
-    if (!channel) return "Message";
-    return "Message in #" + channel.name;
-  }
+    const getPlaceholder = () => {
+      return "Message in #" + props.channel.name;
+    };
 
-  keyDown(e: KeyboardEvent): void {
-    if (e.key !== "Enter") this.$emit("keyDown");
-  }
+    const keyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Enter") emit("keyDown");
+    };
 
-  sendMessage(e: KeyboardEvent | null = null): void {
-    if (this.message.length > 0) {
-      this.$emit("sendMessage", this.message);
-      this.message = "";
-    }
-    if (e) e.preventDefault();
-  }
-}
+    const sendMessage = (e: KeyboardEvent | null = null) => {
+      if (message.value.length > 0) {
+        emit("sendMessage", message.value);
+        message.value = "";
+      }
+      if (e) e.preventDefault();
+    };
+
+    return {
+      message,
+      getPlaceholder,
+      keyDown,
+      sendMessage,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
@@ -63,7 +71,7 @@ export default class MessageInput extends Vue {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-  textarea {
+  .input {
     height: 16px;
     border: 0;
     padding: 0 5px;

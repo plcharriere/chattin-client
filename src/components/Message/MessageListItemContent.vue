@@ -104,7 +104,6 @@ export default defineComponent({
 .message-list-item-content {
   .message {
     .content {
-      line-height: 20px;
     }
     .edited {
       font-size: 12px;
