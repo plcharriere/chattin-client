@@ -18,34 +18,24 @@
           />
           <div class="date">{{ getMessageDateString(message, false) }}</div>
         </div>
-        <div v-if="!editMode" class="content">
-          {{ message.content
-          }}<span class="edited" v-if="message.edited.getTime() > 0"
-            >(edited)</span
-          >
-        </div>
-        <div v-else class="edit">
-          <textarea ref="edit" :value="message.content" />
-          <XIcon class="icon-btn" @click="toggleEditMode()" />
-          <CheckIcon class="icon-btn" @click="saveEdit(message.uuid)" />
-        </div>
+        <MessageListItemContent
+          :message="message"
+          :editing="editing"
+          @saveEditing="saveEditing"
+          @cancelEditing="toggleEditMode"
+        />
       </div>
     </template>
     <template v-else>
       <div class="date small">{{ getMessageDateString(message, true) }}</div>
-      <div v-if="!editMode" class="content">
-        {{ message.content
-        }}<span class="edited" v-if="message.edited.getTime() > 0"
-          >(edited)</span
-        >
-      </div>
-      <div v-else class="edit">
-        <textarea ref="edit" :value="message.content" />
-        <XIcon class="icon-btn" @click="toggleEditMode()" />
-        <CheckIcon class="icon-btn" @click="saveEdit(message.uuid)" />
-      </div>
+      <MessageListItemContent
+        :message="message"
+        :editing="editing"
+        @saveEditing="saveEditing"
+        @cancelEditing="toggleEditMode"
+      />
     </template>
-    <div class="actions" v-if="!editMode">
+    <div class="actions" v-if="!editing">
       <PencilIcon class="icon-btn" @click="toggleEditMode()" v-if="canEdit" />
       <TrashIcon
         class="icon-btn"
@@ -57,27 +47,24 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import { format, isToday, isYesterday } from "date-fns";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { TrashIcon } from "@heroicons/vue/solid";
-import { CheckIcon } from "@heroicons/vue/solid";
-import { XIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
+import MessageListItemContent from "@/components/Message/MessageListItemContent.vue";
 
-@Options({
+export default defineComponent({
   components: {
     UserAvatar,
+    MessageListItemContent,
     UserName,
     PencilIcon,
     TrashIcon,
-    CheckIcon,
-    XIcon,
   },
   props: {
     message: {
@@ -101,42 +88,46 @@ import { ref } from "vue";
       default: false,
     },
   },
-})
-export default class MessageList extends Vue {
-  edit = ref();
+  setup(props, { emit }) {
+    const editing = ref(false);
 
-  editMode = false;
+    const toggleEditMode = () => {
+      editing.value = !editing.value;
+    };
 
-  toggleEditMode(): void {
-    this.editMode = !this.editMode;
-  }
+    const saveEditing = (content: string) => {
+      emit("editMessage", props.message.uuid, content);
+      console.log(content);
+      toggleEditMode();
+    };
 
-  saveEdit(uuid: string): void {
-    this.$emit("editMessage", uuid, this.edit.value);
-    this.toggleEditMode();
-  }
+    const setUserPopoutUuid = (userUuid: string, element: HTMLElement) => {
+      emit("setUserPopoutUuid", userUuid, element);
+    };
 
-  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
-    this.$emit("setUserPopoutUuid", userUuid, element);
-  }
+    const getMessageDateString = (message: Message, onlyHour: boolean) => {
+      if (onlyHour) return format(message.date, "h:mm aa");
+      if (isToday(message.date))
+        return format(message.date, "'Today at' h:mm aa");
+      if (isYesterday(message.date))
+        return format(message.date, "'Yesterday at' h:mm aa");
+      return format(message.date, "dd/MM/yyyy 'at' h:mm aa");
+    };
 
-  getMessageDateString(message: Message, onlyHour: boolean): string {
-    if (onlyHour) return format(message.date, "h:mm aa");
-    if (isToday(message.date))
-      return format(message.date, "'Today at' h:mm aa");
-    if (isYesterday(message.date))
-      return format(message.date, "'Yesterday at' h:mm aa");
-    return format(message.date, "dd/MM/yyyy 'at' h:mm aa");
-  }
+    const deleteMessage = () => {
+      emit("deleteMessage", props.message.uuid);
+    };
 
-  editMessage(): void {
-    //
-  }
-
-  deleteMessage(uuid: string): void {
-    this.$emit("deleteMessage", uuid);
-  }
-}
+    return {
+      editing,
+      toggleEditMode,
+      saveEditing,
+      setUserPopoutUuid,
+      getMessageDateString,
+      deleteMessage,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
@@ -170,12 +161,6 @@ export default class MessageList extends Vue {
       text-align: center;
       width: 78px;
     }
-  }
-
-  .edited {
-    font-size: 12px;
-    color: $lighter-color;
-    margin-left: 8px;
   }
 
   &.user {
@@ -217,37 +202,6 @@ export default class MessageList extends Vue {
     .icon-btn {
       width: 16px;
       height: 16px;
-      margin-left: 10px;
-    }
-  }
-
-  .edit {
-    background: $background-color;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 5px 10px;
-    border: 1px solid $border-color;
-    border-radius: 10px;
-    resize: none;
-    margin: 0;
-    flex-grow: 1;
-
-    textarea {
-      height: 16px;
-      border: 0;
-      padding: 0 5px;
-      margin: 0;
-
-      &:focus {
-        border: 0;
-        box-shadow: none;
-      }
-    }
-
-    .icon-btn {
-      width: 24px;
-      height: 24px;
       margin-left: 10px;
     }
   }
