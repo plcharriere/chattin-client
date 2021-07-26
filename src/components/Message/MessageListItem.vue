@@ -97,7 +97,6 @@ export default defineComponent({
 
     const saveEditing = (content: string) => {
       emit("editMessage", props.message.uuid, content);
-      console.log(content);
       toggleEditMode();
     };
 

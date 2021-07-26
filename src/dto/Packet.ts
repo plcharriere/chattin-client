@@ -40,6 +40,7 @@ export interface PacketAuth {
 export interface PacketMessage {
   channelUuid: string;
   content: string;
+  files: string[];
 }
 
 export interface PacketSendEditMessage {

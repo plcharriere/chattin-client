@@ -17,10 +17,12 @@ export function sendPacket(
 export function sendPacketMessage(
   ws: WebSocket | null,
   channelUuid: string,
-  content: string
+  content: string,
+  files: string[]
 ): void {
   sendPacket(ws, PacketType.MESSAGE, {
     channelUuid,
     content,
+    files,
   } as PacketMessage);
 }

@@ -387,8 +387,8 @@ export default class Main extends Vue {
     }
   }
 
-  sendMessage(content: string): void {
-    sendPacketMessage(this.ws, this.channelUuid, content);
+  sendMessage(content: string, files: string[]): void {
+    sendPacketMessage(this.ws, this.channelUuid, content, files);
   }
 }
 </script>
