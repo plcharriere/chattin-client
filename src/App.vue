@@ -33,7 +33,7 @@ body,
 html,
 body,
 textarea {
-  font-family: sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   background: transparent;
 }

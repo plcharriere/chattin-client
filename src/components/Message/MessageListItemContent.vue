@@ -178,15 +178,19 @@ export default defineComponent({
     flex-wrap: wrap;
 
     .file {
-      background: $background-color;
+      background: $file-background;
       color: $default-color;
       padding: 10px;
       margin-right: 10px;
       border: 1px solid $border-color;
-      border-radius: 10px;
+      border-radius: 5px;
       display: flex;
       flex-direction: row;
       align-items: center;
+
+      &:hover {
+        background: $file-hover-background;
+      }
 
       .infos {
         margin: 0 10px;
