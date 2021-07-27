@@ -9,7 +9,11 @@
       <div class="content" v-html="getMessageContentHtml()"></div>
       <span class="edited" v-if="message.edited.getTime() > 0">(edited)</span>
     </div>
-    <div class="files" v-if="files.length > 0">
+    <div
+      class="files"
+      :class="{ 'below-text': message.content.length > 0 || editing }"
+      v-if="files.length > 0"
+    >
       <div
         class="file"
         v-for="file in files"
@@ -172,10 +176,13 @@ export default defineComponent({
   flex-direction: column;
 
   .files {
-    margin: 10px 0 5px 0;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+
+    &.below-text {
+      margin-top: 10px;
+    }
 
     .file {
       background: $file-background;

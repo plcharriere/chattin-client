@@ -29,6 +29,7 @@ body,
   box-sizing: border-box;
   color: $default-color;
   overflow: hidden;
+  scrollbar-color: $scrollbar-thumb-color $scrollbar-track-color;
 }
 html,
 body,

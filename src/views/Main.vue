@@ -166,7 +166,7 @@ export default class Main extends Vue {
     sendPacket(this.ws, PacketType.DELETE_MESSAGE, uuid);
   }
 
-  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
+  setUserPopoutUuid(userUuid: string, element: HTMLElement | null): void {
     this.userPopoutUuid = userUuid;
     this.userPopoutElement = element;
   }

@@ -104,7 +104,6 @@ export default class MessageList extends Vue {
   overflow: auto;
   padding-bottom: 20px;
   padding-right: 4px;
-  margin-top: 3px;
   margin-right: 4px;
   overflow-y: scroll;
 }

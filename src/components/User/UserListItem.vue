@@ -2,7 +2,7 @@
   <div
     ref="userListItem"
     class="user-list-item open-user-popout"
-    @click="setUserPopoutUuid(user.uuid)"
+    @click="onClick"
     :class="{ active: active, offline: offline }"
   >
     <UserAvatar :uuid="user.avatarUuid" size="tiny" />
@@ -36,10 +36,13 @@ export default defineComponent({
     const userListItem = ref();
     const active = ref(false);
 
-    const setUserPopoutUuid = (userUuid: string) => {
-      if (userListItem.value) {
+    const onClick = () => {
+      if (active.value) {
+        active.value = false;
+        emit("setUserPopoutUuid", "", null);
+      } else if (userListItem.value) {
         active.value = true;
-        emit("setUserPopoutUuid", userUuid, userListItem.value);
+        emit("setUserPopoutUuid", props.user.uuid, userListItem.value);
       }
     };
 
@@ -62,7 +65,7 @@ export default defineComponent({
     return {
       userListItem,
       active,
-      setUserPopoutUuid,
+      onClick,
     };
   },
 });

@@ -80,6 +80,7 @@ export default defineComponent({
     };
 
     const sendMessage = async () => {
+      message.value = message.value.trim();
       if (message.value.length > 0 || files.value.length > 0) {
         const fileUuids: string[] = [];
         if (files.value.length > 0) {
@@ -148,12 +149,11 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/animations.scss";
 @import "~@/assets/scss/variables.scss";
 
 .message-input {
   border-radius: 10px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
 
   .files-container {
@@ -176,10 +176,15 @@ export default defineComponent({
         flex-direction: row;
         padding: 10px;
         border: 1px solid $border-color;
+        background: $file-background;
         align-items: center;
         margin-right: 10px;
         margin-bottom: 10px;
         border-radius: 10px;
+
+        &:hover {
+          background: $file-hover-background;
+        }
 
         svg {
           width: 20px;
