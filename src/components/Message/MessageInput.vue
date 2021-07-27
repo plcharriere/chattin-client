@@ -8,7 +8,7 @@
             v-bind:key="file.name"
             class="file"
           >
-            <DocumentIcon /> <span>{{ file.name }}</span>
+            <DocumentIcon class="icon-btn" /> <span>{{ file.name }}</span>
             <XIcon class="icon-btn" @click="removeFile(index)" />
           </div>
         </div>
@@ -151,8 +151,10 @@ export default defineComponent({
 @import "~@/assets/scss/variables.scss";
 
 .message-input {
+  border-radius: 10px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 
   .files-container {
     display: flex;

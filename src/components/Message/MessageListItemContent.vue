@@ -5,22 +5,20 @@
       <XIcon class="icon-btn" @click="cancelEditing()" />
       <CheckIcon class="icon-btn" @click="saveEditing()" />
     </div>
-    <div v-else class="message-container">
-      <div class="message">
-        <div class="content" v-html="getMessageContentHtml()"></div>
-        <span class="edited" v-if="message.edited.getTime() > 0">(edited)</span>
-      </div>
-      <div class="files" v-if="message.files.length > 0">
-        <a
-          class="file"
-          v-for="file in message.files"
-          v-bind:key="file"
-          :href="httpUrl + `/files/${file}`"
-          target="_blank"
-        >
-          <DocumentIcon /> <span>{{ file }}</span>
-        </a>
-      </div>
+    <div v-else class="message">
+      <div class="content" v-html="getMessageContentHtml()"></div>
+      <span class="edited" v-if="message.edited.getTime() > 0">(edited)</span>
+    </div>
+    <div class="files" v-if="message.files.length > 0">
+      <a
+        class="file"
+        v-for="file in message.files"
+        v-bind:key="file"
+        :href="httpUrl + `/files/${file}`"
+        target="_blank"
+      >
+        <DocumentIcon class="icon-btn" /> <span>{{ file }}</span>
+      </a>
     </div>
   </div>
 </template>
@@ -119,79 +117,78 @@ export default defineComponent({
 @import "~@/assets/scss/variables.scss";
 
 .message-list-item-content {
-  .message-container {
+  display: flex;
+  flex-direction: column;
+
+  .files {
+    margin: 10px 0 5px 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
 
-    .files {
-      margin: 10px 0 5px 0;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-
-      .file {
-        color: $default-color;
-        padding: 10px;
-        margin-right: 10px;
-        border: 1px solid $border-color;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        cursor: pointer;
-
-        &:hover {
-          text-decoration: underline;
-        }
-
-        svg {
-          width: 20px;
-          height: 20px;
-        }
-
-        span {
-          margin: 0 10px;
-        }
-      }
-    }
-
-    .message {
-      .edited {
-        font-size: 12px;
-        color: $lighter-color;
-        margin-left: 8px;
-      }
-    }
-
-    .editing {
+    .file {
       background: $background-color;
+      color: $default-color;
+      padding: 10px;
+      margin-right: 10px;
+      border: 1px solid $border-color;
+      border-radius: 10px;
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: 5px 10px;
-      border: 1px solid $border-color;
-      border-radius: 10px;
-      resize: none;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      span {
+        margin: 0 10px;
+      }
+    }
+  }
+
+  .message {
+    .edited {
+      font-size: 12px;
+      color: $lighter-color;
+      margin-left: 8px;
+    }
+  }
+
+  .editing {
+    background: $background-color;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 10px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    resize: none;
+    margin: 0;
+    flex-grow: 1;
+
+    textarea {
+      height: 16px;
+      border: 0;
+      padding: 0 5px;
       margin: 0;
-      flex-grow: 1;
 
-      textarea {
-        height: 16px;
+      &:focus {
         border: 0;
-        padding: 0 5px;
-        margin: 0;
-
-        &:focus {
-          border: 0;
-          box-shadow: none;
-        }
+        box-shadow: none;
       }
+    }
 
-      .icon-btn {
-        width: 24px;
-        height: 24px;
-        margin-left: 10px;
-      }
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+      margin-left: 10px;
     }
   }
 }
