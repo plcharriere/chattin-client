@@ -19,7 +19,7 @@
       >
         <a
           class="dl-icon"
-          :href="`${httpUrl}/files/${file.uuid}`"
+          :href="`${httpUrl}/files/${file.uuid}/download`"
           target="_blank"
           ><DocumentDownloadIcon class="icon-btn"
         /></a>
