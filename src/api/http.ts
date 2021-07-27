@@ -1,8 +1,14 @@
 import { Channel } from "@/dto/Channel";
+import { Configuration } from "@/dto/Configuration";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { httpUrl } from "@/env";
 import axios from "axios";
+
+export async function getConfiguration(): Promise<Configuration> {
+  const res = await axios.get(`${httpUrl}/configuration`);
+  return res.data;
+}
 
 export async function getChannels(token: string): Promise<Channel[]> {
   const res = await axios.get(`${httpUrl}/channels`, {

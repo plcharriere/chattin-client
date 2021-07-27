@@ -16,7 +16,14 @@
         :closeCallback="toggleUserSettings"
       />
       <div class="infos">
-        <div class="server">Chattin</div>
+        <div class="server">
+          <span class="name">{{ getConfigurationName() }}</span
+          ><span
+            v-if="getConfigurationDescription().length > 0"
+            class="description"
+            >{{ getConfigurationDescription() }}</span
+          >
+        </div>
         <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
         <UserInfo
           :user="getUserByUuid(users, userUuid)"
@@ -147,6 +154,14 @@ export default class Main extends Vue {
 
   typingUsers: TypingUser[] = [];
   cleanTypingUsersTimeout = 0;
+
+  getConfigurationName(): string {
+    return this.$store.state.configuration.name;
+  }
+
+  getConfigurationDescription(): string {
+    return this.$store.state.configuration.description;
+  }
 
   logout(): void {
     this.ws = null;
@@ -412,12 +427,21 @@ export default class Main extends Vue {
 
     .server {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
-      font-weight: 400;
       min-width: 200px;
       padding: 20px;
+
+      .name {
+        font-size: 22px;
+        font-weight: 400;
+      }
+
+      .description {
+        color: $light-color;
+        font-size: 12px;
+      }
     }
 
     & > div {

@@ -1,17 +1,34 @@
 <template>
-  <router-view />
+  <Loading v-if="loading" />
+  <router-view v-else />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent, onMounted } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import Loading from "@/components/Loading.vue";
+import { getConfiguration } from "./api/http";
+import { ref } from "vue";
 
 export default defineComponent({
+  components: {
+    Loading,
+  },
   setup() {
+    const loading = ref(true);
     const store = useStore();
+
+    onMounted(async () => {
+      store.state.configuration = await getConfiguration();
+      loading.value = false;
+    });
 
     const token = localStorage.getItem("token");
     if (token) store.state.token = token;
+
+    return {
+      loading,
+    };
   },
 });
 </script>

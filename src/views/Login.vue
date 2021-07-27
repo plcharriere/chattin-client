@@ -1,7 +1,10 @@
 <template>
   <div class="login">
     <div class="container">
-      <h1>Chattin</h1>
+      <div class="infos">
+        <span class="name">{{ name }}</span>
+        <span class="description">{{ description }}</span>
+      </div>
       <span>{{ error.length > 0 ? error : "Please sign in" }}</span>
       <input
         type="text"
@@ -72,6 +75,8 @@ export default defineComponent({
         error,
         login,
         register,
+        name: store.state.configuration.name,
+        description: store.state.configuration.description,
       };
     }
   },
@@ -79,6 +84,8 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
+
 .login {
   width: 100%;
   height: 100%;
@@ -97,6 +104,25 @@ export default defineComponent({
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    .infos {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .name {
+        font-size: 25px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: $light-color;
+        font-size: 13px;
+        margin-bottom: 25px;
+      }
+    }
 
     span {
       margin-bottom: 20px;
