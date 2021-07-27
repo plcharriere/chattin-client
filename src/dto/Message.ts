@@ -5,6 +5,7 @@ export interface Message {
   date: Date;
   edited: Date;
   content: string;
+  files: string[];
 }
 
 export interface MessageInput {

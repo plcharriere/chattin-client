@@ -9,34 +9,51 @@
       <div class="content" v-html="getMessageContentHtml()"></div>
       <span class="edited" v-if="message.edited.getTime() > 0">(edited)</span>
     </div>
-    <div class="files" v-if="message.files.length > 0">
-      <a
+    <div class="files" v-if="files.length > 0">
+      <div
         class="file"
-        v-for="file in message.files"
+        v-for="file in files"
         v-bind:key="file"
-        :href="httpUrl + `/files/${file}`"
+        :href="httpUrl + `/files/${file.uuid}`"
         target="_blank"
       >
-        <DocumentIcon class="icon-btn" /> <span>{{ file }}</span>
-      </a>
+        <a
+          class="dl-icon"
+          :href="`${httpUrl}/files/${file.uuid}`"
+          target="_blank"
+          ><DocumentDownloadIcon class="icon-btn"
+        /></a>
+        <div class="infos">
+          <a :href="`${httpUrl}/files/${file.uuid}`" target="_blank">{{
+            file.name
+          }}</a>
+          <div class="secondary">
+            <span>{{ file.type }}</span>
+            <span>&nbsp;&nbsp;</span>
+            <span>{{ bytesToReadable(file.size) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { File } from "@/dto/File";
 import { Message } from "@/dto/Message";
 import { defineComponent, PropType } from "@vue/runtime-core";
 import { CheckIcon } from "@heroicons/vue/solid";
 import { XIcon } from "@heroicons/vue/solid";
-import { DocumentIcon } from "@heroicons/vue/outline";
+import { DocumentDownloadIcon } from "@heroicons/vue/outline";
 import { ref } from "vue";
 import { httpUrl } from "@/env";
+import axios from "axios";
 
 export default defineComponent({
   components: {
     CheckIcon,
     XIcon,
-    DocumentIcon,
+    DocumentDownloadIcon,
   },
   props: {
     message: {
@@ -102,12 +119,46 @@ export default defineComponent({
       return contentHtml;
     };
 
+    const files = ref([] as File[]);
+
+    props.message.files.forEach((fileUuid) => {
+      axios.get(`${httpUrl}/files/${fileUuid}/infos`).then((resp) => {
+        if (
+          resp.status === 200 &&
+          resp.data &&
+          resp.data.name &&
+          resp.data.type &&
+          resp.data.size
+        )
+          files.value.push({
+            uuid: fileUuid,
+            name: resp.data.name,
+            type: resp.data.type,
+            size: resp.data.size,
+          } as File);
+      });
+    });
+
+    const bytesToReadable = (bytes: number, decimals = 2) => {
+      if (bytes === 0) return "0 Bytes";
+
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    };
+
     return {
       editTextarea,
       cancelEditing,
       saveEditing,
       getMessageContentHtml,
       httpUrl,
+      files,
+      bytesToReadable,
     };
   },
 });
@@ -136,28 +187,41 @@ export default defineComponent({
       display: flex;
       flex-direction: row;
       align-items: center;
-      cursor: pointer;
 
-      &:hover {
-        text-decoration: underline;
-      }
-
-      svg {
-        width: 20px;
-        height: 20px;
-      }
-
-      span {
+      .infos {
         margin: 0 10px;
+        display: flex;
+        flex-direction: column;
+
+        a {
+          color: $default-color;
+        }
+
+        .secondary {
+          display: flex;
+          flex-direction: row;
+          color: $light-color;
+          font-size: 12px;
+          justify-content: space-between;
+        }
+      }
+
+      .dl-icon {
+        width: 24px;
+        height: 24px;
       }
     }
   }
 
   .message {
+    display: flex;
+    flex-direction: row;
+
     .edited {
       font-size: 12px;
       color: $lighter-color;
       margin-left: 8px;
+      align-self: flex-end;
     }
   }
 
