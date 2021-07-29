@@ -155,8 +155,6 @@ export default defineComponent({
   height: 0;
   overflow: auto;
   padding-bottom: 20px;
-  padding-right: 4px;
-  margin-right: 4px;
   overflow-y: scroll;
   position: relative;
 

@@ -200,7 +200,7 @@ export default class Main extends Vue {
     let users: User[] = [];
     let now = new Date();
     typingUsers.forEach((typing) => {
-      if (now.getTime() - typing.date.getTime() < 1000) {
+      if (typing.userUuid !== this.userUuid && now.getTime() - typing.date.getTime() < 1000) {
         let user = this.users.find((user) => user.uuid === typing.userUuid);
         if (user) users.push(user);
       }
