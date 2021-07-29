@@ -1,7 +1,11 @@
 <template>
   <div class="message-list-item-content">
     <div v-if="editing" class="editing">
-      <textarea ref="editTextarea" :value="message.content" />
+      <textarea
+        ref="editTextarea"
+        :value="message.content"
+        v-on:keydown="editKeyDown"
+      />
       <XIcon class="icon-btn" @click="cancelEditing()" />
       <CheckIcon class="icon-btn" @click="saveEditing()" />
     </div>
@@ -63,7 +67,7 @@ import { defineComponent, PropType } from "@vue/runtime-core";
 import { CheckIcon } from "@heroicons/vue/solid";
 import { XIcon } from "@heroicons/vue/solid";
 import { DocumentDownloadIcon } from "@heroicons/vue/outline";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { httpUrl } from "@/env";
 import { useStore } from "vuex";
 import { getFileInformations } from "@/api/http";
@@ -160,8 +164,25 @@ export default defineComponent({
       return embeds;
     });
 
+    watch(editTextarea, () => {
+      if (editTextarea.value) editTextarea.value.focus();
+    });
+
+    const editKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        saveEditing();
+        e.preventDefault();
+      }
+      if (e.key === "Escape") {
+        cancelEditing();
+        e.preventDefault();
+      }
+    };
+
     const saveEditing = () => {
-      emit("saveEditing", editTextarea.value.value);
+      if (editTextarea.value.value !== props.message.content)
+        emit("saveEditing", editTextarea.value.value);
+      else cancelEditing();
     };
 
     const cancelEditing = () => {
@@ -186,6 +207,7 @@ export default defineComponent({
       getMessageContentHtml,
       files,
       embeds,
+      editKeyDown,
       saveEditing,
       cancelEditing,
       bytesToReadable,

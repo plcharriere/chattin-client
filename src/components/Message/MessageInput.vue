@@ -104,13 +104,15 @@ export default defineComponent({
     };
 
     watch(message, () => {
-      emit("typed");
-      const textareaElement = textarea.value as HTMLTextAreaElement;
-      let newline = 0;
-      for (let i = 0; i < message.value.length; i++) {
-        if (message.value[i] === "\n") newline++;
+      if (message.value.length > 0) {
+        emit("typed");
+        const textareaElement = textarea.value as HTMLTextAreaElement;
+        let newline = 0;
+        for (let i = 0; i < message.value.length; i++) {
+          if (message.value[i] === "\n") newline++;
+        }
+        textareaElement.style.height = textareaHeight * (newline + 1) + "px";
       }
-      textareaElement.style.height = textareaHeight * (newline + 1) + "px";
     });
 
     const keyDown = (e: KeyboardEvent) => {
