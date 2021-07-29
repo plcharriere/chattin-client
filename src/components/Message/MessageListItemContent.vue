@@ -65,8 +65,8 @@ import { XIcon } from "@heroicons/vue/solid";
 import { DocumentDownloadIcon } from "@heroicons/vue/outline";
 import { computed, ref } from "vue";
 import { httpUrl } from "@/env";
-import axios from "axios";
 import { useStore } from "vuex";
+import { getFileInformations } from "@/api/http";
 
 export default defineComponent({
   components: {
@@ -133,27 +133,9 @@ export default defineComponent({
     };
 
     props.message.files.forEach((fileUuid) => {
-      axios
-        .get(`${httpUrl}/files/${fileUuid}`, {
-          headers: {
-            token: store.state.token,
-          },
-        })
-        .then((resp) => {
-          if (
-            resp.status === 200 &&
-            resp.data &&
-            resp.data.name &&
-            resp.data.type &&
-            resp.data.size
-          )
-            files.value.push({
-              uuid: fileUuid,
-              name: resp.data.name,
-              type: resp.data.type,
-              size: resp.data.size,
-            } as File);
-        });
+      getFileInformations(store.state.token, fileUuid).then((file) => {
+        files.value.push(file);
+      });
     });
 
     const embeds = computed(() => {
@@ -226,8 +208,8 @@ export default defineComponent({
     }
 
     img {
-      max-width: 500px;
-      max-height: 500px;
+      max-width: 400px;
+      max-height: 300px;
       margin-right: 8px;
     }
   }

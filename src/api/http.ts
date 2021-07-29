@@ -1,5 +1,6 @@
 import { Channel } from "@/dto/Channel";
 import { Configuration } from "@/dto/Configuration";
+import { File } from "@/dto/File";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
 import { httpUrl } from "@/env";
@@ -60,4 +61,19 @@ export async function getAvatars(token: string): Promise<string[]> {
   });
 
   return res.data || [];
+}
+
+export async function getFileInformations(
+  token: string,
+  fileUuid: string
+): Promise<File> {
+  const res = await axios.get(`${httpUrl}/files/${fileUuid}`, {
+    headers: {
+      token,
+    },
+  });
+  return {
+    uuid: fileUuid,
+    ...res.data,
+  };
 }
