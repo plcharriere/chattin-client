@@ -5,6 +5,7 @@
         :user="user"
         size="small"
         class="open-user-popout"
+        :openUserPopout="true"
         @setUserPopoutUuid="setUserPopoutUuid"
       />
       <div class="container">
