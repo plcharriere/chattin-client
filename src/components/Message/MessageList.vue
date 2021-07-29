@@ -12,6 +12,13 @@
       @editMessage="editMessage"
       @deleteMessage="deleteMessage"
     />
+    <transition name="fade">
+      <ArrowDownIcon
+        v-if="showScrollBottomButton"
+        class="scroll-bottom"
+        @click="scrollBottom"
+      />
+    </transition>
   </div>
 </template>
 
@@ -28,9 +35,11 @@ import {
 import MessageListItem from "@/components/Message/MessageListItem.vue";
 import { datesAreOnSameDay, getUserByUuid } from "@/utils";
 import { ref } from "vue";
+import { ArrowDownIcon } from "@heroicons/vue/solid";
 
 export default defineComponent({
   components: {
+    ArrowDownIcon,
     MessageListItem,
   },
   props: {
@@ -49,11 +58,23 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const messageList = ref();
+    const showScrollBottomButton = ref(false);
 
     onMounted(() => {
       messageList.value.addEventListener("scroll", () => {
         if (messageList.value.scrollTop === 0) {
           emit("scrolledTop");
+        } else if (
+          messageList.value.scrollHeight -
+            messageList.value.offsetHeight -
+            messageList.value.scrollTop >=
+          5000
+        ) {
+          if (!showScrollBottomButton.value)
+            showScrollBottomButton.value = true;
+        } else {
+          if (showScrollBottomButton.value)
+            showScrollBottomButton.value = false;
         }
       });
     });
@@ -103,6 +124,11 @@ export default defineComponent({
       });
     };
 
+    const scrollBottom = () => {
+      messageList.value.scrollTop =
+        messageList.value.scrollHeight - messageList.value.offsetHeight;
+    };
+
     return {
       messageList,
       showUser,
@@ -110,6 +136,8 @@ export default defineComponent({
       deleteMessage,
       setUserPopoutUuid,
       fixScroll,
+      scrollBottom,
+      showScrollBottomButton,
       getUserByUuid,
     };
   },
@@ -117,6 +145,8 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/animations.scss";
+
 .message-list {
   flex-grow: 1;
   min-width: 400px;
@@ -126,5 +156,20 @@ export default defineComponent({
   padding-right: 4px;
   margin-right: 4px;
   overflow-y: scroll;
+  position: relative;
+
+  .scroll-bottom {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    bottom: 90px;
+    padding: 10px;
+    border-radius: 100%;
+    margin-left: -20px;
+    left: 50%;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
 }
 </style>
