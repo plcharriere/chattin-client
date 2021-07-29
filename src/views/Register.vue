@@ -37,6 +37,8 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
 
+    document.title = `Register ~ ${store.state.configuration.name}`;
+
     if (store.state.token != "") router.push("/");
     else {
       const loading = ref(false);

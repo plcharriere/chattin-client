@@ -111,10 +111,16 @@ import {
   },
   methods: {
     getUserByUuid: getUserByUuid,
-    getChannelByUuid: getUserByUuid,
+    getChannelByUuid: getChannelByUuid,
     getMessagesByChannelUuid: getMessagesByChannelUuid,
   },
   watch: {
+    channelUuid() {
+      const channel = getChannelByUuid(this.channels, this.channelUuid);
+      if (channel) {
+        document.title = `#${channel.name} ~ ${this.$store.state.configuration.name}`;
+      }
+    },
     users() {
       this.users = this.users.sort((user1: User, user2: User) => {
         return getUserName(user1).localeCompare(getUserName(user2));
@@ -154,6 +160,10 @@ export default class Main extends Vue {
 
   typingUsers: TypingUser[] = [];
   cleanTypingUsersTimeout = 0;
+
+  created(): void {
+    document.title = `${this.$store.state.configuration.name}`;
+  }
 
   getConfigurationName(): string {
     return this.$store.state.configuration.name;

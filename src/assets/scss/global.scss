@@ -43,6 +43,7 @@ input, textarea {
 .icon-btn {
 	color: $icon-button-color;
 	cursor: pointer;
+	transition: all 200ms;
 
 	&:hover {
 		color: $icon-button-hover-color;
