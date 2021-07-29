@@ -125,8 +125,10 @@ export default defineComponent({
     };
 
     const scrollBottom = () => {
-      messageList.value.scrollTop =
-        messageList.value.scrollHeight - messageList.value.offsetHeight;
+      messageList.value.scrollTo({
+        top: messageList.value.scrollHeight - messageList.value.offsetHeight,
+        behavior: "smooth",
+      });
     };
 
     return {
