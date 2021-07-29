@@ -32,23 +32,19 @@
       }"
       v-if="files.length > 0 && files.length !== embeds.length"
     >
-      <div
-        class="file"
-        v-for="file in files"
-        v-bind:key="file"
-        :href="httpUrl + `/files/${file.uuid}`"
-        target="_blank"
-      >
+      <div class="file" v-for="file in files" v-bind:key="file" target="_blank">
         <a
           class="dl-icon"
-          :href="`${httpUrl}/files/${file.uuid}/download`"
+          :href="`${httpUrl}/files/${file.uuid}/${file.name}/download`"
           target="_blank"
           ><DocumentDownloadIcon class="icon-btn"
         /></a>
         <div class="infos">
-          <a :href="`${httpUrl}/files/${file.uuid}`" target="_blank">{{
-            file.name
-          }}</a>
+          <a
+            :href="`${httpUrl}/files/${file.uuid}/${file.name}`"
+            target="_blank"
+            >{{ file.name }}</a
+          >
           <div class="secondary">
             <span>{{ file.type }}</span>
             <span>&nbsp;&nbsp;</span>
@@ -70,6 +66,7 @@ import { DocumentDownloadIcon } from "@heroicons/vue/outline";
 import { computed, ref } from "vue";
 import { httpUrl } from "@/env";
 import axios from "axios";
+import { useStore } from "vuex";
 
 export default defineComponent({
   components: {
@@ -90,6 +87,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const editTextarea = ref();
     const files = ref([] as File[]);
+    const store = useStore();
 
     const getMessageContentHtml = () => {
       let contentHtml = props.message.content;
@@ -135,21 +133,27 @@ export default defineComponent({
     };
 
     props.message.files.forEach((fileUuid) => {
-      axios.get(`${httpUrl}/files/${fileUuid}/infos`).then((resp) => {
-        if (
-          resp.status === 200 &&
-          resp.data &&
-          resp.data.name &&
-          resp.data.type &&
-          resp.data.size
-        )
-          files.value.push({
-            uuid: fileUuid,
-            name: resp.data.name,
-            type: resp.data.type,
-            size: resp.data.size,
-          } as File);
-      });
+      axios
+        .get(`${httpUrl}/files/${fileUuid}`, {
+          headers: {
+            token: store.state.token,
+          },
+        })
+        .then((resp) => {
+          if (
+            resp.status === 200 &&
+            resp.data &&
+            resp.data.name &&
+            resp.data.type &&
+            resp.data.size
+          )
+            files.value.push({
+              uuid: fileUuid,
+              name: resp.data.name,
+              type: resp.data.type,
+              size: resp.data.size,
+            } as File);
+        });
     });
 
     const embeds = computed(() => {
@@ -168,7 +172,7 @@ export default defineComponent({
             "image/avif",
           ].includes(file.type)
         ) {
-          embeds.push(`${httpUrl}/files/${file.uuid}`);
+          embeds.push(`${httpUrl}/files/${file.uuid}/${file.name}`);
         }
       });
       return embeds;
