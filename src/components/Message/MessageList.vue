@@ -1,5 +1,5 @@
 <template>
-  <div class="message-list">
+  <div ref="messageList" class="message-list">
     <MessageListItem
       v-for="(message, index) in messages"
       v-bind:key="message.uuid"
@@ -16,14 +16,20 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { Message } from "@/dto/Message";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import {
+  defineComponent,
+  nextTick,
+  onMounted,
+  PropType,
+  watch,
+} from "@vue/runtime-core";
 import MessageListItem from "@/components/Message/MessageListItem.vue";
 import { datesAreOnSameDay, getUserByUuid } from "@/utils";
+import { ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     MessageListItem,
   },
@@ -34,66 +40,80 @@ import { datesAreOnSameDay, getUserByUuid } from "@/utils";
     },
     users: {
       type: Array as PropType<User[]>,
-      default: [],
+      required: true,
     },
     messages: {
       type: Array as PropType<Message[]>,
-      default: [],
+      required: true,
     },
   },
-  methods: {
-    getUserByUuid: getUserByUuid,
-  },
-  watch: {
-    messages() {
-      this.fixScroll();
-    },
-  },
-})
-export default class MessageList extends Vue {
-  mounted(): void {
-    this.$el.addEventListener("scroll", () => {
-      if (this.$el.scrollTop === 0) {
-        this.$emit("scrolledTop");
+  setup(props, { emit }) {
+    const messageList = ref();
+
+    onMounted(() => {
+      messageList.value.addEventListener("scroll", () => {
+        if (messageList.value.scrollTop === 0) {
+          emit("scrolledTop");
+        }
+      });
+    });
+
+    watch(
+      () => props.messages,
+      () => {
+        fixScroll();
       }
-    });
-  }
+    );
 
-  fixScroll(): void {
-    const isScrollBarAtTheBottom =
-      this.$el.scrollTop >= this.$el.scrollHeight - this.$el.offsetHeight;
-    const currentScrollHeight = this.$el.scrollHeight;
-    this.$nextTick().then(() => {
-      if (isScrollBarAtTheBottom) this.$el.scrollTop = this.$el.scrollHeight;
-      else if (this.$el.scrollTop === 0)
-        this.$el.scrollTop = this.$el.scrollHeight - currentScrollHeight;
-    });
-  }
+    const showUser = (previousMessage: Message, currentMessage: Message) => {
+      if (previousMessage.userUuid !== currentMessage.userUuid) return true;
+      if (!datesAreOnSameDay(currentMessage.date, previousMessage.date))
+        return true;
+      if (
+        currentMessage.date.getTime() - previousMessage.date.getTime() >
+        600 * 1000
+      )
+        return true;
+      return false;
+    };
 
-  showUser(previousMessage: Message, currentMessage: Message): boolean {
-    if (previousMessage.userUuid !== currentMessage.userUuid) return true;
-    if (!datesAreOnSameDay(currentMessage.date, previousMessage.date))
-      return true;
-    if (
-      currentMessage.date.getTime() - previousMessage.date.getTime() >
-      600 * 1000
-    )
-      return true;
-    return false;
-  }
+    const editMessage = (uuid: string, content: string) => {
+      emit("editMessage", uuid, content);
+    };
 
-  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
-    this.$emit("setUserPopoutUuid", userUuid, element);
-  }
+    const deleteMessage = (uuid: string) => {
+      emit("deleteMessage", uuid);
+    };
 
-  editMessage(uuid: string, content: string): void {
-    this.$emit("editMessage", uuid, content);
-  }
+    const setUserPopoutUuid = (userUuid: string, element: HTMLElement) => {
+      emit("setUserPopoutUuid", userUuid, element);
+    };
 
-  deleteMessage(uuid: string): void {
-    this.$emit("deleteMessage", uuid);
-  }
-}
+    const fixScroll = () => {
+      const isScrollBarAtTheBottom =
+        messageList.value.scrollTop >=
+        messageList.value.scrollHeight - messageList.value.offsetHeight;
+      const currentScrollHeight = messageList.value.scrollHeight;
+      nextTick().then(() => {
+        if (isScrollBarAtTheBottom)
+          messageList.value.scrollTop = messageList.value.scrollHeight;
+        else if (messageList.value.scrollTop === 0)
+          messageList.value.scrollTop =
+            messageList.value.scrollHeight - currentScrollHeight;
+      });
+    };
+
+    return {
+      messageList,
+      showUser,
+      editMessage,
+      deleteMessage,
+      setUserPopoutUuid,
+      fixScroll,
+      getUserByUuid,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

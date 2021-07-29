@@ -1,26 +1,26 @@
 <template>
   <div class="user-list">
-    <div class="list" v-if="getOnlineUsers(users).length > 0">
+    <div class="list" v-if="onlineUsers.length > 0">
       <div class="status">
         <div>Online</div>
         <div class="separator"></div>
-        <div>{{ getOnlineUsers(users).length }}</div>
+        <div>{{ onlineUsers.length }}</div>
       </div>
       <UserListItem
-        v-for="user in getOnlineUsers(users)"
+        v-for="user in onlineUsers"
         v-bind:key="user.uuid"
         :user="user"
         @setUserPopoutUuid="setUserPopoutUuid"
       />
     </div>
-    <div class="list" v-if="getOfflineUsers(users).length > 0">
+    <div class="list" v-if="offlineUsers.length > 0">
       <div class="status">
         <div>Offline</div>
         <div class="separator"></div>
-        <div>{{ getOfflineUsers(users).length }}</div>
+        <div>{{ offlineUsers.length }}</div>
       </div>
       <UserListItem
-        v-for="user in getOfflineUsers(users)"
+        v-for="user in offlineUsers"
         v-bind:key="user.uuid"
         :user="user"
         @setUserPopoutUuid="setUserPopoutUuid"
@@ -31,35 +31,41 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import UserListItem from "@/components/User/UserListItem.vue";
+import { computed } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     UserListItem,
   },
   props: {
     users: {
       type: Array as PropType<User[]>,
-      default: [],
+      required: true,
     },
   },
-})
-export default class UserList extends Vue {
-  getOnlineUsers(users: User[]): User[] {
-    return users.filter((user) => user.online === true);
-  }
+  setup(props, { emit }) {
+    const onlineUsers = computed(() => {
+      return props.users.filter((user) => user.online === true);
+    });
 
-  getOfflineUsers(users: User[]): User[] {
-    return users.filter((user) => user.online === false);
-  }
+    const offlineUsers = computed(() => {
+      return props.users.filter((user) => user.online !== true);
+    });
 
-  setUserPopoutUuid(userUuid: string, element: HTMLElement): void {
-    this.$emit("setUserPopoutUuid", userUuid, element);
-  }
-}
+    const setUserPopoutUuid = (userUuid: string, element: HTMLElement) => {
+      emit("setUserPopoutUuid", userUuid, element);
+    };
+
+    return {
+      onlineUsers,
+      offlineUsers,
+      setUserPopoutUuid,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

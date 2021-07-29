@@ -14,12 +14,11 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import { Channel } from "@/dto/Channel";
 import { HashtagIcon } from "@heroicons/vue/outline";
 
-@Options({
+export default defineComponent({
   components: {
     HashtagIcon,
   },
@@ -33,12 +32,15 @@ import { HashtagIcon } from "@heroicons/vue/outline";
       required: true,
     },
   },
-})
-export default class ChannelList extends Vue {
-  setChannelUuid(uuid: string): void {
-    this.$emit("setChannelUuid", uuid);
-  }
-}
+  setup(props, { emit }) {
+    const setChannelUuid = (uuid: string) => {
+      emit("setChannelUuid", uuid);
+    };
+    return {
+      setChannelUuid,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

@@ -2,10 +2,9 @@
   <div class="message-list-item" :class="{ user: showUser }">
     <template v-if="showUser">
       <UserAvatar
-        :uuid="user.avatarUuid"
+        :user="user"
         size="small"
         class="open-user-popout"
-        :openPopoutUuid="user.uuid"
         @setUserPopoutUuid="setUserPopoutUuid"
       />
       <div class="container">
@@ -13,7 +12,7 @@
           <UserName
             :user="user"
             class="open-user-popout"
-            :openPopoutUuid="user.uuid"
+            :openUserPopout="true"
             @setUserPopoutUuid="setUserPopoutUuid"
           />
           <div class="date">{{ getMessageDateString(message, false) }}</div>

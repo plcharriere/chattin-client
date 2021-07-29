@@ -5,7 +5,7 @@
     @click="onClick"
     :class="{ active: active, offline: offline }"
   >
-    <UserAvatar :uuid="user.avatarUuid" size="tiny" />
+    <UserAvatar :user="user" size="tiny" />
     <UserName :user="user" class="name" />
   </div>
 </template>

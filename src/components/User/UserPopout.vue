@@ -8,7 +8,7 @@
     }"
   >
     <div class="infos">
-      <UserAvatar :uuid="user.avatarUuid" size="medium" />
+      <UserAvatar :user="user" size="medium" />
       <UserName :user="user" :showLogin="true" />
     </div>
     <div class="bio" v-if="user.bio.length > 0">

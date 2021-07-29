@@ -1,11 +1,12 @@
 <template>
   <div
+    ref="userName"
     class="user-name"
-    :class="{ clickable: openPopoutUuid.length > 0 }"
-    @click="nameClick(openPopoutUuid)"
+    :class="{ clickable: openUserPopout }"
+    @click="onNameClick()"
   >
     {{ getUserName(user) }}
-    <small v-if="showLogin && user.nickname.length > 0" class="login">
+    <small v-if="showUserLogin && user.nickname.length > 0" class="login">
       {{ user.login }}
     </small>
   </div>
@@ -14,20 +15,20 @@
 <script lang="ts">
 import { User } from "@/dto/User";
 import { getUserName } from "@/utils";
-import { PropType } from "@vue/runtime-core";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, PropType } from "@vue/runtime-core";
+import { ref } from "vue";
 
-@Options({
+export default defineComponent({
   props: {
     user: {
       type: Object as PropType<User>,
       required: true,
     },
-    openPopoutUuid: {
-      type: String,
-      default: "",
+    showUserLogin: {
+      type: Boolean,
+      default: false,
     },
-    showLogin: {
+    openUserPopout: {
       type: Boolean,
       default: false,
     },
@@ -35,14 +36,21 @@ import { Options, Vue } from "vue-class-component";
   methods: {
     getUserName: getUserName,
   },
-})
-export default class UserName extends Vue {
-  nameClick(openPopoutUuid: string): void {
-    if (openPopoutUuid !== "") {
-      this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);
-    }
-  }
-}
+  setup(props, { emit }) {
+    const userName = ref();
+
+    const onNameClick = () => {
+      if (props.openUserPopout && userName.value) {
+        emit("setUserPopoutUuid", props.user.uuid, userName);
+      }
+    };
+
+    return {
+      userName,
+      onNameClick,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

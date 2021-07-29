@@ -1,7 +1,7 @@
 <template>
   <div class="user">
     <UserAvatar
-      :uuid="user.avatarUuid"
+      :user="user"
       size="large"
       :overlay="true"
       overlayIcon="pencil"
@@ -25,7 +25,7 @@
         :disabled="loading"
         placholder="Tell us more about yourself..."
       />
-      <button class="btn" @click="save" :class="{ disabled: loading }">
+      <button class="btn" @click="saveProfile" :class="{ disabled: loading }">
         Save
       </button>
     </div>
@@ -33,14 +33,15 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
 import { httpUrl } from "@/env";
+import { ref } from "vue";
+import { useStore } from "vuex";
 
-@Options({
+export default defineComponent({
   components: {
     UserAvatar,
   },
@@ -50,41 +51,41 @@ import { httpUrl } from "@/env";
       required: true,
     },
   },
-  mounted() {
-    this.setProfileEdit(this.user);
+  setup(props, { emit }) {
+    const store = useStore();
+    const loading = ref(false);
+    const nickname = ref(props.user.nickname);
+    const bio = ref(props.user.bio);
+
+    const editAvatar = () => {
+      emit("setMenuIndex", 1);
+    };
+
+    const saveProfile = () => {
+      loading.value = true;
+      const formData = new FormData();
+      formData.append("nickname", nickname.value);
+      formData.append("bio", bio.value);
+      axios
+        .post(`${httpUrl}/users/profile`, formData, {
+          headers: {
+            token: store.state.token,
+          },
+        })
+        .then(() => {
+          loading.value = false;
+        });
+    };
+
+    return {
+      loading,
+      nickname,
+      bio,
+      editAvatar,
+      saveProfile,
+    };
   },
-})
-export default class UserSettingsProfile extends Vue {
-  loading = false;
-
-  nickname = "";
-  bio = "";
-
-  setProfileEdit(user: User): void {
-    this.nickname = user.nickname;
-    this.bio = user.bio;
-  }
-
-  editAvatar(): void {
-    this.$emit("setMenuIndex", 1);
-  }
-
-  save(): void {
-    this.loading = true;
-    const formData = new FormData();
-    formData.append("nickname", this.nickname);
-    formData.append("bio", this.bio);
-    axios
-      .post(httpUrl + "/users/profile", formData, {
-        headers: {
-          token: this.$store.state.token,
-        },
-      })
-      .then(() => {
-        this.loading = false;
-      });
-  }
-}
+});
 </script>
 
 <style scoped lang="scss">

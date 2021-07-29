@@ -1,7 +1,7 @@
 <template>
   <div class="user-info visible">
     <div class="user" @click="toggleDropdown">
-      <UserAvatar :uuid="user.avatarUuid" size="tiny" />
+      <UserAvatar :user="user" size="tiny" />
       <UserName :user="user" />
       <ChevronDownIcon :class="{ active: dropdownActive }" />
     </div>

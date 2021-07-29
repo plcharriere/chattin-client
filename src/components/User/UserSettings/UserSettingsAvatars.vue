@@ -3,7 +3,7 @@
     <div class="edit">
       <div class="avatar">
         <UserAvatar
-          :uuid="user.avatarUuid"
+          :user="user"
           size="large"
           :overlay="!loading"
           overlayIcon="upload"
@@ -69,7 +69,7 @@ import { TrashIcon } from "@heroicons/vue/solid";
     },
   },
 })
-export default class UserSettingsProfile extends Vue {
+export default class UserSettingsAvatar extends Vue {
   loading = false;
 
   avatars: string[] = [];

@@ -1,17 +1,19 @@
 <template>
   <div
+    ref="userAvatar"
     class="user-avatar"
     :class="[
       size,
       {
         default:
-          (uuid.length === 0 &&
+          (user &&
+            user.avatarUuid.length === 0 &&
             overrideUrl.length === 0 &&
             overrideUuid.length === 0) ||
           overrideUrl === 'default',
       },
       {
-        clickable: openPopoutUuid.length > 0,
+        clickable: openUserPopout,
       },
     ]"
     :style="{
@@ -22,16 +24,17 @@
           ? 'url(' + overrideUrl + ')'
           : overrideUuid.length > 0
           ? 'url(' + getAvatarUrl(overrideUuid) + ')'
-          : uuid.length > 0
-          ? 'url(' + getAvatarUrl(uuid) + ')'
+          : user.avatarUuid.length > 0
+          ? 'url(' + getAvatarUrl(user.avatarUuid) + ')'
           : '',
     }"
-    @click="avatarClick(openPopoutUuid)"
+    @click="onAvatarClick()"
   >
     <UserIcon
       class="user"
       v-if="
-        (uuid.length === 0 &&
+        (user &&
+          user.avatarUuid.length === 0 &&
           overrideUrl.length === 0 &&
           overrideUuid.length === 0) ||
         overrideUrl === 'default'
@@ -53,13 +56,15 @@
 
 <script lang="ts">
 import { httpUrl } from "@/env";
-import { Options, Vue } from "vue-class-component";
 import { UserIcon } from "@heroicons/vue/outline";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { UploadIcon } from "@heroicons/vue/outline";
 import { ArrowUpIcon } from "@heroicons/vue/solid";
+import { defineComponent } from "@vue/runtime-core";
+import { PropType, ref } from "vue";
+import { User } from "@/dto/User";
 
-@Options({
+export default defineComponent({
   components: {
     UserIcon,
     PencilIcon,
@@ -67,9 +72,8 @@ import { ArrowUpIcon } from "@heroicons/vue/solid";
     ArrowUpIcon,
   },
   props: {
-    uuid: {
-      type: String,
-      default: "",
+    user: {
+      type: Object as PropType<User>,
     },
     overrideUuid: {
       type: String,
@@ -94,22 +98,26 @@ import { ArrowUpIcon } from "@heroicons/vue/solid";
     overlayClickCallback: {
       type: Function,
     },
-    openPopoutUuid: {
-      type: String,
-      default: "",
+    openUserPopout: {
+      type: Boolean,
+      default: false,
     },
   },
-})
-export default class UserAvatar extends Vue {
-  getAvatarUrl(uuid: string): string {
-    return httpUrl + "/avatars/" + uuid;
-  }
+  setup(props, { emit }) {
+    const userAvatar = ref();
 
-  avatarClick(openPopoutUuid: string): void {
-    if (openPopoutUuid !== "")
-      this.$emit("setUserPopoutUuid", openPopoutUuid, this.$el);
-  }
-}
+    const getAvatarUrl = (uuid: string) => {
+      return `${httpUrl}/avatars/${uuid}`;
+    };
+
+    const onAvatarClick = () => {
+      if (props.user && props.openUserPopout && userAvatar.value)
+        emit("setUserPopoutUuid", props.user.uuid, userAvatar.value);
+    };
+
+    return { userAvatar, getAvatarUrl, onAvatarClick };
+  },
+});
 </script>
 
 <style scoped lang="scss">

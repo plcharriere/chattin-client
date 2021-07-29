@@ -13,9 +13,9 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
+import { defineComponent } from "@vue/runtime-core";
 
-@Options({
+export default defineComponent({
   components: {},
   props: {
     menuIndex: {
@@ -23,21 +23,26 @@ import { Options, Vue } from "vue-class-component";
       required: true,
     },
   },
-})
-export default class UserSettings extends Vue {
-  items: string[] = [
-    "Profile",
-    "Avatars",
-    // "Messages",
-    // "Files",
-    // "Security",
-    // "Other",
-  ];
+  setup(props, { emit }) {
+    const items: string[] = [
+      "Profile",
+      "Avatars",
+      // "Messages",
+      // "Files",
+      // "Security",
+      // "Other",
+    ];
 
-  setMenuIndex(index: number): void {
-    this.$emit("setMenuIndex", index);
-  }
-}
+    const setMenuIndex = (index: number) => {
+      emit("setMenuIndex", index);
+    };
+
+    return {
+      items,
+      setMenuIndex,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">

@@ -15,11 +15,10 @@
 
 <script lang="ts">
 import { Channel } from "@/dto/Channel";
-import { PropType } from "@vue/runtime-core";
-import { Options, Vue } from "vue-class-component";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import { HashtagIcon } from "@heroicons/vue/solid";
 
-@Options({
+export default defineComponent({
   components: {
     HashtagIcon,
   },
@@ -29,8 +28,7 @@ import { HashtagIcon } from "@heroicons/vue/solid";
       required: true,
     },
   },
-})
-export default class ChannelInfo extends Vue {}
+});
 </script>
 
 <style scoped lang="scss">
