@@ -10,9 +10,27 @@
       <span class="edited" v-if="message.edited.getTime() > 0">(edited)</span>
     </div>
     <div
-      class="files"
+      v-if="embeds.length > 0"
+      class="embeds"
       :class="{ 'below-text': message.content.length > 0 || editing }"
-      v-if="files.length > 0"
+    >
+      <a
+        v-for="embed in embeds"
+        v-bind:key="embed"
+        :href="embed"
+        target="_blank"
+      >
+        <img :src="embed" />
+      </a>
+    </div>
+    <div
+      class="files"
+      :class="{
+        'below-text':
+          (embeds.length === 0 && message.content.length > 0) || editing,
+        'below-embeds': embeds.length > 0,
+      }"
+      v-if="files.length > 0 && files.length !== embeds.length"
     >
       <div
         class="file"
@@ -49,7 +67,7 @@ import { defineComponent, PropType } from "@vue/runtime-core";
 import { CheckIcon } from "@heroicons/vue/solid";
 import { XIcon } from "@heroicons/vue/solid";
 import { DocumentDownloadIcon } from "@heroicons/vue/outline";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { httpUrl } from "@/env";
 import axios from "axios";
 
@@ -71,14 +89,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const editTextarea = ref();
-
-    const cancelEditing = () => {
-      emit("cancelEditing");
-    };
-
-    const saveEditing = () => {
-      emit("saveEditing", editTextarea.value.value);
-    };
+    const files = ref([] as File[]);
 
     const getMessageContentHtml = () => {
       let contentHtml = props.message.content;
@@ -123,8 +134,6 @@ export default defineComponent({
       return contentHtml;
     };
 
-    const files = ref([] as File[]);
-
     props.message.files.forEach((fileUuid) => {
       axios.get(`${httpUrl}/files/${fileUuid}/infos`).then((resp) => {
         if (
@@ -143,6 +152,36 @@ export default defineComponent({
       });
     });
 
+    const embeds = computed(() => {
+      const embeds: string[] = [];
+      files.value.forEach((file) => {
+        if (
+          [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/bmp",
+            "image/x-icon",
+            "image/vnd.microsoft.icon",
+            "image/svg+xml",
+            "image/avif",
+          ].includes(file.type)
+        ) {
+          embeds.push(`${httpUrl}/files/${file.uuid}`);
+        }
+      });
+      return embeds;
+    });
+
+    const saveEditing = () => {
+      emit("saveEditing", editTextarea.value.value);
+    };
+
+    const cancelEditing = () => {
+      emit("cancelEditing");
+    };
+
     const bytesToReadable = (bytes: number, decimals = 2) => {
       if (bytes === 0) return "0 Bytes";
 
@@ -156,12 +195,13 @@ export default defineComponent({
     };
 
     return {
-      editTextarea,
-      cancelEditing,
-      saveEditing,
-      getMessageContentHtml,
       httpUrl,
+      editTextarea,
+      getMessageContentHtml,
       files,
+      embeds,
+      saveEditing,
+      cancelEditing,
       bytesToReadable,
     };
   },
@@ -174,6 +214,19 @@ export default defineComponent({
 .message-list-item-content {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+
+  .embeds {
+    &.below-text {
+      margin-top: 10px;
+    }
+
+    img {
+      max-width: 500px;
+      max-height: 500px;
+      margin-right: 8px;
+    }
+  }
 
   .files {
     display: flex;
@@ -182,6 +235,9 @@ export default defineComponent({
 
     &.below-text {
       margin-top: 10px;
+    }
+    &.below-embeds {
+      margin-top: 5px;
     }
 
     .file {
