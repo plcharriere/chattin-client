@@ -52,6 +52,7 @@
               :channel="getChannelByUuid(channels, channelUuid)"
               @typed="messageTyping"
               @sendMessage="sendMessage"
+              @editLastMessage="editLastMessage"
             />
             <TypingUsers :users="getTypingUsers(typingUsers)" />
           </div>
@@ -414,6 +415,18 @@ export default defineComponent({
       editingMessageUuid.value = messageUuid;
     };
 
+    const editLastMessage = () => {
+      const lastUserMessage = messages.value
+        .slice()
+        .reverse()
+        .find(
+          (message) =>
+            message.userUuid === userUuid.value &&
+            message.channelUuid === channelUuid.value
+        );
+      if (lastUserMessage) editingMessageUuid.value = lastUserMessage.uuid;
+    };
+
     initWebSocket();
 
     return {
@@ -450,6 +463,7 @@ export default defineComponent({
 
       editingMessageUuid,
       setEditingMessageUuid,
+      editLastMessage,
 
       getUserByUuid,
       getChannelByUuid,

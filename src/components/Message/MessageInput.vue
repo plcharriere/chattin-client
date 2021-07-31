@@ -119,6 +119,9 @@ export default defineComponent({
       if (e.key === "Enter" && !e.shiftKey) {
         sendMessage();
         e.preventDefault();
+      } else if (e.key === "ArrowUp" && message.value.length === 0) {
+        emit("editLastMessage");
+        e.preventDefault();
       }
     };
 
