@@ -17,12 +17,10 @@
       />
       <div class="infos">
         <div class="server">
-          <span class="name">{{ getConfigurationName() }}</span
-          ><span
-            v-if="getConfigurationDescription().length > 0"
-            class="description"
-            >{{ getConfigurationDescription() }}</span
-          >
+          <span class="name">{{ serverName }}</span
+          ><span v-if="serverDescription.length > 0" class="description">{{
+            serverDescription
+          }}</span>
         </div>
         <ChannelInfo :channel="getChannelByUuid(channels, channelUuid)" />
         <UserInfo
@@ -63,7 +61,6 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
 import { Channel } from "@/dto/Channel";
 import { Message } from "@/dto/Message";
@@ -94,9 +91,12 @@ import {
   getMessagesByChannelUuid,
   getUserName,
 } from "@/utils";
+import { useStore } from "vuex";
+import { defineComponent, watch } from "@vue/runtime-core";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-@Options({
-  props: {},
+export default defineComponent({
   components: {
     Loading,
     ChannelList,
@@ -109,25 +109,53 @@ import {
     UserPopout,
     TypingUsers,
   },
-  methods: {
-    getUserByUuid: getUserByUuid,
-    getChannelByUuid: getChannelByUuid,
-    getMessagesByChannelUuid: getMessagesByChannelUuid,
-  },
-  watch: {
-    channelUuid() {
-      const channel = getChannelByUuid(this.channels, this.channelUuid);
+  setup() {
+    const store = useStore();
+    const router = useRouter();
+
+    if (store.state.token == "") {
+      router.push("/login");
+    }
+
+    const loading = ref(true);
+
+    const ws = ref(null as WebSocket | null);
+    const reconnecting = ref(false);
+
+    const userUuid = ref("");
+    const channelUuid = ref("");
+
+    const users = ref([] as User[]);
+    const channels = ref([] as Channel[]);
+    const messages = ref([] as Message[]);
+
+    const userPopoutUuid = ref("");
+    const userPopoutElement = ref(null as HTMLElement | null);
+
+    const showUserSettings = ref(false);
+
+    const typingUsers = ref([] as TypingUser[]);
+    const cleanTypingUsersTimeout = ref(0);
+
+    document.title = `${store.state.configuration.name}`;
+
+    const serverName = store.state.configuration.name;
+
+    const serverDescription = store.state.configuration.description;
+
+    watch(channelUuid, () => {
+      const channel = getChannelByUuid(channels.value, channelUuid.value);
       if (channel) {
-        document.title = `#${channel.name} ~ ${this.$store.state.configuration.name}`;
+        document.title = `#${channel.name} ~ ${store.state.configuration.name}`;
       }
-    },
-    users() {
-      this.users = this.users.sort((user1: User, user2: User) => {
+    });
+    watch(users, () => {
+      users.value = users.value.sort((user1: User, user2: User) => {
         return getUserName(user1).localeCompare(getUserName(user2));
       });
-    },
-    messages() {
-      this.messages = this.messages.sort(
+    });
+    watch(messages, () => {
+      messages.value = messages.value.sort(
         (message1: Message, message2: Message) => {
           return (
             new Date(message1.date).getTime() -
@@ -135,290 +163,289 @@ import {
           );
         }
       );
-    },
-  },
-})
-export default class Main extends Vue {
-  loading = true;
-  reconnecting = false;
+    });
 
-  ws: WebSocket | null = null;
+    const logout = () => {
+      ws.value = null;
+      store.state.token = "";
+      localStorage.removeItem("token");
+      router.push("/login");
+    };
 
-  userUuid = "";
-  channelUuid = "";
+    const editMessage = (messageUuid: string, content: string) => {
+      sendPacket(ws.value, PacketType.EDIT_MESSAGE, {
+        messageUuid,
+        content,
+      } as PacketSendEditMessage);
+    };
 
-  users: User[] = [];
-  channels: Channel[] = [];
-  messages: Message[] = [];
+    const deleteMessage = (uuid: string) => {
+      sendPacket(ws.value, PacketType.DELETE_MESSAGE, uuid);
+    };
 
-  message = "";
+    const setUserPopoutUuid = (
+      userUuid: string,
+      element: HTMLElement | null
+    ) => {
+      userPopoutUuid.value = userUuid;
+      userPopoutElement.value = element;
+    };
 
-  userPopoutUuid = "";
-  userPopoutElement: HTMLElement | null = null;
+    const getTypingUsers = (typingUsers: TypingUser[]) => {
+      let users: User[] = [];
+      let now = new Date();
+      typingUsers.forEach((typing) => {
+        if (
+          typing.userUuid !== userUuid.value &&
+          now.getTime() - typing.date.getTime() < 1000
+        ) {
+          let user = users.find((user) => user.uuid === typing.userUuid);
+          if (user) users.push(user);
+        }
+      });
+      return users;
+    };
 
-  showUserSettings = false;
+    const cleanTypingUsers = () => {
+      let outdatedTypingUsers = typingUsers.value.filter(
+        (typing) => new Date().getTime() - typing.date.getTime() >= 1000
+      );
+      outdatedTypingUsers.forEach((outdatedTyping) => {
+        let index = typingUsers.value.findIndex(
+          (typing) => typing.userUuid === outdatedTyping.userUuid
+        );
+        typingUsers.value.splice(index, 1);
+      });
+    };
 
-  typingUsers: TypingUser[] = [];
-  cleanTypingUsersTimeout = 0;
+    const messageTyping = () => {
+      sendPacket(ws.value, PacketType.TYPING, channelUuid.value);
+    };
 
-  created(): void {
-    document.title = `${this.$store.state.configuration.name}`;
-  }
+    const initWebSocket = () => {
+      ws.value = new WebSocket(webSocketUrl + "/ws");
+      ws.value.onopen = () => {
+        sendPacket(ws.value, PacketType.AUTH, store.state.token);
+      };
+      ws.value.onclose = () => {
+        loading.value = true;
+        reconnecting.value = true;
+        setTimeout(initWebSocket, 3000);
+      };
+      ws.value.onmessage = (e: MessageEvent) => {
+        parseWebSocketMessage(e.data);
+      };
+      ws.value.onerror = function () {
+        //
+      };
+    };
 
-  getConfigurationName(): string {
-    return this.$store.state.configuration.name;
-  }
+    const toggleUserSettings = () => {
+      showUserSettings.value = !showUserSettings.value;
+    };
 
-  getConfigurationDescription(): string {
-    return this.$store.state.configuration.description;
-  }
+    const fetchChannels = async () => {
+      channels.value = await getChannels(store.state.token);
+    };
 
-  logout(): void {
-    this.ws = null;
-    this.$store.state.token = "";
-    localStorage.removeItem("token");
-    this.$router.push("/login");
-  }
+    const fetchChannelMessages = async () => {
+      const firstChannelMessage = messages.value.filter(
+        (message) => message.channelUuid === channelUuid.value
+      )[0];
+      const fmessages = await getChannelMessages(
+        store.state.token,
+        channelUuid.value,
+        firstChannelMessage !== undefined ? firstChannelMessage.uuid : "",
+        50
+      );
+      messages.value = messages.value.concat(fmessages);
+    };
 
-  editMessage(messageUuid: string, content: string): void {
-    sendPacket(this.ws, PacketType.EDIT_MESSAGE, {
-      messageUuid,
-      content,
-    } as PacketSendEditMessage);
-  }
+    const fetchUsers = async () => {
+      users.value = await getUsers(store.state.token);
+    };
 
-  deleteMessage(uuid: string): void {
-    sendPacket(this.ws, PacketType.DELETE_MESSAGE, uuid);
-  }
-
-  setUserPopoutUuid(userUuid: string, element: HTMLElement | null): void {
-    this.userPopoutUuid = userUuid;
-    this.userPopoutElement = element;
-  }
-
-  getTypingUsers(typingUsers: TypingUser[]): User[] {
-    let users: User[] = [];
-    let now = new Date();
-    typingUsers.forEach((typing) => {
+    const setChannelUuid = (uuid: string, notify = true) => {
+      channelUuid.value = uuid;
+      if (notify) sendPacket(ws.value, PacketType.SET_CHANNEL_UUID, uuid);
       if (
-        typing.userUuid !== this.userUuid &&
-        now.getTime() - typing.date.getTime() < 1000
+        messages.value.filter((message) => message.channelUuid === uuid)
+          .length === 0
       ) {
-        let user = this.users.find((user) => user.uuid === typing.userUuid);
-        if (user) users.push(user);
+        const channel = getChannelByUuid(channels.value, uuid);
+        if (channel && channel.saveMessages) fetchChannelMessages();
       }
-    });
-    return users;
-  }
-
-  cleanTypingUsers(): void {
-    let outdatedTypingUsers = this.typingUsers.filter(
-      (typing) => new Date().getTime() - typing.date.getTime() >= 1000
-    );
-    outdatedTypingUsers.forEach((outdatedTyping) => {
-      let index = this.typingUsers.findIndex(
-        (typing) => typing.userUuid === outdatedTyping.userUuid
-      );
-      this.typingUsers.splice(index, 1);
-    });
-  }
-
-  messageTyping(): void {
-    sendPacket(this.ws, PacketType.TYPING, this.channelUuid);
-  }
-
-  mounted(): void {
-    if (this.$store.state.token == "") {
-      this.$router.push("/login");
-    } else {
-      this.initWebSocket();
-    }
-  }
-
-  initWebSocket(): void {
-    this.ws = new WebSocket(webSocketUrl + "/ws");
-    this.ws.onopen = () => {
-      sendPacket(this.ws, PacketType.AUTH, this.$store.state.token);
     };
-    this.ws.onclose = () => {
-      this.loading = true;
-      this.reconnecting = true;
-      setTimeout(this.initWebSocket, 3000);
-    };
-    this.ws.onmessage = (e: MessageEvent) => {
-      this.parseWebSocketMessage(e.data);
-    };
-    this.ws.onerror = function () {
-      //
-    };
-  }
 
-  toggleUserSettings(): void {
-    this.showUserSettings = !this.showUserSettings;
-  }
+    const parseWebSocketMessage = (data: string) => {
+      const packet = JSON.parse(data) as Packet;
 
-  async fetchChannels(): Promise<void> {
-    this.channels = await getChannels(this.$store.state.token);
-  }
-
-  async fetchChannelMessages(): Promise<void> {
-    const firstChannelMessage = this.messages.filter(
-      (message) => message.channelUuid === this.channelUuid
-    )[0];
-    const messages = await getChannelMessages(
-      this.$store.state.token,
-      this.channelUuid,
-      firstChannelMessage !== undefined ? firstChannelMessage.uuid : "",
-      50
-    );
-    this.messages = this.messages.concat(messages);
-  }
-
-  async fetchUsers(): Promise<void> {
-    this.users = await getUsers(this.$store.state.token);
-  }
-
-  setChannelUuid(uuid: string, notify = true): void {
-    this.channelUuid = uuid;
-    if (notify) sendPacket(this.ws, PacketType.SET_CHANNEL_UUID, uuid);
-    if (
-      this.messages.filter((message) => message.channelUuid === uuid).length ===
-      0
-    ) {
-      const channel = getChannelByUuid(this.channels, uuid);
-      if (channel && channel.saveMessages) this.fetchChannelMessages();
-    }
-  }
-
-  parseWebSocketMessage(data: string): void {
-    const packet = JSON.parse(data) as Packet;
-
-    if (packet.type === PacketType.AUTH) {
-      this.reconnecting = false;
-      const auth = packet.data as PacketAuth;
-      if (auth.userUuid) {
-        this.userUuid = auth.userUuid;
-        const channelUuid = auth.channelUuid;
-        this.fetchChannels().then(() => {
-          this.setChannelUuid(
-            channelUuid == "" ? this.channels[0].uuid : channelUuid,
-            false
-          );
-          this.fetchUsers().then(() => {
-            this.loading = false;
-            this.reconnecting = false;
+      if (packet.type === PacketType.AUTH) {
+        reconnecting.value = false;
+        const auth = packet.data as PacketAuth;
+        if (auth.userUuid) {
+          userUuid.value = auth.userUuid;
+          const channelUuid = auth.channelUuid;
+          fetchChannels().then(() => {
+            setChannelUuid(
+              channelUuid == "" ? channels.value[0].uuid : channelUuid,
+              false
+            );
+            fetchUsers().then(() => {
+              loading.value = false;
+              reconnecting.value = false;
+            });
           });
-        });
-      } else {
-        localStorage.removeItem("token");
-        this.$store.state.token = "";
-        this.$router.push("/login");
-      }
-    } else if (packet.type === PacketType.ADD_USERS) {
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let user = packet.data[i] as User;
-          user.online = false;
-          this.users.push(user);
+        } else {
+          localStorage.removeItem("token");
+          store.state.token = "";
+          router.push("/login");
         }
-        sendPacket(this.ws, PacketType.ONLINE_USERS);
-      }
-    } else if (packet.type === PacketType.MESSAGE) {
-      let message = packet.data as Message;
-      message.date = new Date(message.date);
-      message.edited = new Date(message.edited);
-      this.messages.push(message);
-      let index = this.typingUsers.findIndex(
-        (typing) => typing.userUuid === message.userUuid
-      );
-      if (index >= 0) this.typingUsers.splice(index, 1);
-    } else if (packet.type === PacketType.ONLINE_USERS) {
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let userUuid = packet.data[i] as string;
-          const userIndex = this.users.findIndex(
-            (user) => user.uuid === userUuid
-          );
-          if (userIndex >= 0) this.users[userIndex].online = true;
+      } else if (packet.type === PacketType.ADD_USERS) {
+        if (packet.data instanceof Array) {
+          for (let i = 0; i < packet.data.length; i++) {
+            let user = packet.data[i] as User;
+            user.online = false;
+            users.value.push(user);
+          }
+          sendPacket(ws.value, PacketType.ONLINE_USERS);
         }
-      }
-    } else if (packet.type === PacketType.OFFLINE_USERS) {
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let userUuid = packet.data[i] as string;
-          const userIndex = this.users.findIndex(
-            (user) => user.uuid === userUuid
-          );
-          if (userIndex >= 0) this.users[userIndex].online = false;
-        }
-      }
-    } else if (packet.type === PacketType.REMOVE_USERS) {
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let userUuid = packet.data[i] as string;
-          const userIndex = this.users.findIndex(
-            (user) => user.uuid === userUuid
-          );
-          if (userIndex >= 0) this.users.splice(userIndex, 1);
-        }
-      }
-    } else if (packet.type === PacketType.UPDATE_USERS) {
-      if (packet.data instanceof Array) {
-        for (let i = 0; i < packet.data.length; i++) {
-          let packetUser = packet.data[i] as User;
-          const userIndex = this.users.findIndex(
-            (user) => user.uuid === packetUser.uuid
-          );
-          if (userIndex >= 0) {
-            let currentUser = this.users[userIndex];
-            packetUser.online = currentUser.online;
-            this.users[userIndex] = packetUser;
+      } else if (packet.type === PacketType.MESSAGE) {
+        let message = packet.data as Message;
+        message.date = new Date(message.date);
+        message.edited = new Date(message.edited);
+        messages.value.push(message);
+        let index = typingUsers.value.findIndex(
+          (typing) => typing.userUuid === message.userUuid
+        );
+        if (index >= 0) typingUsers.value.splice(index, 1);
+      } else if (packet.type === PacketType.ONLINE_USERS) {
+        if (packet.data instanceof Array) {
+          for (let i = 0; i < packet.data.length; i++) {
+            let userUuid = packet.data[i] as string;
+            const userIndex = users.value.findIndex(
+              (user) => user.uuid === userUuid
+            );
+            if (userIndex >= 0) users.value[userIndex].online = true;
           }
         }
-      }
-    } else if (packet.type === PacketType.TYPING) {
-      if (packet.data instanceof Array) {
-        let channelUuid = packet.data[0] as string;
-        let userUuid = packet.data[1] as string;
-        let index = this.typingUsers.findIndex(
-          (typing) => typing.userUuid == userUuid
+      } else if (packet.type === PacketType.OFFLINE_USERS) {
+        if (packet.data instanceof Array) {
+          for (let i = 0; i < packet.data.length; i++) {
+            let userUuid = packet.data[i] as string;
+            const userIndex = users.value.findIndex(
+              (user) => user.uuid === userUuid
+            );
+            if (userIndex >= 0) users.value[userIndex].online = false;
+          }
+        }
+      } else if (packet.type === PacketType.REMOVE_USERS) {
+        if (packet.data instanceof Array) {
+          for (let i = 0; i < packet.data.length; i++) {
+            let userUuid = packet.data[i] as string;
+            const userIndex = users.value.findIndex(
+              (user) => user.uuid === userUuid
+            );
+            if (userIndex >= 0) users.value.splice(userIndex, 1);
+          }
+        }
+      } else if (packet.type === PacketType.UPDATE_USERS) {
+        if (packet.data instanceof Array) {
+          for (let i = 0; i < packet.data.length; i++) {
+            let packetUser = packet.data[i] as User;
+            const userIndex = users.value.findIndex(
+              (user) => user.uuid === packetUser.uuid
+            );
+            if (userIndex >= 0) {
+              let currentUser = users.value[userIndex];
+              packetUser.online = currentUser.online;
+              users.value[userIndex] = packetUser;
+            }
+          }
+        }
+      } else if (packet.type === PacketType.TYPING) {
+        if (packet.data instanceof Array) {
+          let channelUuid = packet.data[0] as string;
+          let userUuid = packet.data[1] as string;
+          let index = typingUsers.value.findIndex(
+            (typing) => typing.userUuid == userUuid
+          );
+          if (index >= 0) {
+            typingUsers.value[index].channelUuid = channelUuid;
+            typingUsers.value[index].date = new Date();
+          } else {
+            typingUsers.value.push({
+              userUuid,
+              channelUuid,
+              date: new Date(),
+            } as TypingUser);
+          }
+          clearTimeout(cleanTypingUsersTimeout.value);
+          cleanTypingUsersTimeout.value = setTimeout(cleanTypingUsers, 1000);
+        }
+      } else if (packet.type === PacketType.DELETE_MESSAGE) {
+        let index = messages.value.findIndex(
+          (message) => message.uuid === (packet.data as string)
+        );
+        if (index >= 0) messages.value.splice(index, 1);
+      } else if (packet.type === PacketType.EDIT_MESSAGE) {
+        let editMessage = packet.data as PacketReceiveEditMessage;
+        let index = messages.value.findIndex(
+          (message) => message.uuid === editMessage.messageUuid
         );
         if (index >= 0) {
-          this.typingUsers[index].channelUuid = channelUuid;
-          this.typingUsers[index].date = new Date();
-        } else {
-          this.typingUsers.push({
-            userUuid,
-            channelUuid,
-            date: new Date(),
-          } as TypingUser);
+          messages.value[index].content = editMessage.content;
+          messages.value[index].edited = new Date(editMessage.date);
         }
-        clearTimeout(this.cleanTypingUsersTimeout);
-        this.cleanTypingUsersTimeout = setTimeout(this.cleanTypingUsers, 1000);
+      } else {
+        // Unkown PacketType
       }
-    } else if (packet.type === PacketType.DELETE_MESSAGE) {
-      let index = this.messages.findIndex(
-        (message) => message.uuid === (packet.data as string)
-      );
-      if (index >= 0) this.messages.splice(index, 1);
-    } else if (packet.type === PacketType.EDIT_MESSAGE) {
-      let editMessage = packet.data as PacketReceiveEditMessage;
-      let index = this.messages.findIndex(
-        (message) => message.uuid === editMessage.messageUuid
-      );
-      if (index >= 0) {
-        this.messages[index].content = editMessage.content;
-        this.messages[index].edited = new Date(editMessage.date);
-      }
-    } else {
-      // Unkown PacketType
-    }
-  }
+    };
 
-  sendMessage(content: string, files: string[]): void {
-    sendPacketMessage(this.ws, this.channelUuid, content, files);
-  }
-}
+    const sendMessage = (content: string, files: string[]) => {
+      sendPacketMessage(ws.value, channelUuid.value, content, files);
+    };
+
+    initWebSocket();
+
+    return {
+      loading,
+      reconnecting,
+
+      serverName,
+      serverDescription,
+
+      userUuid,
+      channelUuid,
+
+      users,
+      channels,
+      messages,
+
+      userPopoutUuid,
+      userPopoutElement,
+
+      showUserSettings,
+
+      typingUsers,
+
+      logout,
+      editMessage,
+      deleteMessage,
+      setUserPopoutUuid,
+      getTypingUsers,
+      messageTyping,
+      toggleUserSettings,
+      sendMessage,
+      fetchChannelMessages,
+      setChannelUuid,
+
+      getUserByUuid,
+      getChannelByUuid,
+      getMessagesByChannelUuid,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
