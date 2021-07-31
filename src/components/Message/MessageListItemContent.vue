@@ -37,6 +37,18 @@
           class="youtube"
           :src="`https://www.youtube.com/embed/${embed.source}`"
           frameborder="0"
+          allow="encrypted-media"
+        ></iframe>
+        <iframe
+          v-else-if="embed.type === EmbedType.SPOTIFY"
+          :class="{
+            'spotify-track': embed.source.slice(0, 6) === 'track/',
+            'spotify-album': embed.source.slice(0, 6) === 'album/',
+          }"
+          :src="`https://open.spotify.com/embed/${embed.source}`"
+          frameborder="0"
+          allowtransparency="true"
+          allow="encrypted-media"
         ></iframe>
       </div>
     </div>
@@ -160,13 +172,23 @@ export default defineComponent({
     const embeds = computed(() => {
       const embeds: Embed[] = [];
 
-      const youtubeVideos = props.message.content.matchAll(
-        /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([aA0-zZ0-]+)/g
+      const youtubeLinks = props.message.content.matchAll(
+        /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9-_]+)/g
       );
-      for (const youtubeVideo of youtubeVideos) {
+      for (const youtubeLink of youtubeLinks) {
         embeds.push({
           type: EmbedType.YOUTUBE,
-          source: youtubeVideo[1],
+          source: youtubeLink[1],
+        } as Embed);
+      }
+
+      const spotifyLinks = props.message.content.matchAll(
+        /https?:\/\/open\.spotify\.com\/((?:album|track)\/[a-zA-Z0-9-_]+)/g
+      );
+      for (const spotifyLink of spotifyLinks) {
+        embeds.push({
+          type: EmbedType.SPOTIFY,
+          source: spotifyLink[1],
         } as Embed);
       }
 
@@ -302,9 +324,15 @@ export default defineComponent({
       border-radius: 3px;
     }
 
-    .youtube {
+    .youtube,
+    .spotify-album {
       width: 400px;
       height: 225px;
+    }
+
+    .spotify-track {
+      width: 400px;
+      height: 80px;
     }
   }
 

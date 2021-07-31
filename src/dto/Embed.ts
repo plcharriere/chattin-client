@@ -8,4 +8,5 @@ export enum EmbedType {
   VIDEO = 1,
   AUDIO = 2,
   YOUTUBE = 3,
+  SPOTIFY = 4,
 }
