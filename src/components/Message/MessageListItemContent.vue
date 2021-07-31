@@ -18,14 +18,21 @@
       class="embeds"
       :class="{ 'below-text': message.content.length > 0 || editing }"
     >
-      <a
-        v-for="embed in embeds"
-        v-bind:key="embed"
-        :href="embed"
-        target="_blank"
-      >
-        <img :src="embed" />
-      </a>
+      <div v-for="embed in embeds" v-bind:key="embed">
+        <a
+          v-if="embed.type === EmbedType.IMAGE"
+          :href="embed.source"
+          target="_blank"
+        >
+          <img :src="embed.source" />
+        </a>
+        <video v-else-if="embed.type === EmbedType.VIDEO" controls>
+          <source :src="embed.source" />
+        </video>
+        <audio v-else-if="embed.type === EmbedType.AUDIO" controls>
+          <source :src="embed.source" />
+        </audio>
+      </div>
     </div>
     <div
       class="files"
@@ -63,6 +70,7 @@
 <script lang="ts">
 import { File } from "@/dto/File";
 import { Message } from "@/dto/Message";
+import { Embed, EmbedType } from "@/dto/Embed";
 import { defineComponent, PropType } from "@vue/runtime-core";
 import { CheckIcon } from "@heroicons/vue/solid";
 import { XIcon } from "@heroicons/vue/solid";
@@ -144,7 +152,7 @@ export default defineComponent({
     });
 
     const embeds = computed(() => {
-      const embeds: string[] = [];
+      const embeds: Embed[] = [];
       files.value.forEach((file) => {
         if (
           [
@@ -159,7 +167,50 @@ export default defineComponent({
             "image/avif",
           ].includes(file.type)
         ) {
-          embeds.push(`${httpUrl}/files/${file.uuid}/${file.name}`);
+          embeds.push({
+            type: EmbedType.IMAGE,
+            source: `${httpUrl}/files/${file.uuid}/${file.name}`,
+          } as Embed);
+        } else if (
+          [
+            "video/3gpp",
+            "video/mp4",
+            "video/mpeg",
+            "video/ogg",
+            "video/quicktime",
+            "video/webm",
+            "video/x-m4v",
+            "video/ms-asf",
+            "video/x-ms-wmv",
+            "video/x-msvideo",
+          ].includes(file.type)
+        ) {
+          embeds.push({
+            type: EmbedType.VIDEO,
+            source: `${httpUrl}/files/${file.uuid}/${file.name}`,
+          } as Embed);
+        } else if (
+          [
+            "audio/basic",
+            "audio/flac",
+            "audio/mid",
+            "audio/mpeg",
+            "audio/mp4",
+            "audio/x-aiff",
+            "audio/mpegurl",
+            "audio/x-mpegurl",
+            "audio/vnd.rn-realaudio",
+            "audio/ogg",
+            "audio/vorbis",
+            "audio/wav",
+            "audio/vnd.wav",
+            "audio/aac",
+          ].includes(file.type)
+        ) {
+          embeds.push({
+            type: EmbedType.AUDIO,
+            source: `${httpUrl}/files/${file.uuid}/${file.name}`,
+          } as Embed);
         }
       });
       return embeds;
@@ -200,6 +251,7 @@ export default defineComponent({
       saveEditing,
       cancelEditing,
       bytesToReadable,
+      EmbedType,
     };
   },
 });
@@ -218,10 +270,14 @@ export default defineComponent({
       margin-top: 10px;
     }
 
-    img {
+    img,
+    video,
+    audio {
       max-width: 400px;
       max-height: 300px;
       margin-right: 8px;
+      outline: 0;
+      border-radius: 3px;
     }
   }
 
