@@ -48,16 +48,17 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { User } from "@/dto/User";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import UserAvatar from "@/components/User/UserAvatar.vue";
 import axios from "axios";
 import { httpUrl } from "@/env";
 import { getAvatars } from "@/api/http";
 import { TrashIcon } from "@heroicons/vue/solid";
+import { useStore } from "vuex";
+import { ref } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     TrashIcon,
     UserAvatar,
@@ -68,85 +69,99 @@ import { TrashIcon } from "@heroicons/vue/solid";
       required: true,
     },
   },
-})
-export default class UserSettingsAvatar extends Vue {
-  loading = false;
+  setup() {
+    const loading = ref(false);
 
-  avatars: string[] = [];
+    const avatars = ref([] as string[]);
 
-  previewUrl = "";
-  previewUuid = "";
+    const previewUrl = ref("");
+    const previewUuid = ref("");
 
-  file: File | null = null;
+    const file = ref(null as File | null);
 
-  mounted(): void {
-    this.fetchAvatars();
-  }
+    const store = useStore();
 
-  async fetchAvatars(): Promise<void> {
-    this.avatars = (await getAvatars(this.$store.state.token)).reverse() || [];
-  }
+    const fetchAvatars = async (): Promise<void> => {
+      avatars.value = (await getAvatars(store.state.token)).reverse() || [];
+    };
 
-  previewClick(): void {
-    const fileInput = document.getElementById("avatarFile");
-    if (fileInput) fileInput.click();
-  }
+    fetchAvatars();
 
-  previewChange(event: Event): void {
-    if (
-      event.target &&
-      event.target instanceof HTMLInputElement &&
-      event.target.files &&
-      event.target.files[0]
-    )
-      this.file = event.target.files[0];
-    this.previewUrl = URL.createObjectURL(this.file);
-  }
+    const previewClick = () => {
+      const fileInput = document.getElementById("avatarFile");
+      if (fileInput) fileInput.click();
+    };
 
-  previewRemove(): void {
-    this.previewUrl = "default";
-  }
+    const previewChange = (event: Event) => {
+      if (
+        event.target &&
+        event.target instanceof HTMLInputElement &&
+        event.target.files &&
+        event.target.files[0]
+      )
+        file.value = event.target.files[0];
+      previewUrl.value = URL.createObjectURL(file.value);
+    };
 
-  avatarClick(uuid: string): void {
-    this.previewUrl = "";
-    this.file = null;
-    this.previewUuid = uuid;
-  }
+    const previewRemove = () => {
+      previewUrl.value = "default";
+    };
 
-  deleteAvatar(uuid: string): void {
-    axios
-      .delete(`${httpUrl}/avatars/${uuid}`, {
-        headers: {
-          token: this.$store.state.token,
-        },
-      })
-      .then(async () => {
-        await this.fetchAvatars();
-      });
-  }
+    const avatarClick = (uuid: string) => {
+      previewUrl.value = "";
+      file.value = null;
+      previewUuid.value = uuid;
+    };
 
-  save(): void {
-    this.loading = true;
+    const deleteAvatar = (uuid: string) => {
+      axios
+        .delete(`${httpUrl}/avatars/${uuid}`, {
+          headers: {
+            token: store.state.token,
+          },
+        })
+        .then(async () => {
+          await fetchAvatars();
+        });
+    };
 
-    const formData = new FormData();
-    if (this.file) formData.append("file", this.file);
-    else if (this.previewUuid) formData.append("uuid", this.previewUuid);
-    axios
-      .post(httpUrl + "/avatars", formData, {
-        headers: {
-          token: this.$store.state.token,
-        },
-      })
-      .then(async () => {
-        await this.fetchAvatars();
-        this.loading = false;
-        this.previewUrl = "";
-        this.previewUuid = "";
-        this.file = null;
-        (document.getElementById("avatarFile") as HTMLInputElement).value = "";
-      });
-  }
-}
+    const save = () => {
+      loading.value = true;
+
+      const formData = new FormData();
+      if (file.value) formData.append("file", file.value);
+      else if (previewUuid.value) formData.append("uuid", previewUuid.value);
+      axios
+        .post(httpUrl + "/avatars", formData, {
+          headers: {
+            token: store.state.token,
+          },
+        })
+        .then(async () => {
+          await fetchAvatars();
+          loading.value = false;
+          previewUrl.value = "";
+          previewUuid.value = "";
+          file.value = null;
+          (document.getElementById("avatarFile") as HTMLInputElement).value =
+            "";
+        });
+    };
+
+    return {
+      loading,
+      avatars,
+      previewUrl,
+      previewUuid,
+      previewClick,
+      previewChange,
+      previewRemove,
+      avatarClick,
+      deleteAvatar,
+      save,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
