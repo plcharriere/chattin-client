@@ -8,9 +8,11 @@
       :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
       @setUserPopoutUuid="setUserPopoutUuid"
       :canEdit="user.uuid === message.userUuid"
+      :editing="editingMessageUuid === message.uuid"
       :canDelete="user.uuid === message.userUuid"
       @editMessage="editMessage"
       @deleteMessage="deleteMessage"
+      @setEditingMessageUuid="setEditingMessageUuid"
     />
     <transition name="fade">
       <ArrowDownIcon
@@ -55,6 +57,10 @@ export default defineComponent({
       type: Array as PropType<Message[]>,
       required: true,
     },
+    editingMessageUuid: {
+      type: String,
+      default: "",
+    },
   },
   setup(props, { emit }) {
     const messageList = ref();
@@ -96,6 +102,10 @@ export default defineComponent({
       )
         return true;
       return false;
+    };
+
+    const setEditingMessageUuid = (messageUuid: string) => {
+      emit("setEditingMessageUuid", messageUuid);
     };
 
     const editMessage = (uuid: string, content: string) => {
@@ -141,6 +151,7 @@ export default defineComponent({
       scrollBottom,
       showScrollBottomButton,
       getUserByUuid,
+      setEditingMessageUuid,
     };
   },
 });

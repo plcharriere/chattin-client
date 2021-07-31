@@ -22,7 +22,7 @@
           :message="message"
           :editing="editing"
           @saveEditing="saveEditing"
-          @cancelEditing="toggleEditMode"
+          @cancelEditing="disableEditing"
         />
       </div>
     </template>
@@ -32,11 +32,11 @@
         :message="message"
         :editing="editing"
         @saveEditing="saveEditing"
-        @cancelEditing="toggleEditMode"
+        @cancelEditing="disableEditing"
       />
     </template>
     <div class="actions" v-if="!editing">
-      <PencilIcon class="icon-btn" @click="toggleEditMode()" v-if="canEdit" />
+      <PencilIcon class="icon-btn" @click="enableEditing()" v-if="canEdit" />
       <TrashIcon
         class="icon-btn"
         @click="deleteMessage(message.uuid)"
@@ -55,7 +55,6 @@ import UserAvatar from "@/components/User/UserAvatar.vue";
 import UserName from "@/components/User/UserName.vue";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { TrashIcon } from "@heroicons/vue/solid";
-import { ref } from "vue";
 import MessageListItemContent from "@/components/Message/MessageListItemContent.vue";
 
 export default defineComponent({
@@ -79,6 +78,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    editing: {
+      type: Boolean,
+      default: false,
+    },
     canEdit: {
       type: Boolean,
       default: false,
@@ -89,15 +92,17 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const editing = ref(false);
+    const enableEditing = () => {
+      emit("setEditingMessageUuid", props.message.uuid);
+    };
 
-    const toggleEditMode = () => {
-      editing.value = !editing.value;
+    const disableEditing = () => {
+      emit("setEditingMessageUuid", "");
     };
 
     const saveEditing = (content: string) => {
       emit("editMessage", props.message.uuid, content);
-      toggleEditMode();
+      disableEditing();
     };
 
     const setUserPopoutUuid = (userUuid: string, element: HTMLElement) => {
@@ -118,8 +123,8 @@ export default defineComponent({
     };
 
     return {
-      editing,
-      toggleEditMode,
+      enableEditing,
+      disableEditing,
       saveEditing,
       setUserPopoutUuid,
       getMessageDateString,

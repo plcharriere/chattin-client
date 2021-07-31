@@ -40,10 +40,12 @@
             :messages="getMessagesByChannelUuid(messages, channelUuid)"
             :user="getUserByUuid(users, userUuid)"
             :users="users"
+            :editingMessageUuid="editingMessageUuid"
             @scrolledTop="fetchChannelMessages"
             @setUserPopoutUuid="setUserPopoutUuid"
             @editMessage="editMessage"
             @deleteMessage="deleteMessage"
+            @setEditingMessageUuid="setEditingMessageUuid"
           />
           <div class="message">
             <MessageInput
@@ -406,6 +408,12 @@ export default defineComponent({
       sendPacketMessage(ws.value, channelUuid.value, content, files);
     };
 
+    const editingMessageUuid = ref("");
+
+    const setEditingMessageUuid = (messageUuid: string) => {
+      editingMessageUuid.value = messageUuid;
+    };
+
     initWebSocket();
 
     return {
@@ -439,6 +447,9 @@ export default defineComponent({
       sendMessage,
       fetchChannelMessages,
       setChannelUuid,
+
+      editingMessageUuid,
+      setEditingMessageUuid,
 
       getUserByUuid,
       getChannelByUuid,
