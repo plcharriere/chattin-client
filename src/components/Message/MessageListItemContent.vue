@@ -32,6 +32,12 @@
         <audio v-else-if="embed.type === EmbedType.AUDIO" controls>
           <source :src="embed.source" />
         </audio>
+        <iframe
+          v-else-if="embed.type === EmbedType.YOUTUBE"
+          class="youtube"
+          :src="`https://www.youtube.com/embed/${embed.source}`"
+          frameborder="0"
+        ></iframe>
       </div>
     </div>
     <div
@@ -153,6 +159,17 @@ export default defineComponent({
 
     const embeds = computed(() => {
       const embeds: Embed[] = [];
+
+      const youtubeVideos = props.message.content.matchAll(
+        /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([aA0-zZ0-]+)/g
+      );
+      for (const youtubeVideo of youtubeVideos) {
+        embeds.push({
+          type: EmbedType.YOUTUBE,
+          source: youtubeVideo[1],
+        } as Embed);
+      }
+
       files.value.forEach((file) => {
         if (
           [
@@ -266,18 +283,28 @@ export default defineComponent({
   flex-grow: 1;
 
   .embeds {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+
     &.below-text {
       margin-top: 10px;
     }
 
     img,
     video,
-    audio {
+    audio,
+    iframe {
       max-width: 400px;
       max-height: 300px;
       margin-right: 8px;
       outline: 0;
       border-radius: 3px;
+    }
+
+    .youtube {
+      width: 400px;
+      height: 225px;
     }
   }
 
