@@ -154,21 +154,35 @@ export default defineComponent({
         document.title = `#${channel.name} ~ ${store.state.configuration.name}`;
       }
     });
-    watch(users, () => {
-      users.value = users.value.sort((user1: User, user2: User) => {
-        return getUserName(user1).localeCompare(getUserName(user2));
-      });
-    });
-    watch(messages, () => {
-      messages.value = messages.value.sort(
-        (message1: Message, message2: Message) => {
-          return (
-            new Date(message1.date).getTime() -
-            new Date(message2.date).getTime()
-          );
-        }
-      );
-    });
+
+    watch(
+      users,
+      () => {
+        users.value = users.value.sort((user1: User, user2: User) => {
+          return getUserName(user1).localeCompare(getUserName(user2));
+        });
+      },
+      {
+        deep: true,
+      }
+    );
+
+    watch(
+      messages,
+      () => {
+        messages.value = messages.value.sort(
+          (message1: Message, message2: Message) => {
+            return (
+              new Date(message1.date).getTime() -
+              new Date(message2.date).getTime()
+            );
+          }
+        );
+      },
+      {
+        deep: true,
+      }
+    );
 
     watch(unreadMessageCount, () => {
       const channel = getChannelByUuid(channels.value, channelUuid.value);
