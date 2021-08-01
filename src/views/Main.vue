@@ -273,13 +273,20 @@ export default defineComponent({
       const firstChannelMessage = messages.value.filter(
         (message) => message.channelUuid === channelUuid.value
       )[0];
-      const fmessages = await getChannelMessages(
+      const channelMessages = await getChannelMessages(
         store.state.token,
         channelUuid.value,
         firstChannelMessage !== undefined ? firstChannelMessage.uuid : "",
         50
       );
-      messages.value = messages.value.concat(fmessages);
+      channelMessages.forEach(async (channelMessage) => {
+        if (
+          !messages.value.find(
+            (message) => message.uuid === channelMessage.uuid
+          )
+        )
+          messages.value.push(channelMessage);
+      });
     };
 
     const fetchUsers = async () => {
