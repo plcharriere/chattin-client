@@ -4,4 +4,5 @@ export interface Channel {
   description: string;
   nsfw: boolean;
   saveMessages: boolean;
+  unread: boolean;
 }

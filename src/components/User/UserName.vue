@@ -33,21 +33,18 @@ export default defineComponent({
       default: false,
     },
   },
-  methods: {
-    getUserName: getUserName,
-  },
   setup(props, { emit }) {
     const userName = ref();
 
     const onNameClick = () => {
-      if (props.openUserPopout && userName.value) {
+      if (props.openUserPopout && userName.value)
         emit("setUserPopoutUuid", props.user.uuid, userName.value);
-      }
     };
 
     return {
       userName,
       onNameClick,
+      getUserName,
     };
   },
 });

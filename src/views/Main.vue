@@ -146,6 +146,8 @@ export default defineComponent({
 
     const serverDescription = store.state.configuration.description;
 
+    const unreadMessageCount = ref(0);
+
     watch(channelUuid, () => {
       const channel = getChannelByUuid(channels.value, channelUuid.value);
       if (channel) {
@@ -167,6 +169,22 @@ export default defineComponent({
         }
       );
     });
+
+    watch(unreadMessageCount, () => {
+      const channel = getChannelByUuid(channels.value, channelUuid.value);
+      if (channel) {
+        if (unreadMessageCount.value > 0)
+          document.title = `(${unreadMessageCount.value}) #${channel.name} ~ ${store.state.configuration.name}`;
+        else
+          document.title = `#${channel.name} ~ ${store.state.configuration.name}`;
+      }
+    });
+
+    const onWindowFocus = () => {
+      unreadMessageCount.value = 0;
+    };
+
+    window.addEventListener("focus", onWindowFocus);
 
     const logout = () => {
       ws.value = null;
@@ -270,12 +288,13 @@ export default defineComponent({
 
     const setChannelUuid = (uuid: string, notify = true) => {
       channelUuid.value = uuid;
+      const channel = getChannelByUuid(channels.value, uuid);
+      if (channel) channel.unread = false;
       if (notify) sendPacket(ws.value, PacketType.SET_CHANNEL_UUID, uuid);
       if (
         messages.value.filter((message) => message.channelUuid === uuid)
           .length === 0
       ) {
-        const channel = getChannelByUuid(channels.value, uuid);
         if (channel && channel.saveMessages) fetchChannelMessages();
       }
     };
@@ -318,10 +337,16 @@ export default defineComponent({
         message.date = new Date(message.date);
         message.edited = new Date(message.edited);
         messages.value.push(message);
-        let index = typingUsers.value.findIndex(
-          (typing) => typing.userUuid === message.userUuid
-        );
-        if (index >= 0) typingUsers.value.splice(index, 1);
+        if (message.channelUuid === channelUuid.value) {
+          if (!document.hasFocus()) unreadMessageCount.value++;
+          const index = typingUsers.value.findIndex(
+            (typing) => typing.userUuid === message.userUuid
+          );
+          if (index >= 0) typingUsers.value.splice(index, 1);
+        } else {
+          const channel = getChannelByUuid(channels.value, message.channelUuid);
+          if (channel) channel.unread = true;
+        }
       } else if (packet.type === PacketType.ONLINE_USERS) {
         if (packet.data instanceof Array) {
           for (let i = 0; i < packet.data.length; i++) {

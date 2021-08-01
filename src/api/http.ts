@@ -17,7 +17,11 @@ export async function getChannels(token: string): Promise<Channel[]> {
       token,
     },
   });
-  return res.data || [];
+  const channels = (res.data as Channel[]) || ([] as Channel[]);
+  channels.forEach((channel) => {
+    channel.unread = false;
+  });
+  return channels;
 }
 
 export async function getChannelMessages(

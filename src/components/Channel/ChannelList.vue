@@ -4,7 +4,7 @@
       v-for="channel in channels"
       v-bind:key="channel.uuid"
       class="channel"
-      :class="{ active: channelUuid == channel.uuid }"
+      :class="{ active: channelUuid == channel.uuid, unread: channel.unread }"
       @click="setChannelUuid(channel.uuid)"
     >
       <HashtagIcon class="hashtag" />
@@ -59,6 +59,7 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     align-items: center;
+    transition: all 200ms;
 
     .hashtag {
       width: 18px;
@@ -70,6 +71,10 @@ export default defineComponent({
     &:hover {
       background: $hover-color;
       border-radius: 5px;
+    }
+
+    &.unread {
+      font-weight: 600;
     }
   }
 }
