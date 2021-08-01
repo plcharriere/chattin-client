@@ -41,7 +41,7 @@ export default defineComponent({
 
     const onNameClick = () => {
       if (props.openUserPopout && userName.value) {
-        emit("setUserPopoutUuid", props.user.uuid, userName);
+        emit("setUserPopoutUuid", props.user.uuid, userName.value);
       }
     };
 
