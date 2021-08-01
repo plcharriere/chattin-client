@@ -23,20 +23,28 @@ input, textarea {
 .btn {
 	padding: 8px 25px;
 	border-radius: 5px;
-	background: rgb(0, 170, 0);
 	color: white;
 	cursor: pointer;
 	outline: 0;
 	border: 0;
 	font-weight: 600;
+	background: #888;
 
 	&:hover {
-		background: rgb(0, 150, 0);
+		background: #999;
 	}
 
 	&.disabled {
 		opacity: 0.4;
 		cursor: not-allowed;
+	}
+
+	&.btn-green {
+		background: rgb(0, 170, 0);
+
+		&:hover {
+			background: rgb(0, 150, 0);
+		}
 	}
 }
 

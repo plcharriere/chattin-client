@@ -21,7 +21,7 @@
         accept="image/png, image/gif, image/jpeg, image/webp"
       />
       <button
-        class="btn"
+        class="btn btn-green"
         @click="save"
         :class="{
           disabled:

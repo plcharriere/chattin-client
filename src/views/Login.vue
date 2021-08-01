@@ -5,7 +5,7 @@
         <span class="name">{{ name }}</span>
         <span class="description">{{ description }}</span>
       </div>
-      <span>{{ error.length > 0 ? error : "Please sign in" }}</span>
+      <span v-if="error.length > 0" class="error">{{ error }}</span>
       <input
         type="text"
         id="login"
@@ -18,7 +18,7 @@
         placeholder="Password"
         :disabled="loading"
       />
-      <button @click="login" :disabled="loading">Sign in</button>
+      <button class="btn" @click="login" :disabled="loading">Sign in</button>
       <span class="register" @click="register">Register</span>
     </div>
   </div>
@@ -45,27 +45,34 @@ export default defineComponent({
       const error = ref("");
 
       const login = () => {
-        loading.value = true;
-        const formData = new FormData();
-        formData.append(
-          "login",
-          (document.getElementById("login") as HTMLInputElement).value
-        );
-        formData.append(
-          "password",
-          (document.getElementById("password") as HTMLInputElement).value
-        );
-        axios.post(httpUrl + "/users/login", formData).then((resp) => {
-          if (resp.status === 200) {
-            store.state.token = resp.data;
-            localStorage.setItem("token", resp.data);
-            router.push("/");
-          } else {
-            error.value =
-              resp.status === 401 ? "Wrong credentials" : "Unexpected error";
-            loading.value = false;
-          }
-        });
+        const login = (document.getElementById("login") as HTMLInputElement)
+          .value;
+        const password = (
+          document.getElementById("password") as HTMLInputElement
+        ).value;
+
+        if (login.length === 0 || password.length == 0) {
+          error.value = "Please fill in all fields.";
+        } else {
+          loading.value = true;
+          const formData = new FormData();
+          formData.append("login", login);
+          formData.append("password", password);
+          axios
+            .post(httpUrl + "/users/login", formData)
+            .then((resp) => {
+              store.state.token = resp.data;
+              localStorage.setItem("token", resp.data);
+              router.push("/");
+            })
+            .catch((e) => {
+              error.value =
+                e.response.status === 401
+                  ? "Wrong credentials"
+                  : "Unexpected error";
+              loading.value = false;
+            });
+        }
       };
 
       const register = () => {
@@ -91,7 +98,7 @@ export default defineComponent({
 .login {
   width: 100%;
   height: 100%;
-  padding: 15px;
+  background: #eee;
   box-sizing: border-box;
 
   display: flex;
@@ -101,17 +108,23 @@ export default defineComponent({
   align-items: center;
 
   .container {
-    width: 250px;
+    width: 300px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 30px;
 
     .infos {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      margin-bottom: 20px;
 
       .name {
         font-size: 25px;
@@ -122,33 +135,23 @@ export default defineComponent({
       .description {
         color: $light-color;
         font-size: 13px;
-        margin-bottom: 25px;
       }
     }
 
-    span {
-      margin-bottom: 20px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 30px;
+    input {
       border-radius: 20px;
-      border: 0;
-      background: #ccc;
-      outline: 0;
-      cursor: pointer;
-      transition: all 300ms;
+      padding: 10px 20px;
+    }
 
-      &:hover {
-        background: #bbb;
-        transform: scale(1.06);
-      }
+    .error {
+      color: rgb(220, 0, 0);
+      margin-bottom: 20px;
     }
 
     .register {
       cursor: pointer;
       margin-top: 20px;
+      margin-bottom: 0;
       text-decoration: underline;
       font-size: 12px;
     }

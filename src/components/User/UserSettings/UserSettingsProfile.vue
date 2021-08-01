@@ -25,7 +25,11 @@
         :disabled="loading"
         placholder="Tell us more about yourself..."
       />
-      <button class="btn" @click="saveProfile" :class="{ disabled: loading }">
+      <button
+        class="btn btn-green"
+        @click="saveProfile"
+        :class="{ disabled: loading }"
+      >
         Save
       </button>
     </div>

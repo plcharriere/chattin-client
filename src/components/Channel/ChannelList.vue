@@ -59,7 +59,6 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     align-items: center;
-    transition: all 200ms;
 
     .hashtag {
       width: 18px;
