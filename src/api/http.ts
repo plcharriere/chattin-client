@@ -20,6 +20,7 @@ export async function getChannels(token: string): Promise<Channel[]> {
   const channels = (res.data as Channel[]) || ([] as Channel[]);
   channels.forEach((channel) => {
     channel.unread = false;
+    channel.loadedAllMessages = false;
   });
   return channels;
 }

@@ -37,7 +37,11 @@
         />
         <div class="channel">
           <MessageList
+            :channel="getChannelByUuid(channels, channelUuid)"
             :messages="getMessagesByChannelUuid(messages, channelUuid)"
+            :reachedTop="
+              getChannelByUuid(channels, channelUuid).loadedAllMessages
+            "
             :user="getUserByUuid(users, userUuid)"
             :users="users"
             :editingMessageUuid="editingMessageUuid"
@@ -301,6 +305,10 @@ export default defineComponent({
         )
           messages.value.push(channelMessage);
       });
+      if (channelMessages.length === 0 || channelMessages.length < 50) {
+        const channel = getChannelByUuid(channels.value, channelUuid.value);
+        if (channel) channel.loadedAllMessages = true;
+      }
     };
 
     const fetchUsers = async () => {
@@ -316,7 +324,10 @@ export default defineComponent({
         messages.value.filter((message) => message.channelUuid === uuid)
           .length === 0
       ) {
-        if (channel && channel.saveMessages) fetchChannelMessages();
+        if (channel) {
+          if (channel.saveMessages) fetchChannelMessages();
+          else channel.loadedAllMessages = true;
+        }
       }
     };
 

@@ -5,4 +5,5 @@ export interface Channel {
   nsfw: boolean;
   saveMessages: boolean;
   unread: boolean;
+  loadedAllMessages: boolean;
 }

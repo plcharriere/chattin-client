@@ -1,5 +1,20 @@
 <template>
   <div ref="messageList" class="message-list">
+    <div v-if="reachedTop" class="channel-intro">
+      <div class="text">
+        <div class="channel-name">
+          <HashtagIcon class="hashtag" />
+          {{ channel.name }}
+        </div>
+        <div>This is the beginning of this channel.</div>
+        <div class="channel-description">{{ channel.description }}</div>
+      </div>
+      <div class="date-separator">
+        <div class="date" v-if="messages.length > 0">
+          {{ format(messages[0].date, "PPP") }}
+        </div>
+      </div>
+    </div>
     <template v-for="(message, index) in messages" v-bind:key="message.uuid">
       <div
         v-if="
@@ -51,23 +66,34 @@ import { datesAreOnSameDay, getUserByUuid } from "@/utils";
 import { ref } from "vue";
 import { ArrowDownIcon } from "@heroicons/vue/solid";
 import { format } from "date-fns";
+import { HashtagIcon } from "@heroicons/vue/solid";
+import { Channel } from "@/dto/Channel";
 
 export default defineComponent({
   components: {
     ArrowDownIcon,
     MessageListItem,
+    HashtagIcon,
   },
   props: {
+    channel: {
+      type: Object as PropType<Channel>,
+      required: true,
+    },
+    messages: {
+      type: Array as PropType<Message[]>,
+      required: true,
+    },
+    reachedTop: {
+      type: Boolean,
+      default: false,
+    },
     user: {
       type: Object as PropType<User>,
       required: true,
     },
     users: {
       type: Array as PropType<User[]>,
-      required: true,
-    },
-    messages: {
-      type: Array as PropType<Message[]>,
       required: true,
     },
     editingMessageUuid: {
@@ -184,6 +210,39 @@ export default defineComponent({
   padding-bottom: 20px;
   overflow-y: scroll;
   position: relative;
+
+  .channel-intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .text {
+      padding: 20px;
+
+      .channel-name {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 10px;
+
+        svg {
+          width: 40px;
+          height: 40px;
+          margin-right: 10px;
+        }
+      }
+
+      .channel-description {
+        margin-top: 10px;
+      }
+    }
+
+    .date-separator {
+      margin: 5px 0px 12px 0px;
+    }
+  }
 
   .date-separator {
     position: relative;
