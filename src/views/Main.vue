@@ -54,7 +54,7 @@
               @sendMessage="sendMessage"
               @editLastMessage="editLastMessage"
             />
-            <TypingUsers :users="getTypingUsers(typingUsers)" />
+            <TypingUsers :users="getTypingUsers()" />
           </div>
         </div>
         <UserList :users="users" @setUserPopoutUuid="setUserPopoutUuid" />
@@ -226,19 +226,19 @@ export default defineComponent({
       userPopoutElement.value = element;
     };
 
-    const getTypingUsers = (typingUsers: TypingUser[]) => {
-      let users: User[] = [];
+    const getTypingUsers = () => {
+      let rusers: User[] = [];
       let now = new Date();
-      typingUsers.forEach((typing) => {
+      typingUsers.value.forEach((typing) => {
         if (
           typing.userUuid !== userUuid.value &&
           now.getTime() - typing.date.getTime() < 1000
         ) {
-          let user = users.find((user) => user.uuid === typing.userUuid);
-          if (user) users.push(user);
+          let user = users.value.find((user) => user.uuid === typing.userUuid);
+          if (user) rusers.push(user);
         }
       });
-      return users;
+      return rusers;
     };
 
     const cleanTypingUsers = () => {
