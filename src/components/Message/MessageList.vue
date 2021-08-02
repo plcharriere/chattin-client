@@ -1,19 +1,31 @@
 <template>
   <div ref="messageList" class="message-list">
-    <MessageListItem
-      v-for="(message, index) in messages"
-      v-bind:key="message.uuid"
-      :message="message"
-      :user="getUserByUuid(users, message.userUuid)"
-      :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
-      @setUserPopoutUuid="setUserPopoutUuid"
-      :canEdit="user.uuid === message.userUuid"
-      :editing="editingMessageUuid === message.uuid"
-      :canDelete="user.uuid === message.userUuid"
-      @editMessage="editMessage"
-      @deleteMessage="deleteMessage"
-      @setEditingMessageUuid="setEditingMessageUuid"
-    />
+    <template v-for="(message, index) in messages" v-bind:key="message.uuid">
+      <div
+        v-if="
+          index > 0
+            ? !datesAreOnSameDay(messages[index - 1].date, message.date)
+            : false
+        "
+        class="date-separator"
+      >
+        <div class="date">
+          {{ format(message.date, "PPP") }}
+        </div>
+      </div>
+      <MessageListItem
+        :message="message"
+        :user="getUserByUuid(users, message.userUuid)"
+        :showUser="index === 0 ? true : showUser(messages[index - 1], message)"
+        @setUserPopoutUuid="setUserPopoutUuid"
+        :canEdit="user.uuid === message.userUuid"
+        :editing="editingMessageUuid === message.uuid"
+        :canDelete="user.uuid === message.userUuid"
+        @editMessage="editMessage"
+        @deleteMessage="deleteMessage"
+        @setEditingMessageUuid="setEditingMessageUuid"
+      />
+    </template>
     <transition name="fade">
       <ArrowDownIcon
         v-if="showScrollBottomButton"
@@ -38,6 +50,7 @@ import MessageListItem from "@/components/Message/MessageListItem.vue";
 import { datesAreOnSameDay, getUserByUuid } from "@/utils";
 import { ref } from "vue";
 import { ArrowDownIcon } from "@heroicons/vue/solid";
+import { format } from "date-fns";
 
 export default defineComponent({
   components: {
@@ -144,6 +157,7 @@ export default defineComponent({
     return {
       messageList,
       showUser,
+      datesAreOnSameDay,
       editMessage,
       deleteMessage,
       setUserPopoutUuid,
@@ -152,12 +166,14 @@ export default defineComponent({
       showScrollBottomButton,
       getUserByUuid,
       setEditingMessageUuid,
+      format,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
+@import "~@/assets/scss/variables.scss";
 @import "~@/assets/scss/animations.scss";
 
 .message-list {
@@ -168,6 +184,26 @@ export default defineComponent({
   padding-bottom: 20px;
   overflow-y: scroll;
   position: relative;
+
+  .date-separator {
+    position: relative;
+    border-top: 1px solid $border-color;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .date {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: $light-color;
+      font-size: 12px;
+      background: $background-color;
+      padding: 0 10px;
+    }
+  }
 
   .scroll-bottom {
     position: fixed;
