@@ -1,5 +1,6 @@
 import { Channel } from "@/dto/Channel";
 import { User } from "@/dto/User";
+import { Embed, EmbedType } from "./dto/Embed";
 import { Message } from "./dto/Message";
 
 export function getChannelByUuid(
@@ -22,6 +23,10 @@ export function getMessagesByChannelUuid(
 
 export function getUserName(user: User): string {
   return user.nickname.length > 0 ? user.nickname : user.login;
+}
+
+export function getEmbedsByType(embeds: Embed[], type: EmbedType): Embed[] {
+  return embeds.filter((embed) => embed.type == type);
 }
 
 export function datesAreOnSameDay(first: Date, second: Date): boolean {

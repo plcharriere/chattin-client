@@ -16,7 +16,7 @@
     <div
       v-if="embeds.length > 0"
       class="embeds"
-      :class="{ 'below-text': message.content.length > 0 || editing }"
+      :class="{ below: message.content.length > 0 || editing }"
     >
       <Embed
         v-for="(embed, index) in embeds"
@@ -29,11 +29,12 @@
     <div
       class="files"
       :class="{
-        'below-text':
-          (embeds.length === 0 && message.content.length > 0) || editing,
-        'below-embeds': embeds.length > 0,
+        below: embeds.length > 0 || message.content.length > 0 || editing,
       }"
-      v-if="files.length > 0 && files.length !== embeds.length"
+      v-if="
+        files.length > 0 &&
+        files.length !== getEmbedsByType(embeds, EmbedType.IMAGE).length
+      "
     >
       <div class="file" v-for="file in files" v-bind:key="file" target="_blank">
         <a
@@ -71,7 +72,7 @@ import { computed, ref, watch } from "vue";
 import { httpUrl } from "@/env";
 import { useStore } from "vuex";
 import { getFileInformations } from "@/api/http";
-import { bytesToReadable } from "@/utils";
+import { bytesToReadable, getEmbedsByType } from "@/utils";
 import Embed from "@/components/Embed/Embed.vue";
 
 export default defineComponent({
@@ -273,6 +274,7 @@ export default defineComponent({
       bytesToReadable,
       EmbedType,
       openEmbedViewer,
+      getEmbedsByType,
     };
   },
 });
@@ -292,7 +294,7 @@ export default defineComponent({
     align-items: flex-end;
     gap: 10px;
 
-    &.below-text {
+    &.below {
       margin-top: 10px;
     }
 
@@ -305,19 +307,16 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    gap: 10px;
 
-    &.below-text {
+    &.below {
       margin-top: 10px;
-    }
-    &.below-embeds {
-      margin-top: 5px;
     }
 
     .file {
       background: $file-background;
       color: $default-color;
       padding: 10px;
-      margin-right: 10px;
       border: 1px solid $border-color;
       border-radius: 5px;
       display: flex;
