@@ -23,6 +23,7 @@
           :editing="editing"
           @saveEditing="saveEditing"
           @cancelEditing="disableEditing"
+          @openEmbedViewer="openEmbedViewer"
         />
       </div>
     </template>
@@ -33,6 +34,7 @@
         :editing="editing"
         @saveEditing="saveEditing"
         @cancelEditing="disableEditing"
+        @openEmbedViewer="openEmbedViewer"
       />
     </template>
     <div class="actions" v-if="!editing">
@@ -56,6 +58,7 @@ import UserName from "@/components/User/UserName.vue";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { TrashIcon } from "@heroicons/vue/solid";
 import MessageListItemContent from "@/components/Message/MessageListItemContent.vue";
+import { Embed } from "@/dto/Embed";
 
 export default defineComponent({
   components: {
@@ -122,6 +125,10 @@ export default defineComponent({
       emit("deleteMessage", props.message.uuid);
     };
 
+    const openEmbedViewer = (embeds: Embed[], embedIndex: number) => {
+      emit("openEmbedViewer", embeds, embedIndex);
+    };
+
     return {
       enableEditing,
       disableEditing,
@@ -129,6 +136,7 @@ export default defineComponent({
       setUserPopoutUuid,
       getMessageDateString,
       deleteMessage,
+      openEmbedViewer,
     };
   },
 });

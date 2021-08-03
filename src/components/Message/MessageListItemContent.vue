@@ -18,39 +18,13 @@
       class="embeds"
       :class="{ 'below-text': message.content.length > 0 || editing }"
     >
-      <div v-for="embed in embeds" v-bind:key="embed">
-        <a
-          v-if="embed.type === EmbedType.IMAGE"
-          :href="embed.source"
-          target="_blank"
-        >
-          <img :src="embed.source" />
-        </a>
-        <video v-else-if="embed.type === EmbedType.VIDEO" controls>
-          <source :src="embed.source" />
-        </video>
-        <audio v-else-if="embed.type === EmbedType.AUDIO" controls>
-          <source :src="embed.source" />
-        </audio>
-        <iframe
-          v-else-if="embed.type === EmbedType.YOUTUBE"
-          class="youtube"
-          :src="`https://www.youtube.com/embed/${embed.source}`"
-          frameborder="0"
-          allow="encrypted-media"
-        ></iframe>
-        <iframe
-          v-else-if="embed.type === EmbedType.SPOTIFY"
-          :class="{
-            'spotify-track': embed.source.slice(0, 6) === 'track/',
-            'spotify-album': embed.source.slice(0, 6) === 'album/',
-          }"
-          :src="`https://open.spotify.com/embed/${embed.source}`"
-          frameborder="0"
-          allowtransparency="true"
-          allow="encrypted-media"
-        ></iframe>
-      </div>
+      <Embed
+        v-for="(embed, index) in embeds"
+        v-bind:key="embed"
+        class="embed"
+        :embed="embed"
+        @click="openEmbedViewer(index)"
+      />
     </div>
     <div
       class="files"
@@ -88,7 +62,7 @@
 <script lang="ts">
 import { File } from "@/dto/File";
 import { Message } from "@/dto/Message";
-import { Embed, EmbedType } from "@/dto/Embed";
+import { Embed as EmbedT, EmbedType } from "@/dto/Embed";
 import { defineComponent, PropType } from "@vue/runtime-core";
 import { CheckIcon } from "@heroicons/vue/solid";
 import { XIcon } from "@heroicons/vue/solid";
@@ -98,12 +72,14 @@ import { httpUrl } from "@/env";
 import { useStore } from "vuex";
 import { getFileInformations } from "@/api/http";
 import { bytesToReadable } from "@/utils";
+import Embed from "@/components/Embed/Embed.vue";
 
 export default defineComponent({
   components: {
     CheckIcon,
     XIcon,
     DocumentDownloadIcon,
+    Embed,
   },
   props: {
     message: {
@@ -170,7 +146,7 @@ export default defineComponent({
     });
 
     const embeds = computed(() => {
-      const embeds: Embed[] = [];
+      const embeds: EmbedT[] = [];
 
       const youtubeLinks = props.message.content.matchAll(
         /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9-_]+)/g
@@ -179,7 +155,7 @@ export default defineComponent({
         embeds.push({
           type: EmbedType.YOUTUBE,
           source: youtubeLink[1],
-        } as Embed);
+        } as EmbedT);
       }
 
       const spotifyLinks = props.message.content.matchAll(
@@ -189,7 +165,7 @@ export default defineComponent({
         embeds.push({
           type: EmbedType.SPOTIFY,
           source: spotifyLink[1],
-        } as Embed);
+        } as EmbedT);
       }
 
       files.value.forEach((file) => {
@@ -209,7 +185,7 @@ export default defineComponent({
           embeds.push({
             type: EmbedType.IMAGE,
             source: `${httpUrl}/files/${file.uuid}/${file.name}`,
-          } as Embed);
+          } as EmbedT);
         } else if (
           [
             "video/3gpp",
@@ -227,7 +203,7 @@ export default defineComponent({
           embeds.push({
             type: EmbedType.VIDEO,
             source: `${httpUrl}/files/${file.uuid}/${file.name}`,
-          } as Embed);
+          } as EmbedT);
         } else if (
           [
             "audio/basic",
@@ -249,7 +225,7 @@ export default defineComponent({
           embeds.push({
             type: EmbedType.AUDIO,
             source: `${httpUrl}/files/${file.uuid}/${file.name}`,
-          } as Embed);
+          } as EmbedT);
         }
       });
       return embeds;
@@ -280,6 +256,11 @@ export default defineComponent({
       emit("cancelEditing");
     };
 
+    const openEmbedViewer = (embedIndex: number) => {
+      console.log("messagelistitemcontent");
+      emit("openEmbedViewer", embeds.value, embedIndex);
+    };
+
     return {
       httpUrl,
       editTextarea,
@@ -291,6 +272,7 @@ export default defineComponent({
       cancelEditing,
       bytesToReadable,
       EmbedType,
+      openEmbedViewer,
     };
   },
 });
@@ -308,31 +290,14 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
+    gap: 10px;
 
     &.below-text {
       margin-top: 10px;
     }
 
-    img,
-    video,
-    audio,
-    iframe {
-      max-width: 400px;
-      max-height: 300px;
-      margin-right: 8px;
-      outline: 0;
-      border-radius: 3px;
-    }
-
-    .youtube,
-    .spotify-album {
-      width: 400px;
-      height: 225px;
-    }
-
-    .spotify-track {
-      width: 400px;
-      height: 80px;
+    img {
+      cursor: pointer;
     }
   }
 

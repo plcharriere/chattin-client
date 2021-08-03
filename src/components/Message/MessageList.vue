@@ -39,6 +39,7 @@
         @editMessage="editMessage"
         @deleteMessage="deleteMessage"
         @setEditingMessageUuid="setEditingMessageUuid"
+        @openEmbedViewer="openEmbedViewer"
       />
     </template>
     <transition name="fade">
@@ -68,6 +69,7 @@ import { ArrowDownIcon } from "@heroicons/vue/solid";
 import { format } from "date-fns";
 import { HashtagIcon } from "@heroicons/vue/solid";
 import { Channel } from "@/dto/Channel";
+import { Embed } from "@/dto/Embed";
 
 export default defineComponent({
   components: {
@@ -180,6 +182,10 @@ export default defineComponent({
       });
     };
 
+    const openEmbedViewer = (embeds: Embed[], embedIndex: number) => {
+      emit("openEmbedViewer", embeds, embedIndex);
+    };
+
     return {
       messageList,
       showUser,
@@ -193,6 +199,7 @@ export default defineComponent({
       getUserByUuid,
       setEditingMessageUuid,
       format,
+      openEmbedViewer,
     };
   },
 });

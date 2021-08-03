@@ -15,6 +15,14 @@
         :user="getUserByUuid(users, userUuid)"
         :closeCallback="toggleUserSettings"
       />
+      <transition name="fade">
+        <EmbedViewer
+          v-if="viewEmbeds.length > 0"
+          :embeds="viewEmbeds"
+          :embedIndex="viewEmbedIndex"
+          :closeCallback="closeEmbedViewer"
+        />
+      </transition>
       <div class="infos">
         <div class="server">
           <span class="name">{{ serverName }}</span
@@ -50,6 +58,7 @@
             @editMessage="editMessage"
             @deleteMessage="deleteMessage"
             @setEditingMessageUuid="setEditingMessageUuid"
+            @openEmbedViewer="openEmbedViewer"
           />
           <div class="message">
             <MessageInput
@@ -89,6 +98,7 @@ import UserSettings from "@/components/User/UserSettings/UserSettings.vue";
 import MessageInput from "@/components/Message/MessageInput.vue";
 import UserPopout from "@/components/User/UserPopout.vue";
 import TypingUsers from "@/components/TypingUsers.vue";
+import EmbedViewer from "@/components/Embed/EmbedViewer.vue";
 import { webSocketUrl } from "@/env";
 import { getChannelMessages, getChannels, getUsers } from "@/api/http";
 import { sendPacket, sendPacketMessage } from "@/api/ws";
@@ -102,6 +112,7 @@ import { useStore } from "vuex";
 import { defineComponent, watch } from "@vue/runtime-core";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { Embed } from "@/dto/Embed";
 
 export default defineComponent({
   components: {
@@ -115,6 +126,7 @@ export default defineComponent({
     UserList,
     UserPopout,
     TypingUsers,
+    EmbedViewer,
   },
   setup() {
     const store = useStore();
@@ -151,6 +163,18 @@ export default defineComponent({
     const serverDescription = store.state.configuration.description;
 
     const unreadMessageCount = ref(0);
+
+    const viewEmbeds = ref([] as Embed[]);
+    const viewEmbedIndex = ref(0);
+
+    const openEmbedViewer = (embeds: Embed[], embedIndex: number) => {
+      viewEmbeds.value = embeds;
+      viewEmbedIndex.value = embedIndex;
+    };
+
+    const closeEmbedViewer = () => {
+      viewEmbeds.value = [];
+    };
 
     watch(channelUuid, () => {
       const channel = getChannelByUuid(channels.value, channelUuid.value);
@@ -525,6 +549,11 @@ export default defineComponent({
       getUserByUuid,
       getChannelByUuid,
       getMessagesByChannelUuid,
+
+      openEmbedViewer,
+      closeEmbedViewer,
+      viewEmbeds,
+      viewEmbedIndex,
     };
   },
 });

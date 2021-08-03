@@ -56,6 +56,19 @@ input, textarea {
 	&:hover {
 		color: $icon-button-hover-color;
 	}
+
+	&.light {
+		color: #ccc;
+
+		&:hover {
+			color: #fff;
+		}
+
+		&.disabled {
+			cursor: initial;
+			color: #444;
+		}
+	}
 }
 
 a {
