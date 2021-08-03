@@ -33,7 +33,10 @@
       }"
       v-if="
         files.length > 0 &&
-        files.length !== getEmbedsByType(embeds, EmbedType.IMAGE).length
+        files.length !==
+          getEmbedsByType(embeds, EmbedType.IMAGE).length +
+            getEmbedsByType(embeds, EmbedType.VIDEO).length +
+            getEmbedsByType(embeds, EmbedType.AUDIO).length
       "
     >
       <div class="file" v-for="file in files" v-bind:key="file" target="_blank">
