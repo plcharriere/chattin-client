@@ -1,6 +1,6 @@
 <template>
-  <div class="modal-container">
-    <div class="modal" ref="modal">
+  <div ref="modalContainer" class="modal-container">
+    <div class="modal">
       <slot></slot>
       <XIcon class="close" @click="closeCallback" />
     </div>
@@ -23,21 +23,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const modal = ref();
+    const modalContainer = ref();
 
     let onDocumentClick = (e: MouseEvent) => {
-      if (
-        modal.value &&
-        !(modal.value === e.target || modal.value.contains(e.target))
-      ) {
-        if (
-          !(e.target as HTMLElement).closest(".open-modal") &&
-          !(e.target as HTMLElement).closest(".modal") &&
-          !(e.target as HTMLElement).closest(".user") // prevent closing modal when clicking avatar in user profile settings, need to find a fix for this
-        ) {
-          props.closeCallback();
-        }
-      }
+      if (e.target === modalContainer.value) props.closeCallback();
     };
     document.body.addEventListener("click", onDocumentClick);
     onUnmounted(() => {
@@ -45,7 +34,7 @@ export default defineComponent({
     });
 
     return {
-      modal,
+      modalContainer,
     };
   },
 });

@@ -7,7 +7,7 @@
     </div>
     <transition name="slide-down">
       <div ref="dropdown" class="dropdown" v-if="dropdownActive">
-        <div class="item open-modal" @click="openUserSettings">
+        <div class="item" @click="openUserSettings">
           <CogIcon />
           My settings
         </div>
