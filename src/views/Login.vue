@@ -68,7 +68,7 @@ export default defineComponent({
             .catch((e) => {
               error.value =
                 e.response.status === 401
-                  ? "Wrong credentials"
+                  ? "Wrong credentials."
                   : "Unexpected error";
               loading.value = false;
             });
@@ -127,7 +127,7 @@ export default defineComponent({
       margin-bottom: 20px;
 
       .name {
-        font-size: 25px;
+        font-size: 32px;
         font-weight: 600;
         margin-bottom: 10px;
       }

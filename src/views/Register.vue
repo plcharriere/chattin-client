@@ -5,7 +5,7 @@
         <span class="name">{{ name }}</span>
         <span class="description">{{ description }}</span>
       </div>
-      <span>{{ error.length > 0 ? error : "Register" }}</span>
+      <span v-if="error.length > 0" class="error">{{ error }}</span>
       <input
         type="text"
         id="login"
@@ -18,7 +18,13 @@
         placeholder="Password"
         :disabled="loading"
       />
-      <button @click="register" :disabled="loading">Sign up</button>
+      <input
+        type="password"
+        id="confirm-password"
+        placeholder="Confirm password"
+        :disabled="loading"
+      />
+      <button class="btn" @click="register" :disabled="loading">Sign up</button>
       <span class="login" @click="login">Login</span>
     </div>
   </div>
@@ -46,29 +52,40 @@ export default defineComponent({
 
       const register = () => {
         loading.value = true;
-        const formData = new FormData();
-        formData.append(
-          "login",
-          (document.getElementById("login") as HTMLInputElement).value
-        );
-        formData.append(
-          "password",
-          (document.getElementById("password") as HTMLInputElement).value
-        );
 
-        axios.post(httpUrl + "/users/register", formData).then((resp) => {
-          if (resp.status === 200) {
-            store.state.token = resp.data;
-            localStorage.setItem("token", resp.data);
-            router.push("/");
-          } else {
-            error.value =
-              resp.status === 409
-                ? "Username already taken"
-                : "Unexpected error";
-            loading.value = false;
-          }
-        });
+        const login = (document.getElementById("login") as HTMLInputElement)
+          .value;
+        const password = (
+          document.getElementById("password") as HTMLInputElement
+        ).value;
+        const confirmPassword = (
+          document.getElementById("confirm-password") as HTMLInputElement
+        ).value;
+
+        if (password !== confirmPassword) {
+          error.value = "Passwords do not match.";
+
+          loading.value = false;
+        } else {
+          const formData = new FormData();
+          formData.append("login", login);
+          formData.append("password", password);
+
+          axios
+            .post(httpUrl + "/users/register", formData)
+            .then((resp) => {
+              store.state.token = resp.data;
+              localStorage.setItem("token", resp.data);
+              router.push("/");
+            })
+            .catch((e) => {
+              error.value =
+                e.response.status === 409
+                  ? "Username is already taken."
+                  : "Unexpected error.";
+              loading.value = false;
+            });
+        }
       };
 
       const login = () => {
@@ -94,7 +111,7 @@ export default defineComponent({
 .register {
   width: 100%;
   height: 100%;
-  padding: 15px;
+  background: #eee;
   box-sizing: border-box;
 
   display: flex;
@@ -104,20 +121,26 @@ export default defineComponent({
   align-items: center;
 
   .container {
-    width: 250px;
+    width: 300px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 30px;
 
     .infos {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      margin-bottom: 20px;
 
       .name {
-        font-size: 25px;
+        font-size: 32px;
         font-weight: 600;
         margin-bottom: 10px;
       }
@@ -125,35 +148,23 @@ export default defineComponent({
       .description {
         color: $light-color;
         font-size: 13px;
-        margin-bottom: 25px;
       }
     }
 
-    span {
-      margin-bottom: 20px;
-      text-align: center;
-      line-height: 18px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 30px;
+    input {
       border-radius: 20px;
-      border: 0;
-      background: #ccc;
-      outline: 0;
-      cursor: pointer;
-      transition: all 300ms;
+      padding: 10px 20px;
+    }
 
-      &:hover {
-        background: #bbb;
-        transform: scale(1.06);
-      }
+    .error {
+      color: rgb(220, 0, 0);
+      margin-bottom: 20px;
     }
 
     .login {
       cursor: pointer;
       margin-top: 20px;
+      margin-bottom: 0;
       text-decoration: underline;
       font-size: 12px;
     }
