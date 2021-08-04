@@ -64,9 +64,18 @@ export default defineComponent({
     let onDocumentClick = (e: MouseEvent) => {
       if (e.target && e.target === embedViewer.value) props.closeCallback();
     };
+    let onDocumentKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") previousEmbed();
+      else if (e.key === "ArrowRight") nextEmbed();
+      else if (e.key === "Enter")
+        window.open(props.embeds[index.value].source, "_blank")?.focus();
+      else if (e.key === "Escape") props.closeCallback();
+    };
     document.body.addEventListener("click", onDocumentClick);
+    document.body.addEventListener("keydown", onDocumentKeyDown);
     onUnmounted(() => {
       document.body.removeEventListener("click", onDocumentClick);
+      document.body.removeEventListener("keydown", onDocumentKeyDown);
     });
 
     return {

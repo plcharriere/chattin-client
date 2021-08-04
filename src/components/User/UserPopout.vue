@@ -116,7 +116,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   width: 300px;
-  z-index: 2;
+  z-index: 3;
 
   .infos {
     display: flex;
