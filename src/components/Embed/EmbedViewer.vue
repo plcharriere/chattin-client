@@ -20,6 +20,7 @@
         @click="nextEmbed()"
       />
     </div>
+    <XCircleIcon class="icon-btn light" @click="closeCallback()" />
   </div>
 </template>
 
@@ -29,12 +30,14 @@ import Embed from "@/components/Embed/Embed.vue";
 import { defineComponent, onUnmounted, PropType, ref } from "vue";
 import { ChevronLeftIcon } from "@heroicons/vue/outline";
 import { ChevronRightIcon } from "@heroicons/vue/outline";
+import { XCircleIcon } from "@heroicons/vue/outline";
 
 export default defineComponent({
   components: {
     Embed,
     ChevronLeftIcon,
     ChevronRightIcon,
+    XCircleIcon,
   },
   props: {
     embeds: {
@@ -99,17 +102,10 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: 50px;
+  padding: 40px;
   box-sizing: border-box;
   user-select: none;
-
-  .close-btn {
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    right: -45px;
-    top: 5px;
-  }
+  gap: 20px;
 
   .embed {
     margin: auto;
@@ -122,18 +118,17 @@ export default defineComponent({
   .icon-btn {
     width: 40px;
     height: 40px;
-
-    margin: 0 50px;
+    overflow: visible;
   }
 
   .navigation {
-    margin-top: 20px;
     display: flex;
     flex-direction: row;
     align-items: center;
     color: #fff;
     font-size: 16px;
     word-spacing: 10px;
+    gap: 40px;
   }
 
   img,
