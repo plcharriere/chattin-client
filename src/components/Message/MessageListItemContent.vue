@@ -295,7 +295,7 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 10px;
+    gap: 8px;
 
     &.below {
       margin-top: 10px;
@@ -310,7 +310,7 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 
     &.below {
       margin-top: 10px;
