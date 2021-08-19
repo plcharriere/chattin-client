@@ -27,6 +27,7 @@ export default defineComponent({
     const items: string[] = [
       "Profile",
       "Avatars",
+      "Interface",
       // "Messages",
       // "Files",
       // "Security",

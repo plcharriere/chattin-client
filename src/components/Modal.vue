@@ -55,6 +55,7 @@ export default defineComponent({
     position: relative;
     background: var(--background-color);
     width: 800px;
+    min-height: 400px;
     border-radius: 10px;
     display: flex;
     flex-direction: row;

@@ -8,7 +8,7 @@ import { defineComponent, onMounted } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import Loading from "@/components/Loading.vue";
 import { getConfiguration } from "./api/http";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 export default defineComponent({
   components: {
@@ -25,6 +25,22 @@ export default defineComponent({
 
     const token = localStorage.getItem("token");
     if (token) store.state.token = token;
+
+    watch(
+      () => store.state.darkMode,
+      () => {
+        if (store.state.darkMode) {
+          document.querySelector("#app")?.classList.add("dark");
+          localStorage.setItem("darkMode", "");
+        } else {
+          document.querySelector("#app")?.classList.remove("dark");
+          localStorage.removeItem("darkMode");
+        }
+      }
+    );
+
+    const darkMode = localStorage.getItem("darkMode");
+    store.state.darkMode = darkMode !== null ? true : false;
 
     return {
       loading,

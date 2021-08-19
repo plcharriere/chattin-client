@@ -7,6 +7,7 @@
       @setMenuIndex="setMenuIndex"
     />
     <UserSettingsAvatars v-if="menuIndex === 1" :user="user" />
+    <UserSettingsInterface v-if="menuIndex === 2" />
   </Modal>
 </template>
 
@@ -17,6 +18,7 @@ import Modal from "@/components/Modal.vue";
 import UserSettingsMenu from "@/components/User/UserSettings/UserSettingsMenu.vue";
 import UserSettingsProfile from "@/components/User/UserSettings/UserSettingsProfile.vue";
 import UserSettingsAvatars from "@/components/User/UserSettings/UserSettingsAvatars.vue";
+import UserSettingsInterface from "@/components/User/UserSettings/UserSettingsInterface.vue";
 import { ref } from "vue";
 
 export default defineComponent({
@@ -25,6 +27,7 @@ export default defineComponent({
     UserSettingsMenu,
     UserSettingsProfile,
     UserSettingsAvatars,
+    UserSettingsInterface,
   },
   props: {
     user: {
