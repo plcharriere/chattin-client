@@ -46,14 +46,12 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .menu {
   flex-shrink: 0;
   width: 150px;
   padding-right: 20px;
   margin-right: 30px;
-  border-right: 1px solid $border-color;
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -65,7 +63,7 @@ export default defineComponent({
 
     &:hover,
     &.active {
-      background: $hover-color;
+      background: var(--hover-color);
       border-radius: 5px;
     }
   }

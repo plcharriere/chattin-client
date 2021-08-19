@@ -155,7 +155,6 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import "~@/assets/scss/animations.scss";
-@import "~@/assets/scss/variables.scss";
 
 .message-input {
   border-radius: 10px;
@@ -164,7 +163,7 @@ export default defineComponent({
   .files-container {
     display: flex;
     flex-direction: column;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     padding: 10px;
     border-radius: 10px 10px 0 0;
     position: relative;
@@ -180,15 +179,15 @@ export default defineComponent({
         display: flex;
         flex-direction: row;
         padding: 10px;
-        border: 1px solid $border-color;
-        background: $file-background;
+        border: 1px solid var(--border-color);
+        background: var(--file-background);
         align-items: center;
         margin-right: 10px;
         margin-bottom: 10px;
         border-radius: 10px;
 
         &:hover {
-          background: $file-hover-background;
+          background: var(--file-hover-background);
         }
 
         svg {
@@ -212,12 +211,12 @@ export default defineComponent({
     flex-direction: row;
     align-items: center;
     padding: 15px;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     resize: none;
     margin: 0;
     position: relative;
-    background: $background-color;
+    background: var(--background-color);
     z-index: 2;
 
     input[type="file"] {

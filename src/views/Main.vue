@@ -560,7 +560,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
 @import "~@/assets/scss/animations.scss";
 
 .main {
@@ -589,16 +588,16 @@ export default defineComponent({
       }
 
       .description {
-        color: $light-color;
+        color: var(--light-color);
         font-size: 12px;
       }
     }
 
     & > div {
-      background: #fff;
+      background: var(--background-color);
       z-index: 2;
-      border-right: 1px solid $border-color;
-      border-bottom: 1px solid $border-color;
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
     }
 
     div:last-child {
@@ -612,7 +611,7 @@ export default defineComponent({
     flex-direction: row;
 
     & > div {
-      border-right: 1px solid $border-color;
+      border-right: 1px solid var(--border-color);
     }
 
     div:last-child {

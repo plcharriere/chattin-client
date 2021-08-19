@@ -35,6 +35,7 @@ export default defineComponent({
 
 <style lang="scss">
 @import "~@/assets/scss/global.scss";
+@import "~@/assets/scss/variables.scss";
 
 html,
 body,
@@ -42,11 +43,11 @@ body,
   width: 100%;
   height: 100%;
   margin: 0;
-  background: $background-color;
+  background: var(--background-color);
   box-sizing: border-box;
-  color: $default-color;
+  color: var(--default-color);
   overflow: hidden;
-  scrollbar-color: $scrollbar-thumb-color $scrollbar-track-color;
+  scrollbar-color: --scrollbar-thumb-color var(--scrollbar-track-color);
 }
 html,
 body,
@@ -61,14 +62,14 @@ textarea {
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
-  background: $scrollbar-track-color;
+  background: var(--scrollbar-track-color);
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: $scrollbar-thumb-color;
+  background: var(--scrollbar-thumb-color);
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: $scrollbar-thumb-hover-color;
+  background: var(--scrollbar-thumb-hover-color);
 }
 </style>

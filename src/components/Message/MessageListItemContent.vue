@@ -284,8 +284,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .message-list-item-content {
   display: flex;
   flex-direction: column;
@@ -317,17 +315,17 @@ export default defineComponent({
     }
 
     .file {
-      background: $file-background;
-      color: $default-color;
+      background: var(--file-background);
+      color: var(--default-color);
       padding: 10px;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border-color);
       border-radius: 5px;
       display: flex;
       flex-direction: row;
       align-items: center;
 
       &:hover {
-        background: $file-hover-background;
+        background: var(--file-hover-background);
       }
 
       .infos {
@@ -336,13 +334,13 @@ export default defineComponent({
         flex-direction: column;
 
         a {
-          color: $default-color;
+          color: var(--default-color);
         }
 
         .secondary {
           display: flex;
           flex-direction: row;
-          color: $light-color;
+          color: var(--light-color);
           font-size: 12px;
           justify-content: space-between;
         }
@@ -361,19 +359,19 @@ export default defineComponent({
 
     .edited {
       font-size: 12px;
-      color: $lighter-color;
+      color: var(--lighter-color);
       margin-left: 8px;
       align-self: flex-end;
     }
   }
 
   .editing {
-    background: $background-color;
+    background: var(--background-color);
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 5px 10px;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     resize: none;
     margin: 0;

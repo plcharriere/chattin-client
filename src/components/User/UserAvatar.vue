@@ -121,8 +121,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .user-avatar {
   position: relative;
   border-radius: 100%;
@@ -160,8 +158,8 @@ export default defineComponent({
   }
 
   &.default {
-    color: $default-avatar-icon-color;
-    background-color: $default-avatar-background-color;
+    color: var(--default-avatar-icon-color);
+    background-color: var(--default-avatar-background-color);
     display: flex;
     align-items: center;
     justify-content: center;

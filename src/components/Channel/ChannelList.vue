@@ -44,8 +44,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .channel-list {
   min-width: 200px;
   padding: 20px;
@@ -68,7 +66,7 @@ export default defineComponent({
 
     &.active,
     &:hover {
-      background: $hover-color;
+      background: var(--hover-color);
       border-radius: 5px;
     }
 

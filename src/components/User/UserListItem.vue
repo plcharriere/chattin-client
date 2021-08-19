@@ -72,8 +72,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .user-list-item {
   display: flex;
   flex-direction: row;
@@ -93,7 +91,7 @@ export default defineComponent({
   &:hover,
   &.active {
     opacity: 1;
-    background: $hover-color;
+    background: var(--hover-color);
     border-radius: 5px;
   }
 }

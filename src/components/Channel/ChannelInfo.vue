@@ -32,8 +32,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .channel-info {
   flex-grow: 1;
   display: flex;
@@ -53,7 +51,7 @@ export default defineComponent({
   }
 
   .separator {
-    border-left: 1px solid $border-color;
+    border-left: 1px solid var(--border-color);
     width: 1px;
     height: 100%;
     margin: 0 20px;

@@ -165,8 +165,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .avatars {
   width: 100%;
   display: flex;
@@ -185,7 +183,7 @@ export default defineComponent({
 
       .remove {
         cursor: pointer;
-        color: $link-color;
+        color: var(--link-color);
         margin-top: 8px;
         font-size: 13px;
 
@@ -214,7 +212,7 @@ export default defineComponent({
     flex-direction: row;
     flex-wrap: wrap;
     margin-top: 20px;
-    border-top: 1px solid $border-color;
+    border-top: 1px solid var(--border-color);
     padding: 20px 0;
 
     &.empty {
@@ -223,7 +221,7 @@ export default defineComponent({
       align-items: center;
 
       span {
-        color: $light-color;
+        color: var(--light-color);
       }
     }
     .item {
@@ -237,11 +235,11 @@ export default defineComponent({
         width: 16px;
         height: 16px;
         margin-top: 8px;
-        color: $icon-button-color;
+        color: var(--icon-button-color);
 
         &:hover {
           text-decoration: underline;
-          color: $icon-button-hover-color;
+          color: var(--icon-button-hover-color);
         }
       }
     }

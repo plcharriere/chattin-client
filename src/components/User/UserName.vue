@@ -51,14 +51,12 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .user-name {
   display: flex;
   flex-direction: column;
 
   .login {
-    color: $light-color;
+    color: var(--light-color);
     margin-top: 2px;
   }
 

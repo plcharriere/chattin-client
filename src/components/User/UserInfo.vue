@@ -90,7 +90,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
 @import "~@/assets/scss/animations.scss";
 
 .user-info {
@@ -106,15 +105,15 @@ export default defineComponent({
     height: 100%;
     padding: 0 20px;
     align-items: center;
-    background: $background-color;
-    border-bottom: 1px solid $border-color;
+    background: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
 
     .user-name {
       padding-left: 10px;
     }
 
     &:hover {
-      background: $hover-color;
+      background: var(--hover-color);
       cursor: pointer;
     }
 
@@ -135,7 +134,7 @@ export default defineComponent({
     z-index: 1;
     display: flex;
     flex-direction: column;
-    background: $background-color;
+    background: var(--background-color);
     border-radius: 0 0 10px 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -153,7 +152,7 @@ export default defineComponent({
       }
 
       &:hover {
-        background: $hover-color;
+        background: var(--hover-color);
       }
 
       svg {
@@ -164,7 +163,7 @@ export default defineComponent({
     }
 
     .separator {
-      border-top: 1px solid $hover-color;
+      border-top: 1px solid var(--hover-color);
       padding: 0 20px;
       margin: 0 15px;
     }

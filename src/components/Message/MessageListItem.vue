@@ -143,8 +143,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .message-list-item {
   display: flex;
   flex-direction: row;
@@ -152,7 +150,7 @@ export default defineComponent({
   padding: 6px 20px 6px 0;
 
   &:hover {
-    background: $hover-color;
+    background: var(--hover-color);
 
     .date {
       &.small {
@@ -166,7 +164,7 @@ export default defineComponent({
 
   .date {
     font-size: 12px;
-    color: $lighter-color;
+    color: var(--lighter-color);
 
     &.small {
       visibility: hidden;

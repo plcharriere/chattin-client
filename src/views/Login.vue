@@ -93,8 +93,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .login {
   width: 100%;
   height: 100%;
@@ -113,7 +111,7 @@ export default defineComponent({
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #fff;
+    background: var(--background-color);
     border-radius: 10px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -133,7 +131,7 @@ export default defineComponent({
       }
 
       .description {
-        color: $light-color;
+        color: var(--light-color);
         font-size: 13px;
       }
     }

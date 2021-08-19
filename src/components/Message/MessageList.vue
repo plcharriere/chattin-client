@@ -206,7 +206,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
 @import "~@/assets/scss/animations.scss";
 
 .message-list {
@@ -253,7 +252,7 @@ export default defineComponent({
 
   .date-separator {
     position: relative;
-    border-top: 1px solid $border-color;
+    border-top: 1px solid var(--border-color);
     margin: 20px;
     display: flex;
     justify-content: center;
@@ -264,9 +263,9 @@ export default defineComponent({
       display: flex;
       justify-content: center;
       align-items: center;
-      color: $light-color;
+      color: var(--light-color);
       font-size: 12px;
-      background: $background-color;
+      background: var(--background-color);
       padding: 0 10px;
     }
   }

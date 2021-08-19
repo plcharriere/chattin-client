@@ -69,8 +69,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .user-list {
   display: flex;
   flex-direction: column;
@@ -97,7 +95,7 @@ export default defineComponent({
         height: 1px;
         width: 100%;
         flex-grow: 1;
-        border-top: 1px solid $border-color;
+        border-top: 1px solid var(--border-color);
         margin: 0px 16px;
       }
     }

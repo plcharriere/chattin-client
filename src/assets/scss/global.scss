@@ -1,14 +1,14 @@
-@import "~@/assets/scss/variables.scss";
-
 input, textarea {
 	width: 100%;
 	max-width: 100%;
+	background: var(--background-color);
+	color: var(--default-color);
 	padding: 8px 14px;
 	border-radius: 5px;
 	font-size: 15px;
 	margin-bottom: 20px;
 	outline: 0;
-	border: 1px solid $border-color;
+	border: 1px solid var(--border-color);
 	box-sizing: border-box;
 	resize: none;
 	transition: all 300ms;
@@ -49,12 +49,12 @@ input, textarea {
 }
 
 .icon-btn {
-	color: $icon-button-color;
+	color: var(--icon-button-color);
 	cursor: pointer;
 	transition: color 200ms;
 
 	&:hover {
-		color: $icon-button-hover-color;
+		color: var(--icon-button-hover-color);
 	}
 
 	&.light {
@@ -72,7 +72,7 @@ input, textarea {
 }
 
 a {
-	color: $link-color;
+	color: var(--link-color);
 	text-decoration: none;
 
 	&:hover {

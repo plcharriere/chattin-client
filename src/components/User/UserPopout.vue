@@ -102,17 +102,15 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/scss/variables.scss";
-
 .user-popout {
   transition: all 200ms;
   position: absolute;
-  background: #fff;
+  background: var(--background-color);
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -138,7 +136,7 @@ export default defineComponent({
     .separator {
       display: flex;
       flex-direction: row;
-      color: $lighter-color;
+      color: var(--lighter-color);
       font-size: 13px;
       align-items: center;
       margin-bottom: 10px;
@@ -146,7 +144,7 @@ export default defineComponent({
       div {
         width: 100%;
         margin-left: 10px;
-        border-top: 1px solid $border-color;
+        border-top: 1px solid var(--border-color);
       }
     }
   }
