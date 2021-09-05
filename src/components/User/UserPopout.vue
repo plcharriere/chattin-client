@@ -9,7 +9,7 @@
   >
     <div class="infos">
       <UserAvatar :user="user" size="medium" />
-      <UserName :user="user" :showLogin="true" />
+      <UserName :user="user" :showUserLogin="true" />
     </div>
     <div class="bio" v-if="user.bio.length > 0">
       <div class="separator">
