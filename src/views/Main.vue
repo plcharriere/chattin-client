@@ -198,14 +198,12 @@ export default defineComponent({
     watch(
       messages,
       () => {
-        messages.value = messages.value.sort(
-          (message1: Message, message2: Message) => {
-            return (
-              new Date(message1.date).getTime() -
-              new Date(message2.date).getTime()
-            );
-          }
-        );
+        messages.value = messages.value.sort((message1: any, message2: any) => {
+          return (
+            new Date(message1.date).getTime() -
+            new Date(message2.date).getTime()
+          );
+        });
       },
       {
         deep: true,
@@ -339,7 +337,9 @@ export default defineComponent({
       users.value = await getUsers(store.state.token);
     };
 
-    const setChannelUuid = (uuid: string, notify = true) => {
+    const setChannelUuid = async (uuid: string, notify = true) => {
+      if (uuid === channelUuid.value) return;
+      router.push(`/channels/${uuid}`);
       channelUuid.value = uuid;
       const channel = getChannelByUuid(channels.value, uuid);
       if (channel) channel.unread = false;
@@ -349,7 +349,7 @@ export default defineComponent({
           .length === 0
       ) {
         if (channel) {
-          if (channel.saveMessages) fetchChannelMessages();
+          if (channel.saveMessages) await fetchChannelMessages();
           else channel.loadedAllMessages = true;
         }
       }
@@ -363,11 +363,16 @@ export default defineComponent({
         const auth = packet.data as PacketAuth;
         if (auth.userUuid) {
           userUuid.value = auth.userUuid;
-          const channelUuid = auth.channelUuid;
           fetchChannels().then(() => {
             setChannelUuid(
-              channelUuid == "" ? channels.value[0].uuid : channelUuid,
-              false
+              router.currentRoute.value.params.channelUuid &&
+                channels.value.find(
+                  (channel) =>
+                    channel.uuid ===
+                    router.currentRoute.value.params.channelUuid
+                ) !== undefined
+                ? router.currentRoute.value.params.channelUuid.toString()
+                : auth.channelUuid || channels.value[0].uuid
             );
             fetchUsers().then(() => {
               loading.value = false;

@@ -6,6 +6,7 @@ import Main from "../views/Main.vue";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    alias: ["/channels", "/channels/:channelUuid"],
     name: "Main",
     component: Main,
   },

@@ -21,7 +21,6 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .loading {
-  position: absolute;
   width: 100%;
   height: 100%;
   display: flex;
